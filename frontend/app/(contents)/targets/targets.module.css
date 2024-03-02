@@ -1,0 +1,12 @@
+/* responsive table size */
+@media screen and (min-width: 1440px) {
+    .dataTable {
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+    .dataTable {
+        width: 80%;
+    }
+}

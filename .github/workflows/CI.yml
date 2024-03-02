@@ -1,0 +1,170 @@
+name: Full Stack Integration
+run-name: ${{ github.actor }} is testing out Django and Next.js
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    continue-on-error: true
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: tom
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run
+        env:
+          DATABASE_URL: postgresql://admin:password@localhost:5432/tom
+          DATABASE_PORT: 5432
+          DATABASE: tom
+          USER: admin
+          PASSWORD: password
+        run: |
+          cd backend
+          python manage.py test
+
+  frontend:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "21"
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
+
+  summary_send:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [backend, frontend]
+    steps:
+      - name: Set Result Emojis
+        run: |
+          echo "FRONTEND_EMOJI=${{ needs.frontend.result == 'success' && ':white_check_mark:' || ':x:' }}" >> $GITHUB_ENV
+          echo "BACKEND_EMOJI=${{ needs.backend.result == 'success' && ':white_check_mark:' || ':x:' }}" >> $GITHUB_ENV
+      - name: Format commit message
+        run: |
+          COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+
+      - name: Post to Slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          channel-id: "${{ secrets.TOM_DEV_SLACK_CHANNEL }}"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":writing_hand: Commit ${{github.sha}}"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "${{ env.FORMATTED_COMMIT_MESSAGE }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":hand: Author",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ github.event.head_commit.author.name }} <${{ github.event.head_commit.author.email }}>"
+                  }
+                },
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":page_facing_up: Summary",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "- Frontend: ${{ env.FRONTEND_EMOJI }} ${{ needs.frontend.result }} \n- Backend: ${{ env.BACKEND_EMOJI }} ${{ needs.backend.result }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":rocket: Deploy",
+                        "emoji": true
+                      },
+                      "value": "click_me_123",
+                      "action_id": "actionId-0"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

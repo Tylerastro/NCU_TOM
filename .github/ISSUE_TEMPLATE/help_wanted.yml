@@ -1,0 +1,37 @@
+name: Help Wanted
+description: Request for assistance or collaboration
+labels:
+  - help wanted
+  - feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Please read the following information carefully before submitting your request.
+        - Please provide as much information as possible to help us understand and address your request.
+        - Help wanted is not limit to developing new features but also supporting existing features.
+        - If you're seeking help, you may always add help wanted tag to your issue.
+  - type: input
+    id: task-title
+    attributes:
+      label: Task Title
+      description: Provide a brief and descriptive title for the task.
+      placeholder: "e.g., Implement feature X"
+    validations:
+      required: true
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: Describe the task in detail, including any specific requirements or skills needed.
+      placeholder: "e.g., We need to implement feature X using Y..."
+    validations:
+      required: true
+  - type: textarea
+    id: skills-required
+    attributes:
+      label: Skills Required
+      description: List any specific skills or experience required for this task.
+      placeholder: "e.g., Python, Django, JavaScript..."
+    validations:
+      required: true

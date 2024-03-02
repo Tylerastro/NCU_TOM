@@ -1,0 +1,26 @@
+name: Question
+description: Ask a question or seek clarification
+labels:
+  - questions
+  - help wanted
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Please make sure to provide as much information as possible to help us understand and address your question.
+  - type: textarea
+    id: question
+    attributes:
+      label: What is your question?
+      description: Please provide a detailed description of your question or issue.
+      placeholder: "e.g., How do I..."
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Provide any additional context or information that might be helpful.
+      placeholder: "e.g., I'm using version X of..."
+    validations:
+      required: false

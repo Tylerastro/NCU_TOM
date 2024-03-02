@@ -1,0 +1,54 @@
+name: 🐞 Bug Report
+labels:
+  - bug
+description: Tell us about something that's not working the way we (probably) intend.
+body:
+  - type: checkboxes
+    id: awareness
+    attributes:
+      label: Check prerequisites
+      description: Make sure you have the following pre-requisites
+      options:
+        - label: You've checked the issues histroy
+          required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where did you find the bug?
+      options:
+        - Official (https://tom.astro.ncu.edu.tw)
+        - Self-hosted/Localhost
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      description: How to reproduce the bug?
+      placeholder: |-
+        1. foo
+        2. bar
+        3. baz
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Result
+      description: Do you see any log from browser log, terminal? If any screenshots?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Please provide the commit sha so we can reproduce the bug.
+    validations:
+      required: false

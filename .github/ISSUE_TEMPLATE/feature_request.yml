@@ -1,0 +1,30 @@
+name: 💡 Feature request
+description: Request a new feature.
+labels:
+  - feature
+body:
+  - type: textarea
+    attributes:
+      label: Feature description
+      description: Describe a feature you want to be added and why.
+      placeholder: Tell us about the feature!🤩
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Feature details
+      description: Describe details of the feature.
+      placeholder: How do you use this feature? How does it work?
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Any example?
+      description: Link to the example or documentation.
+      placeholder: https://example.com
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Provide additional information if the command differs between platforms.
