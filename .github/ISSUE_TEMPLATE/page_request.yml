@@ -1,0 +1,31 @@
+name: 📜 Page request
+description: Request a new page.
+labels:
+  - feature
+  - page
+body:
+  - type: textarea
+    attributes:
+      label: Page description
+      description: Describe a page you want to be added and why.
+      placeholder: Tell us about the page!🤩
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Page details
+      description: Describe details of the page.
+      placeholder: How do you use this page? How does it work?
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Any example?
+      description: Link to the example or documentation.
+      placeholder: https://example.com
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Provide additional information if the command differs between platforms.
