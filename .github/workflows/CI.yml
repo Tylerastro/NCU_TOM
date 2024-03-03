@@ -3,9 +3,12 @@ run-name: ${{ github.actor }} is testing out Django and Next.js
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - dev
   pull_request:
-    branches: [main]
+    branches:
+      - dev
 
 jobs:
   backend:
