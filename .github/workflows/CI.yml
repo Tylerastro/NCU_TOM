@@ -108,6 +108,16 @@ jobs:
                   "type": "divider"
                 },
                 {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":pencil2: branch ${{github.ref_name}}"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
                   "type": "section",
                   "fields": [
                     {
