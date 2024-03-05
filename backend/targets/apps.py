@@ -6,4 +6,4 @@ class TargetsConfig(AppConfig):
     name = 'targets'
 
     def ready(self):
-        pass
+        import targets.signals  # noqa: F401
