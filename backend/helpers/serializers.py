@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Comments, Tags, Users
+from .models import Announcements, Comments, Tags, Users
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,3 +46,11 @@ class CommentsGetSerializer(serializers.ModelSerializer):
             data['updated_at'] = instance.updated_at.strftime(
                 "%Y-%m-%d %H:%M:%S")
         return data
+
+
+class AnnouncementsSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Announcements
+        fields = '__all__'

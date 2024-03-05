@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/gh/Tylerastro/NCU_TOM/graph/badge.svg?token=HRARMN5RJZ)](https://codecov.io/gh/Tylerastro/NCU_TOM)
 ![Codecov](https://img.shields.io/codecov/c/github/Tylerastro/NCU_TOM)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Tylerastro/NCU_TOM/CI.yml)
+![Server](https://img.shields.io/website?url=https%3A%2F%2Ftom.astro.ncu.edu.tw)
+
 
 
 

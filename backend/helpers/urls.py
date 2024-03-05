@@ -1,9 +1,9 @@
 from django.urls import path, re_path
 from rest_framework import routers
 
-from .views import (LogoutView, TagsDetailView, TagsView, TomProviderAuthView,
-                    TomTokenObtainPairView, TomTokenRefreshView,
-                    TomTokenVerifyView)
+from .views import (AnnouncementsView, LogoutView, TagsDetailView, TagsView,
+                    TomProviderAuthView, TomTokenObtainPairView,
+                    TomTokenRefreshView, TomTokenVerifyView)
 
 router = routers.DefaultRouter()
 
@@ -19,5 +19,6 @@ urlpatterns = [
     path("jwt/verify/", TomTokenVerifyView.as_view()),
     path("logout/", LogoutView.as_view(), name="Logout"),
     path("tags/", TagsView.as_view(), name="tags"),
+    path("announcements/", AnnouncementsView.as_view(), name="announcements"),
     path("tags/<int:pk>/", TagsDetailView.as_view(),),
 ]

@@ -9,8 +9,9 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
-from .models import Tags
-from .serializers import TagsGetSerializer, TagsSerializer
+from .models import Announcements, Tags
+from .serializers import (AnnouncementsSerializer, TagsGetSerializer,
+                          TagsSerializer)
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -103,3 +104,11 @@ class TagsDetailView(APIView):
             return Response(serializer.data)
         except Tags.DoesNotExist:
             return Response({"detail": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AnnouncementsView(APIView):
+
+    def get(self, request) -> List[Announcements]:
+        announcements = Announcements.objects.all()
+        serializer = AnnouncementsSerializer(announcements, many=True)
+        return Response(serializer.data, status=200)
