@@ -1,7 +1,6 @@
 
 from urllib.parse import quote
 
-import numpy as np
 from astropy.table import Table
 from targets.models import Target
 

@@ -1,10 +1,8 @@
-import datetime
 
 from django.test import TestCase
-from django.utils import timezone
 from helpers.models import Tags, Users
 from rest_framework import status
-from rest_framework.test import (APIClient, APIRequestFactory,
+from rest_framework.test import (APIRequestFactory,
                                  force_authenticate)
 
 from .models import Target

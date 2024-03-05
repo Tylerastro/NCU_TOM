@@ -1,30 +1,22 @@
-import json
 from typing import List
 
-import pandas as pd
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView
-from helpers.models import Comments, Users
+from helpers.models import Comments
 from observations.lulin import LulinScheduler
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from targets.serializers import AltAzDataSerializer, TargetAltAzSerializer
 from targets.views import GetTargetsAltAz
 from targets.visibility import TargetAltAz
 
-from .models import Lulin, Observation, Target
+from .models import Lulin, Observation
 from .serializers import (LulinGetSerializer, LulinPutSerializer,
                           ObservationGetSerializer, ObservationPostSerializer,
-                          ObservationPutSerializer, TargetGetSerializer)
+                          ObservationPutSerializer)
 
 
 class ObservationsView(APIView):

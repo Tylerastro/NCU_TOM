@@ -1,7 +1,6 @@
 from typing import List
 
 from django.conf import settings
-from django.shortcuts import render
 from djoser.social.views import ProviderAuthView
 from rest_framework import status
 from rest_framework.response import Response

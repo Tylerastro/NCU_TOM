@@ -1,6 +1,5 @@
 from typing import Any, Dict, List
 
-import astropy.units as u
 import numpy as np
 from astroquery.simbad import Simbad
 

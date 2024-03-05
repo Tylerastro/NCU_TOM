@@ -1,5 +1,5 @@
 import json
-from typing import List, Union
+from typing import List
 
 import pandas as pd
 from astropy.time import Time
@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
-from .serializers import (AltAzDataSerializer, TargetAltAzSerializer,
+from .serializers import (TargetAltAzSerializer,
                           TargetGetSerializer, TargetPostSerializer,
                           TargetSEDSerializer, TargetSimbadDataSerializer)
 from .simbad import SimbadService

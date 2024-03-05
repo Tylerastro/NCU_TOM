@@ -1,9 +1,7 @@
-from typing import Optional, Tuple
 
 from django.conf import settings
 from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import Token
 
 
 class TomJWTAuthentication(JWTAuthentication):
@@ -20,5 +18,5 @@ class TomJWTAuthentication(JWTAuthentication):
                 return None
             validated_token = self.get_validated_token(raw_token)
             return self.get_user(validated_token), validated_token
-        except:
+        except Exception:
             return None

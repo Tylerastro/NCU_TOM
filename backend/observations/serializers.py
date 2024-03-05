@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db import transaction
 from helpers.models import Tags
 from helpers.serializers import (CommentsGetSerializer, TagsSerializer,

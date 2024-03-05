@@ -1,9 +1,7 @@
 import uuid
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.utils.deconstruct import deconstructible
-from helpers.models import Comments, Tags
+from helpers.models import Comments
 from targets.models import Target
 
 

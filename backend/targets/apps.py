@@ -6,4 +6,4 @@ class TargetsConfig(AppConfig):
     name = 'targets'
 
     def ready(self):
-        import targets.signals
+        pass

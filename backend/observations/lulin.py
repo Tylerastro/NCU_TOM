@@ -1,9 +1,8 @@
 
-from typing import List, Optional
+from typing import List
 
 import astropy.units as u
-import numpy as np
-from astropy.coordinates import AltAz, Angle, EarthLocation, SkyCoord, get_body
+from astropy.coordinates import Angle
 from astropy.time import Time
 from observations.models import Lulin
 from targets.models import Target
