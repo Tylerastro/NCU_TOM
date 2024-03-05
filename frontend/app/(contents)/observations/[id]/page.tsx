@@ -40,7 +40,13 @@ export default function Page({ params }: { params: { id: number } }) {
       case 0:
         return <Info observation={observation} />;
       case 1:
-        return <div>Loading...</div>;
+        const queryParams = new URLSearchParams({
+          observatory: observation.observatory,
+          start_date: observation.start_date,
+          end_date: observation.end_date,
+          id: observation.id.toString(),
+        }).toString();
+        router.push(`/observations/complete-your-submission?${queryParams}`);
       case 2:
         return <div>Loading...</div>;
       default:

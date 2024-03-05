@@ -46,6 +46,17 @@ export default function CodeBlock({
     }
   };
 
+  const resetCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    getLulinCode(observation_id, true)
+      .then((data) => {
+        setCodeBlock(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const rows = codeBlock ? countLines(codeBlock) + 2 : 1;
 
   return (
@@ -66,10 +77,11 @@ export default function CodeBlock({
         </div>
         <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
           <button
+            onClick={resetCodeBlock}
             type="submit"
             className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-[#b538c366] duration-300 transition ease-in-out"
           >
-            Save scripts
+            Reset Script
           </button>
           <button
             onClick={handleSubmit}

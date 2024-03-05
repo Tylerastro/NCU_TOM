@@ -100,10 +100,14 @@ class CodeView(APIView):
         except Observation.DoesNotExist:
             return Response({"detail": "Observation not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        code = service.gen_code(observation_id=id)
-        lulin.code = code
-        lulin.save()
-        return HttpResponse(code, content_type='text/plain')
+        refresh = request.query_params.get('refresh')
+        print(refresh)
+        print(lulin.code)
+        if refresh == 'true' or not lulin.code:
+            code = service.gen_code(observation_id=id)
+            return HttpResponse(code, content_type='text/plain')
+        else:
+            return HttpResponse(lulin.code, content_type='text/plain')
 
 
 @api_view(['POST'])

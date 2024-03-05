@@ -143,15 +143,16 @@ export async function putLulin(
   }
 }
 
-export async function getLulinCode(id: number) {
+export async function getLulinCode(id: number, refresh: boolean = false) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/code/`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
+    const url = new URL(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/code/`
     );
+    url.searchParams.append("refresh", refresh ? "true" : "false");
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      credentials: "include",
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

@@ -106,10 +106,6 @@ export default function Lulin(props: {
     };
   }
 
-  React.useEffect(() => {
-    console.log(targetAltAz);
-  }, [targetAltAz]);
-
   const [lulinObservations, setLulinObservations] = React.useState<
     LulinObservations[]
   >([]);

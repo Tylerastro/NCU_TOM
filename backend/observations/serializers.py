@@ -1,5 +1,5 @@
 from django.db import transaction
-from helpers.models import Tags
+from helpers.models import Comments, Tags
 from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
                                  UserSerializer)
 from rest_framework import serializers
@@ -91,6 +91,21 @@ class ObservationPutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Observation
         fields = "__all__"
+
+    def update(self, instance, validated_data):
+        if 'status' in validated_data and validated_data['status'] != instance.status:
+            status = instance.statuses(validated_data['status']).label
+            comment = Comments.objects.create(
+                context=f"Observation {instance.name} is now {status}.",
+                user=self.context['request'].user
+            )
+            instance.comments.add(comment)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            instance.save()
+
+        return instance
 
 
 class LulinGetSerializer(serializers.ModelSerializer):
