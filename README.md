@@ -3,6 +3,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Tylerastro/NCU_TOM)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/tylerastro/NCU_TOM)
 [![codecov](https://codecov.io/gh/Tylerastro/NCU_TOM/graph/badge.svg?token=HRARMN5RJZ)](https://codecov.io/gh/Tylerastro/NCU_TOM)
+![Codecov](https://img.shields.io/codecov/c/github/Tylerastro/NCU_TOM)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Tylerastro/NCU_TOM/CI.yml)
 
 
