@@ -30,7 +30,7 @@ export default function Info(props: Props) {
           setIsLoading(false);
         });
     }
-  }, [props.target?.id]);
+  }, [props.target?.id, props.target]);
 
   if (isLoading) {
     return <div>Loading...</div>;

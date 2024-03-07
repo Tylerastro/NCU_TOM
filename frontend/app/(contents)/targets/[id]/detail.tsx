@@ -1,6 +1,4 @@
 import { Target, TargetSimbad } from "@/models/targets";
-import Aladin from "./aladin";
-import Simbad from "./simbad";
 import { getTargetSimbad } from "@/apis/targets";
 import * as React from "react";
 import Divider from "@mui/material/Divider";
@@ -18,7 +16,7 @@ export default function Detail(props: Props) {
         setTargetSimbad(targetSimbad);
       });
     }
-  }, [props.target?.id]);
+  }, [props.target?.id, props.target]);
 
   return (
     <div>

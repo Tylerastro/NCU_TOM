@@ -50,10 +50,6 @@ export default function LulinData(
   const [exposure, setExposure] = React.useState<number | "">(
     props.exposure_time || ""
   );
-  const [startTime, setStartTime] = React.useState<string>(
-    props.start_date || ""
-  );
-  const [endTime, setEndTime] = React.useState<string>(props.end_date || "");
   const [formData, setFormData] = React.useState<LulinObservations>(props);
   const [updateLulin, setUpdateLulin] = React.useState(false);
 

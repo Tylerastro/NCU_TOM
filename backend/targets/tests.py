@@ -2,8 +2,8 @@
 from django.test import TestCase
 from helpers.models import Tags, Users
 from rest_framework import status
-from rest_framework.test import (APIRequestFactory,
-                                 force_authenticate)
+from rest_framework.test import APIRequestFactory, force_authenticate
+from targets.signals import DEFAULT_TARGETS
 
 from .models import Target
 from .views import TargetsView
@@ -44,7 +44,8 @@ class TargetModelTest(TestCase):
 
 
 class TargetApiTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(self):
         Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
                              title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
 
@@ -59,6 +60,14 @@ class TargetApiTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
+
+    def test_get_specific_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get('/api/targets/?target_id=-2')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_target(self):
         view = TargetsView.as_view()

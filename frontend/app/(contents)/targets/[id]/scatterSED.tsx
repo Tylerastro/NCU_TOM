@@ -49,7 +49,7 @@ const ScatterSED = ({ id }: ScatterSEDProps) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (targetSED) {
