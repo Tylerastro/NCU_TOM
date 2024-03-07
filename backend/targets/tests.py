@@ -61,9 +61,31 @@ class TargetApiTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
-    def test_get_specific_target(self):
+    def test_get_negative_id_target(self):
         view = TargetsView.as_view()
         request = self.factory.get('/api/targets/?target_id=-2')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_own_id_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get('/api/targets/')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+        target_id = response.data[0]['id']
+
+        view = TargetsView.as_view()
+        request = self.factory.get(f'/api/targets/?target_id={target_id}')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_other_id_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get(f'/api/targets/?target_id=99999')
         force_authenticate(request, user=self.user)
         response = view(request)
 
@@ -88,3 +110,46 @@ class TargetApiTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 11)
+
+    def test_invalid_ra_post_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.post('/api/targets/', data={
+            'name': 'testtarget',
+            'ra': 361,
+            'dec': 78.90
+        })
+        force_authenticate(request, user=self.user)
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        request = self.factory.post('/api/targets/', data={
+            'name': 'testtarget',
+            'ra': -0.01,
+            'dec': 78.90
+        })
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_dec_post_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.post('/api/targets/', data={
+            'name': 'testtarget',
+            'ra': 123.456,
+            'dec': 90.01
+        })
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        request = self.factory.post('/api/targets/', data={
+            'name': 'testtarget',
+            'ra': 123.456,
+            'dec': -90.01
+        })
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

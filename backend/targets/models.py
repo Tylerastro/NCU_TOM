@@ -1,5 +1,6 @@
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -7,8 +8,10 @@ class Target(models.Model):
     user = models.ForeignKey('helpers.Users',
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    ra = models.FloatField(null=False)
-    dec = models.FloatField(null=False)
+    ra = models.FloatField(null=False, validators=[
+                           MinValueValidator(0), MaxValueValidator(360)])
+    dec = models.FloatField(null=False, validators=[
+                            MinValueValidator(-90), MaxValueValidator(90)])
     redshift = models.FloatField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
