@@ -7,7 +7,7 @@ export interface Observation {
   name: string;
   observatory: string;
   priority: number;
-  status?: number;
+  status: number;
   start_date: string;
   end_date: string;
   created_at?: Date;

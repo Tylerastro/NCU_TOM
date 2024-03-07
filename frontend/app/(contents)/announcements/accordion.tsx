@@ -20,9 +20,9 @@ export default function BasicAccordion() {
         <AccordionDetails>
           <Typography>
             Thank you for tesing the server at the early-stage. If you encounter
-            any issues, or have any suggestions. please contact{" "}
-            <a href="https://mail.google.com/mail/?view=cm&source=mailto&to=hantanglin70036440@gamil.com">
-              @Tylerastro
+            any issues, or have any suggestions. please refer to{" "}
+            <a href="https://github.com/Tylerastro/NCU_TOM/issues">
+              issues page
             </a>{" "}
             without hesitations. Every opinion is important to us.
           </Typography>

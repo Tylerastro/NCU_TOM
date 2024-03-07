@@ -23,10 +23,9 @@ export default function Page({ params }: { params: { id: number } }) {
   React.useEffect(() => {
     getObservations(params.id)
       .then((data) => {
-        setObservation(data);
+        setObservation(data[0]);
       })
       .catch((error) => {
-        console.log(error);
         router.push("/observations");
       });
   }, [params.id, router]);

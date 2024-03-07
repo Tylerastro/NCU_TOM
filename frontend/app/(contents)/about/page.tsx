@@ -33,18 +33,13 @@ export default function page() {
               If you encounter any problem with the site, please report it to
               us.
               <br />
-              Direct contact:
-              <a href="https://mail.google.com/mail/?view=cm&source=mailto&to=hantanglin70036440@gamil.com">
-                @Tylerastro
+              <a href="https://github.com/Tylerastro/NCU_TOM/issues">
+                Issues page
               </a>
             </p>
             <p className="font-light text-gray-500 sm:text-xl dark:text-gray-400">
-              {`Currently we are not accepting PRs, you'd like to join our team in
-              the early stage, please also contact`}{" "}
-              <a href="https://mail.google.com/mail/?view=cm&source=mailto&to=hantanglin70036440@gamil.com">
-                @Tylerastro
-              </a>{" "}
-              directly.
+              {`We welcom you to submit PRs to the project:`}{" "}
+              <a href="https://github.com/Tylerastro/NCU_TOM">@NCU_TOM</a>{" "}
             </p>
           </div>
           <div className="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

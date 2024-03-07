@@ -146,7 +146,7 @@ export async function putLulin(
 export async function getLulinCode(id: number, refresh: boolean = false) {
   try {
     const url = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/code/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/lulin/${id}/code/`
     );
     url.searchParams.append("refresh", refresh ? "true" : "false");
     const response = await fetch(url.toString(), {
@@ -170,7 +170,7 @@ export async function getObservationAltAz(
 ) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/altaz/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/lulin/${id}/altaz/`,
       {
         method: "POST",
         body: JSON.stringify({ start_time: start_time, end_time: end_time }),

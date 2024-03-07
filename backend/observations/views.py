@@ -1,9 +1,10 @@
 from typing import List
 
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from helpers.models import Comments
+from helpers.models import Comments, Users
 from observations.lulin import LulinScheduler
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -23,16 +24,28 @@ class ObservationsView(APIView):
     serializer_class = ObservationGetSerializer
 
     def get(self, request):
+        conditions = []
         observation_id = request.query_params.get('observation_id')
+        observatory = request.query_params.get('observatory')
         if observation_id:
-            observation = get_object_or_404(
-                Observation, id=observation_id, user=request.user)
-            serializer = ObservationGetSerializer(observation)
-            return Response(serializer.data, status=200)
+            conditions.append(Q(id=observation_id))
+        if observatory:
+            conditions.append(Q(observatory=observatory))
+
+        combined_conditions = Q()
+        for condition in conditions:
+            combined_conditions &= condition
+
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observations = Observation.objects.filter(
+                combined_conditions
+            )
         else:
-            observaiotns = Observation.objects.filter(user=request.user)
-            serializer = ObservationGetSerializer(observaiotns, many=True)
-            return Response(serializer.data, status=200)
+            observations = Observation.objects.filter(
+                Q(user=request.user) & combined_conditions
+            )
+        serializer = ObservationGetSerializer(observations, many=True)
+        return Response(serializer.data, status=200)
 
     def post(self, request):
         serializer = ObservationPostSerializer(
@@ -75,8 +88,12 @@ class LulinView(APIView):
     serializer_class = LulinGetSerializer
 
     def get(self, request, pk):
-        observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
-            'observation', 'observation__user')
+        if pk:
+            observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
+                'observation', 'observation__user')
+        else:
+            observations = Lulin.objects.filter(observation__user=request.user).select_related(
+                'observation')
 
         serializer = LulinGetSerializer(observations, many=True)
         return Response(serializer.data, status=200)
