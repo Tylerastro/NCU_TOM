@@ -3,6 +3,10 @@ from django.contrib.auth.models import (AbstractUser, BaseUserManager,
 from django.db import models
 
 
+class Observatories(models.IntegerChoices):
+    LULIN = 1
+
+
 class Tags(models.Model):
     user = models.ForeignKey('helpers.Users',
                              on_delete=models.CASCADE)
