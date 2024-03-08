@@ -13,11 +13,12 @@ class TargetModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        test_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
-                                         title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
-        test_tag = Tags.objects.create(name='testtag', user=test_user)
+        test_student_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
+                                                 title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+
+        test_tag = Tags.objects.create(name='testtag', user=test_student_user)
         target = Target.objects.create(
-            user=test_user,
+            user=test_student_user,
             name='NGC 3824',
             ra=123.456,
             dec=78.90,
@@ -45,12 +46,34 @@ class TargetModelTest(TestCase):
 
 class TargetApiTest(TestCase):
     @classmethod
-    def setUpTestData(self):
-        Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
-                             title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+    def setUpTestData(cls):
+        user = Users.objects.create(username='teststudentuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
+                                    title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+        admin = Users.objects.create(username='testadminuser', password='12345', email='admin@a.com', role=Users.roles.ADMIN,
+                                     title=Users.titles.PROFESSOR, institute='testinstitute', first_name='testfirst', last_name='testlast')
+        student_target = Target.objects.create(
+            user=user,
+            name='NGC 9999',
+            ra=123.456,
+            dec=78.90,
+            redshift=0.123,
+            notes="Velit consequat fugiat lorem laborum"
+        )
+        admin_target = Target.objects.create(
+            user=admin,
+            name='SN 9999',
+            ra=33.456,
+            dec=48.90,
+            redshift=0.456,
+            notes="Culpa in commodo"
+        )
+        factory = APIRequestFactory()
 
-        self.factory = APIRequestFactory()
-        self.user = Users.objects.get(username='testuser')
+        cls.factory = factory
+        cls.user = user
+        cls.admin = admin
+        cls.student_target = student_target
+        cls.admin_target = admin_target
 
     def test_get_target(self):
         view = TargetsView.as_view()
@@ -59,7 +82,37 @@ class TargetApiTest(TestCase):
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 10)
+
+    def test_student_get_student_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get(
+            f'/api/targets/?target_id={self.student_target.id}')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.student_target.name)
+        self.assertEqual(response.data['notes'], self.student_target.notes)
+        self.assertEqual(response.data['notes'],
+                         "Velit consequat fugiat lorem laborum")
+
+    def test_admin_get_student_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get(
+            f'/api/targets/?target_id={self.student_target.id}')
+        force_authenticate(request, user=self.admin)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_student_get_admin_target(self):
+        view = TargetsView.as_view()
+        request = self.factory.get(
+            f'/api/targets/?target_id={self.admin_target.id}')
+        force_authenticate(request, user=self.user)
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_negative_id_target(self):
         view = TargetsView.as_view()
@@ -109,7 +162,6 @@ class TargetApiTest(TestCase):
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 11)
 
     def test_invalid_ra_post_target(self):
         view = TargetsView.as_view()

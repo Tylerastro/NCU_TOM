@@ -29,6 +29,6 @@ DEFAULT_TARGETS = [
 
 @receiver(post_save, sender=Users)
 def create_user_default_targets(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.use_demo_targets:
         for target_data in DEFAULT_TARGETS:
             Target.objects.create(user=instance, **target_data)

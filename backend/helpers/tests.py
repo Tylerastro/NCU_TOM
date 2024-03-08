@@ -5,11 +5,113 @@ from django.test import TestCase
 from .models import Announcements, Comments, Tags, Users
 
 
+class UsersModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        admin = {
+            'username': 'admin',
+            'password': 'password',
+            'email': 'admin@ncu.edu.com',
+            'role': Users.roles.ADMIN,
+            'title': Users.titles.MS,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin',
+            'use_demo_targets': True,
+            'is_superuser': True
+        }
+        faculty = {
+            'username': 'faculty',
+            'password': 'password',
+            'email': 'faculty@ncu.edu.com',
+            'role': Users.roles.FACULTY,
+            'title': Users.titles.MS,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin'
+        }
+        professor = {
+            'username': 'professor',
+            'password': 'password',
+            'email': 'professor@ncu.edu.com',
+            'role': Users.roles.PROFESSOR,
+            'title': Users.titles.MS,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin'
+        }
+        student = {
+            'username': 'student',
+            'password': 'password',
+            'email': 'student@ncu.edu.com',
+            'role': Users.roles.STUDENT,
+            'title': Users.titles.MS,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin'
+        }
+        cls.admin = Users.objects.create(**admin)
+        cls.faculty = Users.objects.create(**faculty)
+        cls.professor = Users.objects.create(**professor)
+        cls.student = Users.objects.create(**student)
+
+    def test_existed_admin(self):
+        admin = Users.objects.get(username='admin')
+        self.assertEqual(admin.username, 'admin')
+        self.assertEqual(admin.email, 'admin@ncu.edu.com')
+        self.assertEqual(admin.role, Users.roles.ADMIN)
+        self.assertEqual(admin.title, Users.titles.MS)
+        self.assertEqual(admin.institute, 'NCU')
+        self.assertTrue(admin.is_superuser)
+        self.assertTrue(admin.use_demo_targets)
+
+    def test_existed_faculty(self):
+        faculty = Users.objects.get(username='faculty')
+        self.assertEqual(faculty.username, 'faculty')
+        self.assertEqual(faculty.email, 'faculty@ncu.edu.com')
+        self.assertEqual(faculty.role, Users.roles.FACULTY)
+        self.assertEqual(faculty.title, Users.titles.MS)
+        self.assertEqual(faculty.institute, 'NCU')
+        self.assertFalse(faculty.is_superuser)
+
+    def test_user_create(self):
+        user = Users.objects.create(
+            username='testuser',
+            password='12345',
+            email='a@a.com',
+            role=Users.roles.STUDENT,
+            title=Users.titles.MS,
+            institute='testinstitute',
+            first_name='testfirst',
+            last_name='testlast')
+        self.assertEqual(user.username, 'testuser')
+        self.assertEqual(user.email, 'a@a.com')
+        self.assertEqual(user.role, Users.roles.STUDENT)
+        self.assertEqual(user.title, Users.titles.MS)
+        self.assertEqual(user.institute, 'testinstitute')
+        self.assertEqual(user.first_name, 'testfirst')
+        self.assertEqual(user.last_name, 'testlast')
+
+        user = Users.objects.get(email='a@a.com')
+        self.assertEqual(user.username, 'testuser')
+        self.assertEqual(user.email, 'a@a.com')
+        self.assertEqual(user.role, Users.roles.STUDENT)
+        self.assertEqual(user.title, Users.titles.MS)
+        self.assertEqual(user.institute, 'testinstitute')
+        self.assertEqual(user.first_name, 'testfirst')
+        self.assertEqual(user.last_name, 'testlast')
+
+    def test_username_field(self):
+        user = Users.objects.get(username='admin')
+        user.username = ''  # setting an invalid (blank) username
+        with self.assertRaises(ValidationError):
+            user.full_clean()  # This should raise a ValidationError
+
+
 class TagsModelTest(TestCase):
     @classmethod
-    def setUpTestData(self):
-        # Set up non-modified objects used by all test methods
-        self.user = Users.objects.create(
+    def setUpTestData(cls):
+        user = Users.objects.create(
             username='admin',
             password='password',
             email='tom@ncu.edu.com',
@@ -18,7 +120,9 @@ class TagsModelTest(TestCase):
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
-        Tags.objects.create(user=self.user, name='Test Tag')
+        Tags.objects.create(user=user, name='Test Tag')
+
+        cls.user = user
 
     def test_tag_create(self):
         tag = Tags.objects.create(user=self.user, name='Test Tag A')
@@ -85,71 +189,10 @@ class CommentsModelTest(TestCase):
         self.assertIsNotNone(comment.created_at)
 
 
-class UsersModelTest(TestCase):
-    @classmethod
-    def setUpTestData(self):
-        Users.objects.create(
-            username='admin',
-            password='password',
-            email='tom@ncu.edu.com',
-            role=Users.roles.ADMIN,
-            title=Users.titles.MS,
-            is_superuser=True,
-            institute='NCU',
-            first_name='Tyler',
-            last_name='Lin')
-
-    def test_user_creation(self):
-        user = Users.objects.get(username='admin')
-        self.assertEqual(user.username, 'admin')
-        self.assertEqual(user.password, 'password')
-        self.assertEqual(user.email, 'tom@ncu.edu.com')
-        self.assertEqual(user.role, Users.roles.ADMIN)
-        self.assertEqual(user.title, Users.titles.MS)
-        self.assertEqual(user.institute, 'NCU')
-        self.assertEqual(user.first_name, 'Tyler')
-        self.assertEqual(user.last_name, 'Lin')
-        self.assertTrue(user.is_superuser)
-        self.assertTrue(user.is_active)
-
-    def test_user_create(self):
-        user = Users.objects.create(
-            username='testuser',
-            password='12345',
-            email='a@a.com',
-            role=Users.roles.STUDENT,
-            title=Users.titles.MS,
-            institute='testinstitute',
-            first_name='testfirst',
-            last_name='testlast')
-        self.assertEqual(user.username, 'testuser')
-        self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.STUDENT)
-        self.assertEqual(user.title, Users.titles.MS)
-        self.assertEqual(user.institute, 'testinstitute')
-        self.assertEqual(user.first_name, 'testfirst')
-        self.assertEqual(user.last_name, 'testlast')
-
-        user = Users.objects.get(email='a@a.com')
-        self.assertEqual(user.username, 'testuser')
-        self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.STUDENT)
-        self.assertEqual(user.title, Users.titles.MS)
-        self.assertEqual(user.institute, 'testinstitute')
-        self.assertEqual(user.first_name, 'testfirst')
-        self.assertEqual(user.last_name, 'testlast')
-
-    def test_username_field(self):
-        user = Users.objects.get(username='admin')
-        user.username = ''  # setting an invalid (blank) username
-        with self.assertRaises(ValidationError):
-            user.full_clean()  # This should raise a ValidationError
-
-
 class AnnouncementsModelTest(TestCase):
     @classmethod
-    def setUpTestData(self):
-        self.user = Users.objects.create(
+    def setUpTestData(cls):
+        cls.user = Users.objects.create(
             username='admin',
             password='password',
             email='tom@ncu.edu.com',
@@ -159,7 +202,7 @@ class AnnouncementsModelTest(TestCase):
             first_name='Tyler',
             last_name='Lin')
         Announcements.objects.create(
-            user=self.user,
+            user=cls.user,
             title='Test title',
             context='Id velit ea occaecat occaecat',
             type=Announcements.types.INFO

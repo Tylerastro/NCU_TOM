@@ -6,6 +6,7 @@ from astropy.time import Time
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from helpers.models import Comments, Users
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,9 +14,9 @@ from rest_framework.views import APIView
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
-from .serializers import (TargetAltAzSerializer,
-                          TargetGetSerializer, TargetPostSerializer,
-                          TargetSEDSerializer, TargetSimbadDataSerializer)
+from .serializers import (TargetAltAzSerializer, TargetGetSerializer,
+                          TargetPostSerializer, TargetSEDSerializer,
+                          TargetSimbadDataSerializer)
 from .simbad import SimbadService
 from .vizier import SedData, VizierService
 
@@ -26,14 +27,18 @@ class TargetsView(APIView):
     def get(self, request):
         target_id = request.query_params.get('target_id')
 
+        is_admin_or_faculty = request.user.role in (
+            Users.roles.ADMIN, Users.roles.FACULTY)
         if target_id:
-            target = get_object_or_404(Target, id=target_id, user=request.user)
+            target_filter = {} if is_admin_or_faculty else {'user': request.user}
+            target = get_object_or_404(Target, id=target_id, **target_filter)
             serializer = TargetGetSerializer(target)
-            return Response(serializer.data, status=200)
         else:
-            targets = Target.objects.filter(user=request.user)
-            serializer = TargetGetSerializer(targets, many=True)
-            return Response(serializer.data, status=200)
+            targets_filter = Target.objects.all(
+            ) if is_admin_or_faculty else Target.objects.filter(user=request.user)
+            serializer = TargetGetSerializer(targets_filter, many=True)
+
+        return Response(serializer.data, status=200)
 
     def post(self, request):
         serializer = TargetPostSerializer(
@@ -47,7 +52,7 @@ class TargetsView(APIView):
         if pk is None:
             return Response(status=400)
 
-        target = get_object_or_404(Target, pk=pk)
+        target = get_object_or_404(Target, pk=pk, user=request.user)
         serializer = TargetPostSerializer(
             target, data=request.data, partial=True)
         if serializer.is_valid():

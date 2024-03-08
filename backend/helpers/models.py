@@ -82,6 +82,7 @@ class Users(AbstractUser, PermissionsMixin):
     role = models.IntegerField(choices=roles.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
+    use_demo_targets = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 

@@ -16,7 +16,7 @@ class Target(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('helpers.Tags', related_name='targets')
-    notes = models.TextField(null=True, blank=True)
+    notes = models.TextField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
