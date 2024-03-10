@@ -1,9 +1,9 @@
 
 from django.test import TestCase
-from helpers.models import Tags, Users
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
-from targets.signals import DEFAULT_TARGETS
+
+from helpers.models import Tags, Users
 
 from .models import Target
 from .views import TargetsView
@@ -138,7 +138,7 @@ class TargetApiTest(TestCase):
 
     def test_get_other_id_target(self):
         view = TargetsView.as_view()
-        request = self.factory.get(f'/api/targets/?target_id=99999')
+        request = self.factory.get('/api/targets/?target_id=99999')
         force_authenticate(request, user=self.user)
         response = view(request)
 

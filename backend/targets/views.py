@@ -6,11 +6,12 @@ from astropy.time import Time
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from helpers.models import Comments, Users
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from helpers.models import Users
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target

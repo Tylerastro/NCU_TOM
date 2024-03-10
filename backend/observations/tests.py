@@ -2,10 +2,8 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-from helpers.models import Tags, Users
-from rest_framework import status
-from rest_framework.test import (APIClient, APIRequestFactory,
-                                 force_authenticate)
+
+from helpers.models import Users
 from targets.models import Target
 
 from .models import Observation
@@ -17,7 +15,6 @@ class ObservationModelTest(TestCase):
     def setUpTestData(cls):
         test_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
                                          title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
-        test_tag = Tags.objects.create(name='testtag', user=test_user)
         test_target = Target.objects.create(
             user=test_user,
             name='NGC 3824',
