@@ -2,6 +2,10 @@
 import { deleteBulkTarget, deleteTarget, fetchTargets } from "@/apis/targets";
 import TagSelection from "@/components/Tags";
 import { Tag } from "@/models/helpers";
+import {
+  useLogoutMutation,
+  useRetrieveUserQuery,
+} from "@/redux/features/authApiSlice";
 import { Target } from "@/models/targets";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { Box, Button, Container, Typography } from "@mui/material";
@@ -23,6 +27,7 @@ export default function DataTable() {
   const [selectedRows, setSelectedRows] = React.useState<GridRowId[]>([]);
   const [tagsRefreshSignal, setTagsRefreshSignal] = React.useState(false);
 
+  const { data } = useRetrieveUserQuery();
   const handleTagChange = (newTags: Tag[]) => {
     setSelectedTags(newTags);
   };
@@ -162,6 +167,19 @@ export default function DataTable() {
       },
     },
   ];
+
+  if (data && [1, 2].includes(data.role)) {
+    columns.splice(1, 0, {
+      field: "user",
+      headerName: "User",
+      width: 150,
+      renderCell: (params) => (
+        <Link href={`/users/${params.row.user.id}`}>
+          {params.value.username}
+        </Link>
+      ),
+    });
+  }
 
   return (
     <>
