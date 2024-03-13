@@ -55,7 +55,7 @@ class Observation(models.Model):
             old_observation = Observation.objects.get(pk=self.pk)
             if old_observation.status == old_observation.statuses.PREP:
                 comment = Comments.objects.create(
-                    context=f"Observation {self.name} is now pending.",
+                    context=f"Observation {self.name} is now Pending.",
                 )
                 self.comments.add(comment)
 

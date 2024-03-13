@@ -6,12 +6,11 @@ from astropy.time import Time
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from helpers.models import Users
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from helpers.models import Users
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
@@ -65,10 +64,16 @@ class TargetsView(APIView):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def BulkTargetCreation(request):
+    def handle_uploads(file):
+        file_extension = file.name.split('.')[-1]
+        if file_extension == 'csv':
+            return pd.read_csv(file)
+        else:
+            return HttpResponse("Invalid file type", status=400)
     if request.method == 'POST':
         try:
             uploaded_file = request.FILES['file']
-            df = pd.read_csv(uploaded_file)
+            df = handle_uploads(uploaded_file)
             targets = []
             for _, row in df.iterrows():
                 try:
@@ -95,20 +100,15 @@ def BulkTargetCreation(request):
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
-def DeleteTarget(request, pk):
-    if request.method == 'POST':
-        try:
-            target = Target.objects.get(id=pk)
-            if target.user != request.user:
-                return JsonResponse({'error': 'Unauthorized'}, status=401)
-            target.delete()
-            return JsonResponse({'message': 'Target deleted successfully'})
-        except Target.DoesNotExist:
-            return JsonResponse({'error': 'Target not found'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': f'Error deleting target: {str(e)}'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
+def DeleteTarget(request, target_id):
+    try:
+        target = Target.objects.get(id=target_id, user=request.user)
+        target.delete()
+        return JsonResponse({'message': 'Target deleted successfully'})
+    except Target.DoesNotExist:
+        return JsonResponse({'error': 'Target not found'}, status=404)
+    except Exception:
+        return JsonResponse({'error': 'Error deleting target'}, status=500)
 
 
 @csrf_exempt

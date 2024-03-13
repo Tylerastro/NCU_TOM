@@ -27,10 +27,14 @@ class ObservationsView(APIView):
         conditions = []
         observation_id = request.query_params.get('observation_id')
         observatory = request.query_params.get('observatory')
+        status = request.query_params.get('status')
+
         if observation_id:
             conditions.append(Q(id=observation_id))
         if observatory:
             conditions.append(Q(observatory=observatory))
+        if status:
+            conditions.append(Q(status=status))
 
         combined_conditions = Q()
         for condition in conditions:

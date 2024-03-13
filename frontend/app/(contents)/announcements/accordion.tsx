@@ -10,6 +10,23 @@ export default function BasicAccordion() {
       <Accordion defaultExpanded>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel2a-content"
+          id="panel2a-header"
+        >
+          <Typography variant="h6" color={"primary"}>
+            The current status
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            We are about to implement functions related to real observaitons and
+            data products. Thus we may restric user's role to non-admin users.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
