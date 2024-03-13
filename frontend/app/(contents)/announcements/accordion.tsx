@@ -20,7 +20,8 @@ export default function BasicAccordion() {
         <AccordionDetails>
           <Typography>
             We are about to implement functions related to real observaitons and
-            data products. Thus we may restric user's role to non-admin users.
+            data products. Thus we may restric user{`'`}s role to non-admin
+            users.
           </Typography>
         </AccordionDetails>
       </Accordion>
