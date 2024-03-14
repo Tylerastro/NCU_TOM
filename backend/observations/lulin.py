@@ -84,14 +84,14 @@ class LulinScheduler:
                     exposure += str(obs.exposure_time) + ","
 
             tmp = f"""
-            #REPEAT 1
-            #BINNING {binning} 
-            #COUNT {frames}
-            #INTERVAL {exposure}
-            #FILTER {filters}
+#REPEAT 1
+#BINNING {binning} 
+#COUNT {frames}
+#INTERVAL {exposure}
+#FILTER {filters}
 
-            {obs.target.name} {self.degrees_to_hour_angle(obs.target.ra)} {self.degrees_to_hour_angle(obs.target.dec)}
-            #WAITFOR 1
+{obs.target.name}    {self.degrees_to_hour_angle(obs.target.ra)}    {self.degrees_to_hour_angle(obs.target.dec)}
+#WAITFOR 1
             """
 
             code += tmp
