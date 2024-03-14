@@ -177,8 +177,9 @@ const LulinTable: React.FC<ObservationTableProps> = ({
   observations,
   itemsPerPage,
 }) => {
+  const targets = observations.map((observation) => observation.targets).flat();
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = Math.ceil(observations.length / itemsPerPage);
+  const totalPages = Math.ceil(targets.length / itemsPerPage);
 
   const handlePreviousClick = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -194,7 +195,7 @@ const LulinTable: React.FC<ObservationTableProps> = ({
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = observations.slice(startIndex, endIndex);
+  const currentItems = targets.slice(startIndex, endIndex);
 
   const paginationNumbers = Array.from(
     { length: totalPages },
@@ -239,48 +240,46 @@ const LulinTable: React.FC<ObservationTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((observation) =>
-            observation.targets?.map((target) => (
-              <tr
-                key={target.id}
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+          {currentItems.map((target) => (
+            <tr
+              key={target?.id}
+              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              <td className="w-4 p-4">
+                <div className="flex items-center">
+                  <input
+                    id="checkbox-table-1"
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label htmlFor="checkbox-table-1" className="sr-only">
+                    checkbox
+                  </label>
+                </div>
+              </td>
+              <th
+                scope="row"
+                className="px-2 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                <td className="w-4 p-4">
-                  <div className="flex items-center">
-                    <input
-                      id="checkbox-table-1"
-                      type="checkbox"
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <label htmlFor="checkbox-table-1" className="sr-only">
-                      checkbox
-                    </label>
-                  </div>
-                </td>
-                <th
-                  scope="row"
-                  className="px-2 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                  {target.id}
-                </th>
-                <td className="px-6 py-4">
-                  {" "}
-                  <Link href={`/target/${target.id}`}>{target.name}</Link>
-                </td>
-                <td className="px-6 py-4">{target.ra}</td>
-                <td className="px-6 py-4">{target.dec}</td>
-                <td className="px-6 py-4">{target.redshift}</td>
-                <td className="px-6 py-4">{target.coordinates}</td>
-              </tr>
-            ))
-          )}
+                {target?.id}
+              </th>
+              <td className="px-6 py-4">
+                {" "}
+                <Link href={`/target/${target?.id}`}>{target?.name}</Link>
+              </td>
+              <td className="px-6 py-4">{target?.ra}</td>
+              <td className="px-6 py-4">{target?.dec}</td>
+              <td className="px-6 py-4">{target?.redshift}</td>
+              <td className="px-6 py-4">{target?.coordinates}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <nav className="flex items-center justify-between pt-4">
         <span className="text-sm font-normal text-gray-500">
           Showing {(currentPage - 1) * itemsPerPage + 1}-
-          {Math.min(currentPage * itemsPerPage, observations.length)} of{" "}
-          {observations.length}
+          {Math.min(currentPage * itemsPerPage, targets.length)} of{" "}
+          {targets.length}
         </span>
         <ul className="inline-flex -space-x-px text-sm h-8">
           <li>

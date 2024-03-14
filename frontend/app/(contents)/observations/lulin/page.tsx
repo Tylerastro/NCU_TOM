@@ -27,6 +27,7 @@ export default function LulinStaffView() {
         maxWidth={false}
         sx={{
           width: "100%",
+          height: "100px",
           display: "flex",
           justifyContent: "space-between",
           paddingBottom: 2,
