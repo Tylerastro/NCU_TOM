@@ -49,7 +49,7 @@ AUTH_COOKIE_MAX_AGE = 60 * 60 * 24
 AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "True") == "True"
 AUTH_COOKIE_HTTPONLY = True
 AUTH_COOKIE_PATH = "/"
-AUTH_COOKE_SAMESITE = 'strict'
+AUTH_COOKIE_SAMESITE = os.getenv("AUTH_COOKIE_SAMESITE", "strict")
 
 # Application definition
 INSTALLED_APPS = [
