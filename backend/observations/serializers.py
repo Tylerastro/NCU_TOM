@@ -93,7 +93,7 @@ class ObservationPutSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def update(self, instance, validated_data):
-        if 'status' in validated_data and validated_data['status'] != instance.status:
+        if 'status' in validated_data and validated_data['status'] != instance.status and instance.user != self.context['request'].user:
             status = instance.statuses(validated_data['status']).label
             comment = Comments.objects.create(
                 context=f"Observation {instance.name} is now {status}.",
