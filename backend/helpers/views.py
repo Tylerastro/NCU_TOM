@@ -23,10 +23,10 @@ class TomProviderAuthView(ProviderAuthView):
 
             response.set_cookie('access', access_token, max_age=settings.AUTH_COOKIE_MAX_AGE,
                                 path=settings.AUTH_COOKIE_PATH, secure=settings.AUTH_COOKIE_SECURE,
-                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKE_SAMESITE)
+                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKIE_SAMESITE)
             response.set_cookie('refresh', refresh_token, max_age=settings.AUTH_COOKIE_MAX_AGE,
                                 path=settings.AUTH_COOKIE_PATH, secure=settings.AUTH_COOKIE_SECURE,
-                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKE_SAMESITE)
+                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKIE_SAMESITE)
 
         return response
 
@@ -40,10 +40,10 @@ class TomTokenObtainPairView(TokenObtainPairView):
 
             response.set_cookie('access', access_token, max_age=settings.AUTH_COOKIE_MAX_AGE,
                                 path=settings.AUTH_COOKIE_PATH, secure=settings.AUTH_COOKIE_SECURE,
-                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKE_SAMESITE)
+                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKIE_SAMESITE)
             response.set_cookie('refresh', refresh_token, max_age=settings.AUTH_COOKIE_MAX_AGE,
                                 path=settings.AUTH_COOKIE_PATH, secure=settings.AUTH_COOKIE_SECURE,
-                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKE_SAMESITE)
+                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKIE_SAMESITE)
 
         return response
 
@@ -64,7 +64,7 @@ class TomTokenRefreshView(TokenRefreshView):
 
             response.set_cookie('access', access_token, max_age=settings.AUTH_COOKIE_MAX_AGE,
                                 path=settings.AUTH_COOKIE_PATH, secure=settings.AUTH_COOKIE_SECURE,
-                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKE_SAMESITE)
+                                httponly=settings.AUTH_COOKIE_HTTPONLY, samesite=settings.AUTH_COOKIE_SAMESITE)
 
         return response
 

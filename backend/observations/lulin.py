@@ -1,10 +1,11 @@
 
+from datetime import datetime
 from typing import List
 
 import astropy.units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
-from observations.models import Lulin
+from observations.models import Lulin, Observation
 from targets.models import Target
 from targets.visibility import Visibility
 
@@ -35,11 +36,18 @@ class LulinScheduler:
         return mapping[filter]
 
     @staticmethod
-    def degrees_to_hour_angle(degrees: float):
+    def convert_ra(degrees: float) -> str:
         angle_in_degrees = Angle(degrees, u.deg)
-        hour_angle = angle_in_degrees.to_string(unit=u.hour, sep=':')
+        right_ascension = angle_in_degrees.to_string(unit=u.hour, sep=':')
 
-        return hour_angle
+        return right_ascension
+
+    @staticmethod
+    def convert_dec(degrees: float) -> str:
+        angle_in_degrees = Angle(degrees, u.deg)
+        declination = angle_in_degrees.to_string(unit=u.degree, sep=':')
+
+        return declination
 
     def schedule(self, targets: List[Target], start_time: Time, end_time: Time):
         sorted_targets: List[Target] = sorted(
@@ -90,10 +98,24 @@ class LulinScheduler:
 #INTERVAL {exposure}
 #FILTER {filters}
 
-{obs.target.name}    {self.degrees_to_hour_angle(obs.target.ra)}    {self.degrees_to_hour_angle(obs.target.dec)}
+{obs.target.name}    {self.convert_ra(obs.target.ra)}    {self.convert_dec(obs.target.dec)}
 #WAITFOR 1
             """
 
             code += tmp
 
         return code
+
+    def get_codes(self, start_date: datetime, end_date: datetime):
+
+        observations = Observation.objects.filter(
+            start_date__gte=start_date,
+            end_date__lte=end_date
+        )
+
+        tmp = ""
+
+        for obs in observations:
+            tmp += obs.code
+
+        return tmp

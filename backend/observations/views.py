@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from django.db.models import Q
@@ -91,13 +92,34 @@ def DeleteObservation(request, pk):
 class LulinView(APIView):
     serializer_class = LulinGetSerializer
 
-    def get(self, request, pk):
-        if pk:
-            observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
-                'observation', 'observation__user')
+    def get(self, request, pk=None):
+        conditions = []
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        if start_date:
+            conditions.append(Q(observation__start_date__gte=start_date))
+        if end_date:
+            conditions.append(Q(observation__end_date__lte=end_date))
+
+        combined_conditions = Q()
+        for condition in conditions:
+            combined_conditions &= condition
+
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observations = Lulin.objects.filter(
+                combined_conditions
+            )
+            if pk:
+                observations = observations.filter(observation__id=pk).select_related(
+                    'observation')
         else:
-            observations = Lulin.objects.filter(observation__user=request.user).select_related(
-                'observation')
+            observations = Lulin.objects.filter(
+                Q(observation__user=request.user) & combined_conditions
+            )
+            if pk:
+                observations = observations.filter(observation__id=pk).select_related(
+                    'observation', 'observation__user')
 
         serializer = LulinGetSerializer(observations, many=True)
         return Response(serializer.data, status=200)
@@ -116,8 +138,12 @@ class LulinView(APIView):
 class CodeView(APIView):
     def get(self, request, id):
         service = LulinScheduler()
+
         try:
-            lulin = Observation.objects.get(id=id, user=request.user)
+            if request.user in (Users.roles.ADMIN, Users.roles.FACULTY):
+                lulin = Observation.objects.get(id=id)
+            else:
+                lulin = Observation.objects.get(id=id, user=request.user)
         except Observation.DoesNotExist:
             return Response({"detail": "Observation not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -127,6 +153,26 @@ class CodeView(APIView):
             return HttpResponse(code, content_type='text/plain')
         else:
             return HttpResponse(lulin.code, content_type='text/plain')
+
+
+@api_view(['POST'])
+def GetCodes(request):
+    if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+        return Response({"detail": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    service = LulinScheduler()
+    start_date = request.data['start_date']
+    end_date = request.data['end_date']
+    if all([not start_date, not end_date]):
+        return Response({"detail": "start_date and end_date are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    if end_date:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+    return HttpResponse(service.get_codes(
+        start_date, end_date), content_type='text/plain')
 
 
 @api_view(['POST'])
