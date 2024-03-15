@@ -14,10 +14,12 @@ export default function PersonCard(props: PersonalInfo) {
         width={500}
         height={500}
       />
-      <h3 className="mb-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+      <h3 className="mb-1 text-2xl font-bold tracking-tight text-primary-foreground">
         <a href="#">{props.name}</a>
       </h3>
-      <p>{props.title}</p>
+      <p className="bg-accent text-accent-foreground rounded-full px-2 py-1">
+        {props.title}
+      </p>
       <ul className="flex justify-center mt-4 space-x-4">
         {props.site && (
           <li key={props.site}>

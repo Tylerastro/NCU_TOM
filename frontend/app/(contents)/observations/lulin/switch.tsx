@@ -30,7 +30,7 @@ export default function Switch({
     <div className="flex flex-col items-center py-8">
       <Transition
         show={isShowing}
-        enter="transform transition duration-[400ms]"
+        enter="transform transition duration-&lsqb;400ms&rsqb;"
         enterFrom="opacity-0 scale-50"
         enterTo="opacity-100 scale-100"
         leave="transform duration-200 transition ease-in-out"

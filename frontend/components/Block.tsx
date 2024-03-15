@@ -49,12 +49,12 @@ export default function Block(props: {
 
       <div className={`mx-auto max-w-7xl px-6 lg:px-8 ${textAlignClass}`}>
         <h2
-          className={`text-4xl font-bold tracking-tight text-white sm:text-6xl ${textAlignClass}`}
+          className={`text-4xl font-bold tracking-tight text-primary-foreground sm:text-6xl ${textAlignClass}`}
         >
           {props.title}
         </h2>
         {props.context.map((contextItem, index) => (
-          <div key={index}>
+          <div className="text-primary-foreground" key={index}>
             {" "}
             {contextItem}
             <br />
@@ -64,7 +64,7 @@ export default function Block(props: {
           className={`mx-auto mt-10 max-w-full lg:mx-0 lg:max-w-none ${textAlignClass}`}
         >
           <div
-            className={`flex ${justifyContentClass} gap-x-8 gap-y-4 md:gap-x-2 lg:gap-x-4`}
+            className={`flex ${justifyContentClass} text-primary-foreground gap-x-8 gap-y-4 md:gap-x-2 lg:gap-x-4`}
           >
             {links.map((link) => (
               <Link key={link.name} href={link.href}>

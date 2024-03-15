@@ -175,7 +175,9 @@ export default function DataTable() {
           paddingBottom: 2,
         }}
       >
-        <Typography variant="h4">Observations</Typography>
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+          Observations
+        </h1>
         <FormDialog />
       </Container>
       <Container

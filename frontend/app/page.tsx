@@ -1,6 +1,5 @@
 import Block from "@/components/Block";
 import { Box } from "@mui/material";
-import Typography from "@mui/material/Typography";
 import Image from "next/image";
 import styles from "./page.module.css";
 
@@ -39,30 +38,12 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <Typography
-            sx={{ textAlign: "center", height: "960px" }}
-            variant="h1"
-            className="flex justify-center items-center h-screen font-Pacifico"
+          <h1
+            style={{ textAlign: "center", height: "960px" }}
+            className=" flex items-center scroll-m-20  font-extrabold tracking-tight lg:text-9xl font-Pacifico text-primary-foreground"
           >
             NCU TOM
-          </Typography>
-          {/* <div style={{ height: "400px" }}></div> */}
-          {/* <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "136px",
-              padding: "16px",
-            }}
-          >
-            <IntroCard
-              title="Targets"
-              context="Easily create your observation"
-              price=""
-            />
-            <IntroCard title="Observations" context="" price="" />
-            <IntroCard title="DataProducts" context="" price="" />
-          </Box> */}
+          </h1>
         </Box>
       </div>
       <Block

@@ -191,7 +191,9 @@ export default function DataTable() {
           paddingBottom: 2,
         }}
       >
-        <Typography variant="h4">Targets</Typography>
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+          Targets
+        </h1>
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 5 }}>
           <Button
             variant="outlined"
