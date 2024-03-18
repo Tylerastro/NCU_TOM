@@ -1,5 +1,5 @@
 import Background from "@/components/Background";
-import Nav from "@/components/Navbar";
+import { ResponsiveAppBar, NavBar } from "@/components/Navbar";
 import Setup from "@/components/setup";
 import theme from "@/components/themes";
 import Provider from "@/redux/provider";
@@ -24,7 +24,7 @@ export default function RootLayout({
           <main>
             <Provider>
               <Setup />
-              <Nav />
+              <NavBar />
               <Background />
               {children}
             </Provider>

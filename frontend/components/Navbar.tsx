@@ -2,7 +2,6 @@
 import AuthTooltip from "@/components/AuthNavBarTooltip";
 import UnAuthTooltip from "@/components/UnauthNavBarTooltip";
 import { useAppSelector } from "@/redux/hook";
-import AdbIcon from "@mui/icons-material/Adb";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -14,6 +13,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
+import { Button as UiButton } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import * as React from "react";
 
@@ -133,7 +134,6 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Link
@@ -166,4 +166,39 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
-export default ResponsiveAppBar;
+
+function NavBar() {
+  const { isAuthenticated }: { isAuthenticated: boolean } = useAppSelector(
+    (state) => state.auth
+  );
+
+  return (
+    <div className=" w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around bg-primary">
+      <div>
+        <h2 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl text-primary-foreground">
+          <a href="/">NCU TOM</a>
+        </h2>
+      </div>
+      <div>
+        <nav className="flex">
+          {pages.map((page) => (
+            <Link
+              className={
+                buttonVariants({ variant: "link" }) +
+                " text-2xl lg:text-xl text-primary-foreground"
+              }
+              key={page.name}
+              href={page.enabled ? page.link : "#"}
+              passHref
+            >
+              {page.name}
+            </Link>
+          ))}
+        </nav>
+      </div>
+      <div>{isAuthenticated ? <AuthTooltip /> : <UnAuthTooltip />}</div>
+    </div>
+  );
+}
+
+export { ResponsiveAppBar, NavBar };
