@@ -1,139 +1,135 @@
 "use client";
-import Spinner from "@/components/Spinner";
 import { useLoginMutation } from "@/redux/features/authApiSlice";
 import { login as setAuth } from "@/redux/features/authSlice";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import Container from "@mui/material/Container";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function SignIn() {
   const [login, { isLoading }] = useLoginMutation();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    login(formData)
-      .unwrap()
-      .then(() => {
-        dispatch(setAuth());
-        toast.success("Logged in successfully");
-        router.push("/");
-      })
-      .catch((error) => {
-        toast.error("Invalid username or password");
-      });
-  };
-
-  const [formData, setFormData] = React.useState({
-    username: "",
-    password: "",
+  const formSchema = z.object({
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+    password: z.string(),
   });
 
-  const { username, password } = formData;
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
-  const theme = useTheme();
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    console.log(values);
+  }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+    <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="gray"
+          className="mx-auto h-16 w-auto"
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            NCU TOM
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+          />
+        </svg>
+
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-foreground">
+          Sign in to your account
+        </h2>
+      </div>
+
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 items-center justify-center align-center"
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              onChange={onChange}
-              id="username"
-              label="Username"
+            <FormField
+              control={form.control}
               name="username"
-              autoComplete="username"
-              autoFocus
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Username
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="username" {...field} />
+                  </FormControl>
+                  {/* <FormDescription> */}
+                  {/* This is your public display name. */}
+                  {/* </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              onChange={onChange}
+            <FormField
+              control={form.control}
               name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Password
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              disabled={isLoading}
-              variant="outlined"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              {isLoading ? <Spinner /> : "Sign in"}
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/auth/register" variant="body2">
-                  {"Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs sx={{ backgroundColor: "red", color: "white" }}>
-                Note: Database is frequently reset at this stage. If you cannot
-                log in, please sign up again.
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+            <div className="text-center w-full">
+              <Button
+                className="w-full text-primary-foreground bg-primary"
+                type="submit"
+              >
+                Submit
+              </Button>
+            </div>
+          </form>
+        </Form>
+        <p className="mt-10 text-center text-sm text-primary-foreground">
+          Not a member?{" "}
+          <a
+            href="/auth/register"
+            className="font-semibold leading-6 text-primary-foreground hover:text-popover-foreground"
+          >
+            Sign up here!
+          </a>
+        </p>
+      </div>
+    </div>
   );
 }

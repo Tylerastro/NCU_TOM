@@ -1,14 +1,12 @@
-import Button from "@mui/material/Button";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function UnAuthTooltip() {
   return (
     <>
-      <Link href="/auth/signin" passHref>
-        <Button variant="contained" sx={{ textTransform: "capitalize" }}>
-          Login
-        </Button>
-      </Link>
+      <Button asChild variant="secondary">
+        <Link href="/auth/signin">Login</Link>
+      </Button>
     </>
   );
 }
