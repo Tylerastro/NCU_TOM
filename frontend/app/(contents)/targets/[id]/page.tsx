@@ -23,7 +23,7 @@ export default function Page({ params }: { params: { id: number } }) {
   React.useEffect(() => {
     fetchTargets(params.id)
       .then((data) => {
-        setTarget(data);
+        setTarget(data[0]);
       })
       .catch((error) => {
         console.log(error);

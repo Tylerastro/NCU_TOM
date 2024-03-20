@@ -1,9 +1,10 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
-import { Tag } from "./helpers";
+import { Tag, User } from "./helpers";
 import { Observation } from "./observations";
 export interface Target {
   id?: number;
   name: string;
+  user?: User;
   ra: number;
   dec: number;
   coordinates?: string;

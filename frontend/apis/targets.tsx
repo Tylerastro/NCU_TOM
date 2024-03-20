@@ -1,6 +1,6 @@
 import { Target } from "../models/targets";
 
-export async function fetchTargets(targetId?: number) {
+export async function fetchTargets(targetId?: number): Promise<Target[]> {
   try {
     let url = `${process.env.NEXT_PUBLIC_API_URL}/api/targets/`;
 
@@ -18,12 +18,13 @@ export async function fetchTargets(targetId?: number) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      return [];
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }
