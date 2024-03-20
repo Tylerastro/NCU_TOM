@@ -2,6 +2,7 @@
 import UnAuthTooltip from "@/components/UnauthNavBarTooltip";
 import { useAppSelector } from "@/redux/hook";
 import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { AuthTooltip } from "@/components/AuthNavBarTooltip";
 import Link from "next/link";
 import * as React from "react";
@@ -49,17 +50,14 @@ function NavBar() {
       <div>
         <nav className="flex">
           {pages.map((page) => (
-            <Link
-              className={
-                buttonVariants({ variant: "link" }) +
-                " text-2xl lg:text-xl text-primary-foreground"
-              }
+            <Button
+              disabled={!page.enabled}
+              className="text-2xl lg:text-xl text-primary-foreground"
+              variant={"link"}
               key={page.name}
-              href={page.enabled ? page.link : "#"}
-              passHref
             >
-              {page.name}
-            </Link>
+              <Link href={page.enabled ? page.link : "#"}>{page.name}</Link>
+            </Button>
           ))}
         </nav>
       </div>

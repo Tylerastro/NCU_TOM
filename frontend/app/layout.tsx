@@ -1,5 +1,5 @@
 import Background from "@/components/Background";
-import { ResponsiveAppBar, NavBar } from "@/components/Navbar";
+import { NavBar } from "@/components/Navbar";
 import Setup from "@/components/setup";
 import theme from "@/components/themes";
 import Provider from "@/redux/provider";

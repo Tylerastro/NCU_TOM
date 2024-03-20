@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -26,6 +26,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@reduxjs/toolkit": "^2.0.1",
+    "@tanstack/react-table": "^8.14.0",
     "async-mutex": "^0.4.0",
     "axios": "^1.6.2",
     "chart.js": "^4.4.1",
