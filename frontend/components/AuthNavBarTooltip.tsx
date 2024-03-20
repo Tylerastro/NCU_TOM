@@ -13,26 +13,29 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
-export default function AuthTooltip() {
-  const settings = [
-    { name: "Dashboard", url: "/dashboard", disabled: true },
-    { name: "Settings", url: "/settings", disabled: true },
-    { name: "Logout", url: "/", disabled: false },
-  ];
+const settings = [
+  { name: "Dashboard", url: "/dashboard", disabled: true },
+  { name: "Settings", url: "/settings", disabled: true },
+];
 
+import { Button as ButtonUI } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export function AuthTooltip() {
   const { data } = useRetrieveUserQuery();
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
-
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [logout] = useLogoutMutation();
@@ -46,51 +49,29 @@ export default function AuthTooltip() {
         router.push("/");
       });
   };
-
   return (
-    <>
-      <Tooltip title="Open settings">
-        <Button
-          onClick={handleOpenUserMenu}
-          variant="contained"
-          sx={{ textTransform: "capitalize" }}
-        >
-          Hi, {data?.username}
-        </Button>
-      </Tooltip>
-      <Menu
-        sx={{ mt: "45px" }}
-        id="menu-appbar"
-        anchorEl={anchorElUser}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        open={Boolean(anchorElUser)}
-        onClose={handleCloseUserMenu}
-      >
-        {settings.map((setting) => (
-          <MenuItem
-            disabled={setting.disabled}
-            key={setting.name}
-            onClick={() => {
-              handleCloseUserMenu();
-              if (setting.name === "Logout") {
-                handleLogout();
-              }
-            }}
-          >
-            <Link href={setting.url} passHref>
-              <Typography textAlign="center">{setting.name}</Typography>
-            </Link>
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <ButtonUI variant="outline">Hi, {data?.username}</ButtonUI>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          {settings.map((setting) => (
+            <DropdownMenuItem key={setting.name} disabled={setting.disabled}>
+              <Link href={setting.url} passHref>
+                {setting.name}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => handleLogout()}>
+          {" "}
+          Log Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

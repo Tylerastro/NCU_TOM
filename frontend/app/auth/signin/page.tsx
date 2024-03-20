@@ -43,9 +43,17 @@ export default function SignIn() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    login(values)
+      .unwrap()
+      .then(() => {
+        dispatch(setAuth());
+        toast.success("Logged in successfully");
+        router.push("/");
+      })
+      .catch((error) => {
+        toast.error("Invalid username or password");
+        toast.error(error.data.message);
+      });
   }
 
   return (
@@ -86,7 +94,11 @@ export default function SignIn() {
                     Username
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} />
+                    <Input
+                      className="text-primary-foreground"
+                      placeholder="username"
+                      {...field}
+                    />
                   </FormControl>
                   {/* <FormDescription> */}
                   {/* This is your public display name. */}
@@ -104,7 +116,12 @@ export default function SignIn() {
                     Password
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="password" {...field} />
+                    <Input
+                      className="text-primary-foreground"
+                      type="password"
+                      placeholder="password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
