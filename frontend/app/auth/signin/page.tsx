@@ -1,9 +1,8 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import { useLoginMutation } from "@/redux/features/authApiSlice";
 import { login as setAuth } from "@/redux/features/authSlice";
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import * as React from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -15,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -63,7 +61,7 @@ export default function SignIn() {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke-width="1.5"
+          strokeWidth="1.5"
           stroke="gray"
           className="mx-auto h-16 w-auto"
         >

@@ -1,13 +1,6 @@
 "use client";
 
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import * as React from "react";
-import {
   Table,
   TableBody,
   TableCell,
@@ -15,6 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import * as React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -42,7 +42,10 @@ export function DataTable<TData, TValue>({
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className="text-2xl text-primary-foreground sm:h-12 lg:h-20"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -59,6 +62,7 @@ export function DataTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
+                className="text-xl text-primary-foreground sm:h-12 lg:h-20"
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >

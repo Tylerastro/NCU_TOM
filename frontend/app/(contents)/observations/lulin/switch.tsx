@@ -1,8 +1,8 @@
 import { Transition } from "@headlessui/react";
 import { Typography } from "@mui/material";
-import { Fragment, useState } from "react";
-import { useTimeoutFn } from "react-use";
 import * as React from "react";
+import { useState } from "react";
+import { useTimeoutFn } from "react-use";
 
 export default function Switch({
   viewset,
@@ -27,7 +27,7 @@ export default function Switch({
   };
 
   return (
-    <div className="flex flex-col items-center py-8">
+    <div className="flex flex-col items-center py-8 text-primary-foreground">
       <Transition
         show={isShowing}
         enter="transform transition duration-&lsqb;400ms&rsqb;"

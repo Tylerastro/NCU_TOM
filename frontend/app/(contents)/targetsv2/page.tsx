@@ -1,9 +1,11 @@
 "use client";
-import { columns } from "./columns";
-import { Target } from "@/models/targets";
-import { DataTable } from "./dataTable";
 import { fetchTargets } from "@/apis/targets";
+import { Button } from "@/components/ui/button";
+import { Target } from "@/models/targets";
 import * as React from "react";
+import { columns } from "./columns";
+import { NewTargetFrom } from "./createTargets";
+import { DataTable } from "./dataTable";
 
 export default function TargetsTable() {
   const [data, setData] = React.useState<Target[]>([]);
@@ -19,13 +21,28 @@ export default function TargetsTable() {
 
   return (
     <>
-      <div className="flex space-between pb-2">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-          Targets
-        </h1>
+      <div className="flex space-between justify-between pb-2">
+        <div>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+            Targets
+          </h1>
+        </div>
+
+        <div className="flex gap-2">
+          <NewTargetFrom />
+
+          <Button
+            color={"secondary"}
+            size={"lg"}
+            variant={"outline"}
+            className="hover:bg-red-500 hover:border-red-500"
+          >
+            Delete targets
+          </Button>
+        </div>
       </div>
 
-      <div className="container mx-auto py-10">
+      <div className="container  sm:max-w-[825px] lg:max-w-full  py-10">
         <DataTable columns={columns} data={data} />
       </div>
     </>
