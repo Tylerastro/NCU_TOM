@@ -87,5 +87,13 @@ export const columns: ColumnDef<Target>[] = [
         </Link>
       ));
     },
+    filterFn: (row, id, value) => {
+      const tags: Tag[] = row.original.tags;
+      return value.some((filter: string) =>
+        tags.some((tag) =>
+          tag.name.toLowerCase().includes(filter.toLowerCase())
+        )
+      );
+    },
   },
 ];

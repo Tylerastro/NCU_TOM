@@ -11,11 +11,17 @@ import {
 import {
   ColumnDef,
   flexRender,
+  ColumnFiltersState,
+  getFilteredRowModel,
   getPaginationRowModel,
   getCoreRowModel,
+  getFacetedUniqueValues,
+  VisibilityState,
+  getFacetedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
+import { DataTableToolbar } from "./tooltip";
 import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
@@ -28,17 +34,31 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const table = useReactTable({
     data,
     columns,
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     getPaginationRowModel: getPaginationRowModel(),
-    state: { rowSelection },
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    state: { rowSelection, columnFilters, columnVisibility },
   });
 
   return (
     <div>
+      <div className="pb-4">
+        <DataTableToolbar table={table} />
+      </div>
       <div className="rounded-md border ">
         <Table>
           <TableHeader>
