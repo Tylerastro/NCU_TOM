@@ -15,7 +15,7 @@ class TagsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tags
-        fields = ('name', 'targets', 'observations')
+        fields = ('id', 'name', 'targets', 'observations')
 
     def get_targets(self, tag):
         return [target.id for target in tag.targets.all()]
