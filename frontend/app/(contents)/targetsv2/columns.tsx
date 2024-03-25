@@ -2,8 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Target } from "@/models/targets";
-import { User } from "@/models/helpers";
+import { Tag, User } from "@/models/helpers";
 import { Checkbox } from "@/components/ui/checkbox";
+import { badgeVariants } from "@/components/ui/badge";
+import Link from "next/link";
 
 export const columns: ColumnDef<Target>[] = [
   {
@@ -71,13 +73,19 @@ export const columns: ColumnDef<Target>[] = [
     },
   },
   {
-    accessorKey: "created_at",
-    header: "Created At",
+    accessorKey: "tags",
+    header: "tags",
     cell(props) {
-      const created_at: number = props.row.getValue("created_at");
-      return (
-        <div className="text-primary-foreground font-medium">{created_at}</div>
-      );
+      const tags: Tag[] = props.row.getValue("tags");
+      return tags.map((tag) => (
+        <Link
+          key={tag.id}
+          href={`/targetsv2/tags/${tag.id}`}
+          className={badgeVariants({ variant: "badge" })}
+        >
+          {tag.name}
+        </Link>
+      ));
     },
   },
 ];

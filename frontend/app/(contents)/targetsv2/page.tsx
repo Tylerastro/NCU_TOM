@@ -42,7 +42,7 @@ export default function TargetsTable() {
         </div>
       </div>
 
-      <div className="container  sm:max-w-[825px] lg:max-w-full  py-10">
+      <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
         <DataTable columns={columns} data={data} />
       </div>
     </>
