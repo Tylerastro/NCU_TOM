@@ -1,8 +1,7 @@
-import * as React from "react";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { Column } from "@tanstack/react-table";
+import * as React from "react";
 
-import { cn } from "@/components/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,13 +19,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/components/utils";
+import { Tag } from "@/models/helpers";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
   options: {
     label: string;
-    value: string;
+    value: Tag;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
 }
@@ -38,12 +39,26 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
+  const [occurrences, setOccurrences] = React.useState<Map<number, number>>(
+    new Map()
+  );
 
   React.useEffect(() => {
-    console.log(facets);
-    console.log(selectedValues);
-  }, [facets, selectedValues]);
-
+    if (facets) {
+      const counts = new Map<number, number>();
+      facets.forEach((value, key: Tag[]) => {
+        if (Array.isArray(key)) {
+          key.forEach((element: Tag) => {
+            if (element.id !== undefined) {
+              const count = counts.get(element.id) ?? 0;
+              counts.set(element.id, count + 1);
+            }
+          });
+        }
+      });
+      setOccurrences(counts);
+    }
+  }, [facets]);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -69,11 +84,11 @@ export function DataTableFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value))
+                    .filter((option) => selectedValues.has(option.value.name))
                     .map((option) => (
                       <Badge
                         variant="secondary"
-                        key={option.value}
+                        key={option.value.id}
                         className="rounded-sm px-1 font-normal"
                       >
                         {option.label}
@@ -92,18 +107,19 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected: boolean = selectedValues.has(option.value);
+                const isSelected: boolean = selectedValues.has(
+                  option.value.name
+                );
                 return (
                   <CommandItem
-                    key={option.value}
+                    key={option.value.id}
                     onSelect={() => {
                       if (isSelected) {
-                        selectedValues.delete(option.value);
+                        selectedValues.delete(option.value.name);
                       } else {
-                        selectedValues.add(option.value);
+                        selectedValues.add(option.value.name);
                       }
                       const filterValues = Array.from(selectedValues);
-                      console.log(filterValues, filterValues.length);
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
                       );
@@ -123,9 +139,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
+                    {occurrences?.get(option.value.id ?? 0) && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
+                        {occurrences.get(option.value.id ?? 0)}
                       </span>
                     )}
                   </CommandItem>

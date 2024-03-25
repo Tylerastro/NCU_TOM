@@ -7,20 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./viewOptions";
 
-import { DataTableFacetedFilter } from "./dataTableFacetedFilter";
 import { fetchTags } from "@/apis/tags";
 import { Tag } from "@/models/helpers";
+import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import * as React from "react";
-import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CheckCircledIcon,
-  CircleIcon,
-  CrossCircledIcon,
-  QuestionMarkCircledIcon,
-  StopwatchIcon,
-} from "@radix-ui/react-icons";
+import { DataTableFacetedFilter } from "./dataTableFacetedFilter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -28,7 +19,7 @@ interface DataTableToolbarProps<TData> {
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag.name,
+    value: tag,
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -40,7 +31,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<
-    { value: string; label: string; icon: React.ComponentType<any> }[]
+    { value: Tag; label: string; icon: React.ComponentType<any> }[]
   >([]);
 
   React.useEffect(() => {

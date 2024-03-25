@@ -1,10 +1,10 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Target } from "@/models/targets";
-import { Tag, User } from "@/models/helpers";
-import { Checkbox } from "@/components/ui/checkbox";
 import { badgeVariants } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tag, User } from "@/models/helpers";
+import { Target } from "@/models/targets";
+import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
 export const columns: ColumnDef<Target>[] = [
