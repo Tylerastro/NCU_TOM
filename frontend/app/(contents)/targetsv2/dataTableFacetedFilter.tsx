@@ -59,6 +59,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       setOccurrences(counts);
     }
   }, [facets]);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -84,7 +85,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value.name))
+                    .filter((option) => selectedValues.has(option.label))
                     .map((option) => (
                       <Badge
                         variant="secondary"
@@ -107,17 +108,16 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected: boolean = selectedValues.has(
-                  option.value.name
-                );
+                const isSelected: boolean = selectedValues.has(option.label);
                 return (
                   <CommandItem
                     key={option.value.id}
                     onSelect={() => {
+                      console.log("clicked");
                       if (isSelected) {
-                        selectedValues.delete(option.value.name);
+                        selectedValues.delete(option.label);
                       } else {
-                        selectedValues.add(option.value.name);
+                        selectedValues.add(option.label);
                       }
                       const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(
@@ -129,8 +129,8 @@ export function DataTableFacetedFilter<TData, TValue>({
                       className={cn(
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
+                          ? "bg-purple-200 text-primary-foreground"
+                          : "bg-purple-300 text-primary opacity-50 [&_svg]:invisible"
                       )}
                     >
                       <CheckIcon className={cn("h-4 w-4")} />
