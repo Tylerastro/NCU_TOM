@@ -65,22 +65,14 @@ class UserManager(BaseUserManager):
 class Users(AbstractUser, PermissionsMixin):
     objects = UserManager()
 
-    class titles(models.IntegerChoices):
-        PROFESSOR = 1
-        DR = 2
-        MS = 3
-        BS = 4
-
     class roles(models.IntegerChoices):
         ADMIN = 1
         FACULTY = 2
-        PROFESSOR = 3
-        STUDENT = 4
+        USER = 3
 
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    title = models.IntegerField(choices=titles.choices)
     institute = models.CharField(max_length=100)
     email = models.EmailField(unique=True, verbose_name='email address')
     role = models.IntegerField(choices=roles.choices)
@@ -91,8 +83,8 @@ class Users(AbstractUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'role', 'title', 'institute',
-                       'last_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name',
+                       'institute', 'email', 'role', 'use_demo_targets']
 
     def __str__(self):
         return self.username

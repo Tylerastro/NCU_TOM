@@ -6,7 +6,7 @@ from .models import Announcements, Comments, Tags, Users
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ('id', 'username', 'institute', 'title', 'role', 'created_at')
+        fields = ('id', 'username', 'institute', 'role', 'created_at')
 
 
 class TagsSerializer(serializers.ModelSerializer):

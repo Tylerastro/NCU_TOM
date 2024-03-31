@@ -40,6 +40,7 @@ const authApiSlice = apiSlice.injectEndpoints({
         username,
         password,
         re_password,
+        use_demo_targets,
       }) => ({
         url: "/users/",
         method: "POST",
@@ -53,6 +54,7 @@ const authApiSlice = apiSlice.injectEndpoints({
           username,
           password,
           re_password,
+          use_demo_targets,
         },
       }),
     }),

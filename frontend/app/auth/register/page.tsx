@@ -1,260 +1,297 @@
 "use client";
-import Spinner from "@/components/Spinner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { useRegisterMutation } from "@/redux/features/authApiSlice";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
-import InputLabel from "@mui/material/InputLabel";
-import Link from "@mui/material/Link";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { login as setAuth } from "@/redux/features/authSlice";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import * as React from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SignUp() {
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    register(formData)
+  const roleMap = {
+    Admin: 1,
+    Faculty: 2,
+    User: 3,
+  };
+
+  const formSchema = z.object({
+    first_name: z.string(),
+    last_name: z.string(),
+    institute: z.string(),
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+    password: z.string(),
+    re_password: z.string(),
+    email: z.string().email(),
+    use_demo_targets: z.boolean().default(true),
+    role: z
+      .enum(["Admin", "Faculty", "User"])
+      .transform((role) => roleMap[role]),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      institute: "NCU",
+      username: "",
+      password: "",
+      re_password: "",
+      email: "12345@gmail.com",
+      use_demo_targets: true,
+      role: roleMap["User"],
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    register(values)
       .unwrap()
       .then(() => {
-        toast.success("Account created successfully");
-        router.push("/auth/signin");
+        dispatch(setAuth());
+        toast.success("Registered successfully");
+        router.push("/");
       })
       .catch((error) => {
         for (const key in error.data) {
-          toast.error(`${key}: ` + error.data[key][0]);
+          toast.error(`${key}: ${error.data[key][0]}`);
         }
-        toast.error(error.data.message);
       });
-  };
-
-  const theme = useTheme();
-
-  const [formData, setFormData] = React.useState({
-    first_name: "",
-    last_name: "",
-    username: "",
-    email: "",
-    password: "",
-    re_password: "",
-    title: "",
-    institute: "",
-    role: "",
-  });
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const {
-    first_name,
-    last_name,
-    username,
-    email,
-    password,
-    re_password,
-    title,
-    institute,
-    role,
-  } = formData;
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+    <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="gray"
+          className="mx-auto h-16 w-auto"
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+          />
+        </svg>
+
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-foreground">
+          Register an account
+        </h2>
+      </div>
+
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 items-center justify-center align-center"
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  onChange={onChange}
-                  name="first_name"
-                  value={first_name}
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  onChange={onChange}
-                  required
-                  fullWidth
-                  id="last_name"
-                  label="Last Name"
-                  name="last_name"
-                  value={last_name}
-                  autoComplete="family-name"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  onChange={onChange}
-                  name="username"
-                  required
-                  fullWidth
-                  value={username}
-                  id="userName"
-                  label="Username"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="title">Title</InputLabel>
-                  <Select
-                    onChange={handleChange}
-                    fullWidth
-                    labelId="title"
-                    name="title"
-                    id="title"
-                    value={title}
-                    label="title"
-                  >
-                    <MenuItem value={1}>Prof.</MenuItem>
-                    <MenuItem value={2}>Dr.</MenuItem>
-                    <MenuItem value={3}>M.S.</MenuItem>
-                    <MenuItem value={4}>B.S.</MenuItem>
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    First Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      placeholder="first name"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Last name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      placeholder="last name"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Username
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      placeholder="username"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Password
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      type="password"
+                      placeholder="password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="re_password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Re-Password
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      type="password"
+                      placeholder="repassword"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Email
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="text-primary-foreground"
+                      type="email"
+                      placeholder="Email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Role
+                  </FormLabel>
+                  <Select onValueChange={field.onChange}>
+                    <FormControl className="text-primary-foreground">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Admin"> Admin</SelectItem>
+                      <SelectItem value="Faculty">Faculty</SelectItem>
+                      <SelectItem value="User">User</SelectItem>
+                    </SelectContent>
                   </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="role">Role</InputLabel>
-                  <Select
-                    onChange={handleChange}
-                    fullWidth
-                    labelId="role"
-                    name="role"
-                    id="role"
-                    value={role}
-                    label="role"
-                  >
-                    <MenuItem value={1}>Admin</MenuItem>
-                    <MenuItem value={2}>Faculty</MenuItem>
-                    <MenuItem value={3}>Professor</MenuItem>
-                    <MenuItem value={4}>Student</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  onChange={onChange}
-                  label="Email Address"
-                  name="email"
-                  value={email}
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  onChange={onChange}
-                  name="password"
-                  value={password}
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  onChange={onChange}
-                  name="re_password"
-                  value={re_password}
-                  label="Confirm Password"
-                  type="password"
-                  id="re_password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  onChange={onChange}
-                  name="institute"
-                  value={institute}
-                  label="Institute"
-                  type="institute"
-                  id="institute"
-                />
-              </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
-                  }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
-            </Grid>
-            <Button
-              type="submit"
-              color="primary"
-              fullWidth
-              variant="outlined"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              {isLoading ? <Spinner /> : "Sign Up"}
-            </Button>
-            <Grid container justifyContent="center">
-              <Grid item>
-                <Link href="/auth/signin" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="use_demo_targets"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 text-primary-foreground">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Let us create sample targets to explore.
+                    </FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <div className="text-center w-full">
+              <Button
+                className="w-full text-primary-foreground bg-primary"
+                type="submit"
+              >
+                Submit
+              </Button>
+            </div>
+          </form>
+        </Form>
+        <p className="mt-10 text-center text-sm text-primary-foreground">
+          Not a member?{" "}
+          <a
+            href="/auth/register"
+            className="font-semibold leading-6 text-primary-foreground hover:text-popover-foreground"
+          >
+            Sign up here!
+          </a>
+        </p>
+      </div>
+    </div>
   );
 }
