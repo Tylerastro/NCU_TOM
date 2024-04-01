@@ -13,7 +13,6 @@ class UsersModelTest(TestCase):
             'password': 'password',
             'email': 'admin@ncu.edu.com',
             'role': Users.roles.ADMIN,
-            'title': Users.titles.MS,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
@@ -25,7 +24,6 @@ class UsersModelTest(TestCase):
             'password': 'password',
             'email': 'faculty@ncu.edu.com',
             'role': Users.roles.FACULTY,
-            'title': Users.titles.MS,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
@@ -34,8 +32,7 @@ class UsersModelTest(TestCase):
             'username': 'professor',
             'password': 'password',
             'email': 'professor@ncu.edu.com',
-            'role': Users.roles.PROFESSOR,
-            'title': Users.titles.MS,
+            'role': Users.roles.FACULTY,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
@@ -44,8 +41,7 @@ class UsersModelTest(TestCase):
             'username': 'student',
             'password': 'password',
             'email': 'student@ncu.edu.com',
-            'role': Users.roles.STUDENT,
-            'title': Users.titles.MS,
+            'role': Users.roles.USER,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
@@ -60,7 +56,6 @@ class UsersModelTest(TestCase):
         self.assertEqual(admin.username, 'admin')
         self.assertEqual(admin.email, 'admin@ncu.edu.com')
         self.assertEqual(admin.role, Users.roles.ADMIN)
-        self.assertEqual(admin.title, Users.titles.MS)
         self.assertEqual(admin.institute, 'NCU')
         self.assertTrue(admin.is_superuser)
         self.assertTrue(admin.use_demo_targets)
@@ -70,7 +65,6 @@ class UsersModelTest(TestCase):
         self.assertEqual(faculty.username, 'faculty')
         self.assertEqual(faculty.email, 'faculty@ncu.edu.com')
         self.assertEqual(faculty.role, Users.roles.FACULTY)
-        self.assertEqual(faculty.title, Users.titles.MS)
         self.assertEqual(faculty.institute, 'NCU')
         self.assertFalse(faculty.is_superuser)
 
@@ -79,15 +73,13 @@ class UsersModelTest(TestCase):
             username='testuser',
             password='12345',
             email='a@a.com',
-            role=Users.roles.STUDENT,
-            title=Users.titles.MS,
+            role=Users.roles.USER,
             institute='testinstitute',
             first_name='testfirst',
             last_name='testlast')
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.STUDENT)
-        self.assertEqual(user.title, Users.titles.MS)
+        self.assertEqual(user.role, Users.roles.USER)
         self.assertEqual(user.institute, 'testinstitute')
         self.assertEqual(user.first_name, 'testfirst')
         self.assertEqual(user.last_name, 'testlast')
@@ -95,8 +87,7 @@ class UsersModelTest(TestCase):
         user = Users.objects.get(email='a@a.com')
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.STUDENT)
-        self.assertEqual(user.title, Users.titles.MS)
+        self.assertEqual(user.role, Users.roles.USER)
         self.assertEqual(user.institute, 'testinstitute')
         self.assertEqual(user.first_name, 'testfirst')
         self.assertEqual(user.last_name, 'testlast')
@@ -116,7 +107,6 @@ class TagsModelTest(TestCase):
             password='password',
             email='tom@ncu.edu.com',
             role=Users.roles.ADMIN,
-            title=Users.titles.MS,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
@@ -157,7 +147,6 @@ class CommentsModelTest(TestCase):
             password='password',
             email='tom@ncu.edu.com',
             role=Users.roles.ADMIN,
-            title=Users.titles.MS,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
@@ -197,7 +186,6 @@ class AnnouncementsModelTest(TestCase):
             password='password',
             email='tom@ncu.edu.com',
             role=Users.roles.ADMIN,
-            title=Users.titles.MS,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')

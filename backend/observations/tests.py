@@ -2,7 +2,6 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-
 from helpers.models import Users
 from targets.models import Target
 
@@ -13,8 +12,8 @@ class ObservationModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        test_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
-                                         title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+        test_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER,
+                                         institute='testinstitute', first_name='testfirst', last_name='testlast')
         test_target = Target.objects.create(
             user=test_user,
             name='NGC 3824',

@@ -1,9 +1,8 @@
 
 from django.test import TestCase
+from helpers.models import Tags, Users
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
-
-from helpers.models import Tags, Users
 
 from .models import Target
 from .views import TargetsView
@@ -13,8 +12,8 @@ class TargetModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        test_student_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
-                                                 title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+        test_student_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER,
+                                                 institute='testinstitute', first_name='testfirst', last_name='testlast')
 
         test_tag = Tags.objects.create(name='testtag', user=test_student_user)
         target = Target.objects.create(
@@ -47,10 +46,10 @@ class TargetModelTest(TestCase):
 class TargetApiTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = Users.objects.create(username='teststudentuser', password='12345', email='a@a.com', role=Users.roles.STUDENT,
-                                    title=Users.titles.MS, institute='testinstitute', first_name='testfirst', last_name='testlast')
+        user = Users.objects.create(username='teststudentuser', password='12345', email='a@a.com', role=Users.roles.USER,
+                                    institute='testinstitute', first_name='testfirst', last_name='testlast')
         admin = Users.objects.create(username='testadminuser', password='12345', email='admin@a.com', role=Users.roles.ADMIN,
-                                     title=Users.titles.PROFESSOR, institute='testinstitute', first_name='testfirst', last_name='testlast')
+                                     institute='testinstitute', first_name='testfirst', last_name='testlast')
         student_target = Target.objects.create(
             user=user,
             name='NGC 9999',
