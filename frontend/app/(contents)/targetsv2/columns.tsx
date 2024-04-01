@@ -43,7 +43,7 @@ export const columns: ColumnDef<Target>[] = [
       const user: User = row.getValue("user");
       return (
         <div className="text-primary-foreground font-medium">
-          {user.username}
+          <Link href={`/users/${user.id}`}>{user.username}</Link>
         </div>
       );
     },
@@ -53,7 +53,11 @@ export const columns: ColumnDef<Target>[] = [
     header: "Name",
     cell(props) {
       const name: number = props.row.getValue("name");
-      return <div className="text-primary-foreground font-medium">{name}</div>;
+      return (
+        <div className="text-primary-foreground font-medium">
+          <Link href={`/targetsv2/${props.row.id}`}>{name}</Link>
+        </div>
+      );
     },
   },
   {

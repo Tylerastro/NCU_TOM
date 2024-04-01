@@ -1,9 +1,8 @@
 import Background from "@/components/Background";
 import { NavBar } from "@/components/Navbar";
 import Setup from "@/components/setup";
-import theme from "@/components/themes";
 import Provider from "@/redux/provider";
-import { ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -18,9 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <html lang="en">
-        <body>
+    <html lang="en">
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <main>
             <Provider>
               <Setup />
@@ -29,8 +33,8 @@ export default function RootLayout({
               {children}
             </Provider>
           </main>
-        </body>
-      </html>
-    </ThemeProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

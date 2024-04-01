@@ -1,5 +1,4 @@
 import Block from "@/components/Block";
-import { Box } from "@mui/material";
 import Image from "next/image";
 import styles from "./page.module.css";
 
@@ -30,21 +29,13 @@ export default function Home() {
           height={1080}
           src="/Dalle-observatory.png"
         />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-around",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+
+        <h1
+          style={{ textAlign: "center", height: "960px" }}
+          className=" flex items-center scroll-m-20  font-extrabold tracking-tight lg:text-9xl font-Pacifico text-primary-foreground"
         >
-          <h1
-            style={{ textAlign: "center", height: "960px" }}
-            className=" flex items-center scroll-m-20  font-extrabold tracking-tight lg:text-9xl font-Pacifico text-primary-foreground"
-          >
-            NCU TOM
-          </h1>
-        </Box>
+          NCU TOM
+        </h1>
       </div>
       <Block
         title="Create your targets"
