@@ -1,12 +1,10 @@
 "use client";
-import { fetchTargets } from "@/apis/targets";
-import { Button } from "@/components/ui/button";
+import { deleteBulkTarget, fetchTargets } from "@/apis/targets";
 import { Target } from "@/models/targets";
 import * as React from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
-import { deleteBulkTarget } from "@/apis/targets";
 
 export default function TargetsTable() {
   const [data, setData] = React.useState<Target[]>([]);
@@ -45,15 +43,6 @@ export default function TargetsTable() {
 
         <div className="flex gap-2">
           <NewTargetFrom />
-
-          <Button
-            color={"secondary"}
-            size={"lg"}
-            variant={"outline"}
-            className="hover:bg-red-500 hover:border-red-500"
-          >
-            Delete targets
-          </Button>
         </div>
       </div>
 

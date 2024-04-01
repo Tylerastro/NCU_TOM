@@ -1,4 +1,4 @@
-import Tags from "@/components/Tags";
+import { TagOptions } from "@/components/TagOptions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,7 +47,7 @@ export function NewTargetFrom() {
             <Input id="dec" className="col-span-3" />
           </div>
         </div>
-        <Tags placeholder="Tags" creatable={true} settags={() => {}} />
+        <TagOptions />
         <FileUpload />
         <DialogFooter>
           <Button type="submit">Save changes</Button>
