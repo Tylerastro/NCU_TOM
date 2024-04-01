@@ -6,6 +6,7 @@ import * as React from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
+import { deleteBulkTarget } from "@/apis/targets";
 
 export default function TargetsTable() {
   const [data, setData] = React.useState<Target[]>([]);
@@ -18,6 +19,20 @@ export default function TargetsTable() {
         console.error("Error fetching data:", error);
       });
   }, []);
+
+  const handleDelete = async (ids: number[]) => {
+    try {
+      await deleteBulkTarget(ids);
+
+      const updatedData = data.filter(
+        (target) => target.id !== undefined && !ids.includes(target.id)
+      );
+
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
 
   return (
     <>
@@ -43,7 +58,7 @@ export default function TargetsTable() {
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} onDelete={handleDelete} />
       </div>
     </>
   );

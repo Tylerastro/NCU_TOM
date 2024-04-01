@@ -23,15 +23,18 @@ import {
 import * as React from "react";
 import { DataTableToolbar } from "./tooltip";
 import { Button } from "@/components/ui/button";
+import { Target } from "@/models/targets";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onDelete: (ids: number[]) => void; // New prop for the delete function
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onDelete,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -39,6 +42,11 @@ export function DataTable<TData, TValue>({
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
+  const hanldeDelete = async (ids: number[]) => {
+    onDelete(ids);
+    table.resetRowSelection();
+  };
 
   const table = useReactTable({
     data,
@@ -61,8 +69,23 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="pb-4">
+      <div className="pb-4 flex flex-col gap-4">
         <DataTableToolbar table={table} />
+        <Button
+          variant="outline"
+          disabled={!table.getIsSomeRowsSelected()}
+          className="w-[200px] hover:bg-red-500 hover:border-red-500"
+          onClick={() =>
+            hanldeDelete(
+              table
+                .getSelectedRowModel()
+                .flatRows.map((row) => (row.original as Target).id)
+                .filter((id): id is number => id !== undefined)
+            )
+          }
+        >
+          Delete
+        </Button>
       </div>
       <div className="rounded-md border ">
         <Table>
