@@ -5,7 +5,8 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from django.db import transaction
 from helpers.models import Tags
-from helpers.serializers import TagsSerializer, UserSerializer
+from helpers.serializers import (TagsGetSerializer, TagsSerializer,
+                                 UserSerializer)
 from observations.models import Observation
 from rest_framework import serializers
 
@@ -20,7 +21,7 @@ class ObservationSerializer(serializers.ModelSerializer):
 
 
 class TargetGetSerializer(serializers.ModelSerializer):
-    tags = TagsSerializer(many=True, required=False)
+    tags = TagsGetSerializer(many=True, required=False)
     user = UserSerializer()
     coordinates = serializers.SerializerMethodField()
     observations = serializers.SerializerMethodField()
