@@ -92,8 +92,15 @@ class TagsView(APIView):
 
     def get(self, request) -> List[Tags]:
         tags = Tags.objects.filter(user=request.user)
-        serializer = TagsSerializer(tags, many=True)
+        serializer = TagsGetSerializer(tags, many=True)
         return Response(serializer.data, status=200)
+
+    def post(self, request):
+        serializer = TagsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 class TagsDetailView(APIView):

@@ -15,14 +15,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/components/utils";
-import { Tag } from "@/models/helpers";
+import { NewTag, Tag } from "@/models/helpers";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { postNewTag } from "@/apis/tags";
 import * as React from "react";
 
 export function TagOptions() {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
   const [value, setValue] = React.useState("");
   const [tags, setTags] = React.useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
   React.useEffect(() => {
     fetchTags()
@@ -32,7 +35,23 @@ export function TagOptions() {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  });
+  }, []);
+
+  const createTag = (name: string) => {
+    const NewTag: NewTag = {
+      name: name,
+    };
+    console.log(NewTag);
+    postNewTag(NewTag)
+      .then((data) => {
+        setTags((prevTags) => [...prevTags, data]);
+        setSelectedTags((prevSelectedTags) => [...prevSelectedTags, data]);
+        setOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -43,30 +62,51 @@ export function TagOptions() {
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value
-            ? tags.find((tag) => tag.name === value)?.name
-            : "Select Tag..."}
+          {selectedTags.length > 0
+            ? selectedTags.map((tag) => tag.name).join(", ")
+            : "Select Tags..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search tag..." />
-          <CommandEmpty>No tag found.</CommandEmpty>
+          <CommandInput
+            value={search}
+            onValueChange={setSearch}
+            placeholder="Search tag..."
+          />
+          <CommandEmpty>
+            <Button className="w-[90%]" onClick={() => createTag(search)}>
+              {search}
+            </Button>
+          </CommandEmpty>
           <CommandGroup>
             {tags.map((tag) => (
               <CommandItem
                 key={tag.id}
                 value={tag.name}
                 onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue);
-                  setOpen(false);
+                  setSelectedTags((prevSelectedTags) => {
+                    if (prevSelectedTags.some((t) => t.name === currentValue)) {
+                      return prevSelectedTags.filter(
+                        (t) => t.name !== currentValue
+                      );
+                    } else {
+                      const newTag = tags.find((t) => t.name === currentValue);
+                      if (newTag) {
+                        return [...prevSelectedTags, newTag];
+                      }
+                      return prevSelectedTags;
+                    }
+                  });
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === tag.name ? "opacity-100" : "opacity-0"
+                    selectedTags.some((t) => t.name === tag.name)
+                      ? "opacity-100"
+                      : "opacity-0"
                   )}
                 />
                 {tag.name}

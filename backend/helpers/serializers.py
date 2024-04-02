@@ -10,24 +10,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TagsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tags
+        fields = ('name',)
+
+
+class TagsGetSerializer(serializers.ModelSerializer):
     targets = serializers.SerializerMethodField()
     observations = serializers.SerializerMethodField()
 
     class Meta:
         model = Tags
-        fields = ('id', 'name', 'targets', 'observations')
+        fields = '__all__'
 
     def get_targets(self, tag):
         return [target.id for target in tag.targets.all()]
 
     def get_observations(self, tag):
         return [observation.id for observation in tag.observations.all()]
-
-
-class TagsGetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tags
-        fields = '__all__'
 
 
 class CommentsGetSerializer(serializers.ModelSerializer):
