@@ -1,4 +1,32 @@
-export default function FileUpload() {
+import { bulkCreate } from "@/apis/targets";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+
+function FileUpload() {
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+    handleUpload();
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      toast.success("File uploaded successfully");
+    } catch (error) {
+      toast.error("Error uploading file");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center w-full">
       <label
@@ -26,8 +54,16 @@ export default function FileUpload() {
             drop
           </p>
         </div>
+        <input
+          id="dropzone-file"
+          type="file"
+          className="hidden"
+          onChange={handleFileChange}
+        />
         <input id="dropzone-file" type="file" className="hidden" />
       </label>
     </div>
   );
 }
+
+export default FileUpload;

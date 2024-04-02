@@ -41,7 +41,7 @@ function NavBar() {
   );
 
   return (
-    <div className="w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around bg-primary">
+    <div className="w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
       <div>
         <h2 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl text-primary-foreground">
           <a href="/">NCU TOM</a>
