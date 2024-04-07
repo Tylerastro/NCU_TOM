@@ -70,7 +70,6 @@ export default function SignUp() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     register(values)
       .unwrap()
       .then(() => {

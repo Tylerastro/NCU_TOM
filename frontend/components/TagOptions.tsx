@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchTags } from "@/apis/tags";
+import { fetchTags, postNewTag } from "@/apis/tags";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,13 +17,31 @@ import {
 import { cn } from "@/components/utils";
 import { NewTag, Tag } from "@/models/helpers";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { postNewTag } from "@/apis/tags";
 import * as React from "react";
+import { z } from "zod";
 
-export function TagOptions() {
+const formSchema = z.object({
+  name: z.string(),
+  ra: z.number(),
+  dec: z.number(),
+  tags: z.array(
+    z.object({
+      name: z.string(),
+      targets: z.array(z.number()),
+      observations: z.array(z.number()),
+    })
+  ),
+});
+
+interface TagOptionsProps {
+  onChange: (tags: z.infer<typeof formSchema>["tags"]) => void;
+  value: z.infer<typeof formSchema>["tags"];
+}
+
+export function TagOptions(props: TagOptionsProps) {
+  const { onChange, value } = props;
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
-  const [value, setValue] = React.useState("");
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
@@ -41,7 +59,6 @@ export function TagOptions() {
     const NewTag: NewTag = {
       name: name,
     };
-    console.log(NewTag);
     postNewTag(NewTag)
       .then((data) => {
         setTags((prevTags) => [...prevTags, data]);
@@ -52,6 +69,10 @@ export function TagOptions() {
         console.error("Error fetching data:", error);
       });
   };
+
+  React.useEffect(() => {
+    onChange(selectedTags);
+  }, [selectedTags, onChange]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
