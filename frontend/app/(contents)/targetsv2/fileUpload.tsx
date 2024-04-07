@@ -2,14 +2,17 @@ import { bulkCreate } from "@/apis/targets";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-function FileUpload() {
+function FileUpload({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
     }
-    handleUpload();
   };
 
   const handleUpload = async () => {
@@ -21,11 +24,20 @@ function FileUpload() {
     formData.append("file", file);
 
     try {
+      await bulkCreate(formData);
       toast.success("File uploaded successfully");
+      setOpen(false);
     } catch (error) {
+      console.error("Error uploading file", error);
       toast.error("Error uploading file");
     }
   };
+
+  React.useEffect(() => {
+    if (file) {
+      handleUpload();
+    }
+  }, [file]);
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -60,7 +72,6 @@ function FileUpload() {
           className="hidden"
           onChange={handleFileChange}
         />
-        <input id="dropzone-file" type="file" className="hidden" />
       </label>
     </div>
   );

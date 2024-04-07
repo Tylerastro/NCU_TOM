@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import * as React from "react";
 import FileUpload from "./fileUpload";
 
 export function NewTargetFrom() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
           Create target
@@ -48,7 +51,7 @@ export function NewTargetFrom() {
           </div>
         </div>
         <TagOptions />
-        <FileUpload />
+        <FileUpload setOpen={setOpen} />
         <DialogFooter>
           <Button type="submit">Save changes</Button>
         </DialogFooter>
