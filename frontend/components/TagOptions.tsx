@@ -8,6 +8,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -134,6 +135,19 @@ export function TagOptions(props: TagOptionsProps) {
               </CommandItem>
             ))}
           </CommandGroup>
+          {selectedTags.length > 0 && (
+            <>
+              <CommandSeparator />
+              <CommandGroup>
+                <CommandItem
+                  onSelect={() => setSelectedTags([])}
+                  className="justify-center text-center"
+                >
+                  Clear filters
+                </CommandItem>
+              </CommandGroup>
+            </>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
