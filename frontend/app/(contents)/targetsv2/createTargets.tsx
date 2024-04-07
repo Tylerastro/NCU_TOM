@@ -47,6 +47,10 @@ export function NewTargetFrom() {
     setSelectedTags(tags);
   };
 
+  React.useEffect(() => {
+    console.log(selectedTags);
+  }, [selectedTags]);
+
   const formSchema = z.object({
     name: z.string(),
     ra: z.preprocess((val) => parseFloat(val as string), z.number()),
@@ -155,10 +159,7 @@ export function NewTargetFrom() {
                     Tags
                   </FormLabel>
                   <FormControl>
-                    <TagOptions
-                      onChange={handleTagChange}
-                      value={field.value}
-                    />
+                    <TagOptions {...field} />
                   </FormControl>
                 </FormItem>
               )}
