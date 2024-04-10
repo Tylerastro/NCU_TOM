@@ -31,10 +31,9 @@ export function NewTargetFrom() {
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     createTarget(values)
       .then(() => {
-        toast.success("Registered successfully");
+        toast.success("Target created successfully");
       })
       .catch((error) => {
         for (const key in error.data) {
@@ -53,8 +52,14 @@ export function NewTargetFrom() {
 
   const formSchema = z.object({
     name: z.string(),
-    ra: z.preprocess((val) => parseFloat(val as string), z.number()),
-    dec: z.preprocess((val) => parseFloat(val as string), z.number()),
+    ra: z.preprocess(
+      (val) => parseFloat(val as string),
+      z.number().min(0).max(360)
+    ),
+    dec: z.preprocess(
+      (val) => parseFloat(val as string),
+      z.number().min(-90).max(90)
+    ),
     tags: z.array(
       z.object({
         name: z.string(),
