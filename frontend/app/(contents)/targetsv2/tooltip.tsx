@@ -19,7 +19,7 @@ interface DataTableToolbarProps<TData> {
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag,
+    value: tag.name,
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -31,7 +31,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<
-    { value: Tag; label: string; icon: React.ComponentType<any> }[]
+    { value: string; label: string; icon: React.ComponentType<any> }[]
   >([]);
 
   React.useEffect(() => {

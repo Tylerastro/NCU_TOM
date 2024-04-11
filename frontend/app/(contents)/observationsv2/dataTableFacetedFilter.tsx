@@ -27,7 +27,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   title?: string;
   options: {
     label: string;
-    value: Tag;
+    value: string;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
 }
@@ -39,19 +39,19 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
-  const [occurrences, setOccurrences] = React.useState<Map<number, number>>(
+  const [occurrences, setOccurrences] = React.useState<Map<string, number>>(
     new Map()
   );
 
   React.useEffect(() => {
     if (facets) {
-      const counts = new Map<number, number>();
+      const counts = new Map<string, number>();
       facets.forEach((value, key: Tag[]) => {
         if (Array.isArray(key)) {
           key.forEach((element: Tag) => {
             if (element.id !== undefined) {
-              const count = counts.get(element.id) ?? 0;
-              counts.set(element.id, count + 1);
+              const count = counts.get(element.name) ?? 0;
+              counts.set(element.name, count + 1);
             }
           });
         }
@@ -89,7 +89,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     .map((option) => (
                       <Badge
                         variant="secondary"
-                        key={option.value.id}
+                        key={option.value}
                         className="rounded-sm px-1 font-normal"
                       >
                         {option.label}
@@ -111,7 +111,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 const isSelected: boolean = selectedValues.has(option.label);
                 return (
                   <CommandItem
-                    key={option.value.id}
+                    key={option.value}
                     onSelect={() => {
                       console.log("clicked");
                       if (isSelected) {
@@ -139,9 +139,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
-                    {occurrences?.get(option.value.id ?? 0) && (
+                    {occurrences?.get(option.value) && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {occurrences.get(option.value.id ?? 0)}
+                        {occurrences.get(option.value ?? 0)}
                       </span>
                     )}
                   </CommandItem>

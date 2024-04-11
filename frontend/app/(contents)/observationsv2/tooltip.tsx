@@ -17,24 +17,40 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-const status = [
+const statuses = [
   {
-    label: "Low",
-    value: "low",
+    label: "Prep.",
+    value: "Prep.",
   },
   {
-    label: "Medium",
-    value: "medium",
+    label: "Pending",
+    value: "Pending",
   },
   {
-    label: "High",
-    value: "high",
+    label: "In progress",
+    value: "In progress",
+  },
+  {
+    label: "Done",
+    value: "Done",
+  },
+  {
+    label: "EXPIRED",
+    value: "EXPIRED",
+  },
+  {
+    label: "DENIED",
+    value: "DENIED",
+  },
+  {
+    label: "Postponed",
+    value: "Postponed",
   },
 ];
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag,
+    value: tag.name,
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -46,7 +62,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<
-    { value: Tag; label: string; icon: React.ComponentType<any> }[]
+    { value: string; label: string; icon: React.ComponentType<any> }[]
   >([]);
 
   React.useEffect(() => {
@@ -63,7 +79,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter observations..."
+          placeholder="Filter targets..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
@@ -77,7 +93,13 @@ export function DataTableToolbar<TData>({
             options={tagOptions}
           />
         )}
-
+        {table.getColumn("status") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("status")}
+            title="Status"
+            options={statuses}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"
