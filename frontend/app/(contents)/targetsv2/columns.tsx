@@ -52,10 +52,11 @@ export const columns: ColumnDef<Target>[] = [
     accessorKey: "name",
     header: "Name",
     cell(props) {
-      const name: number = props.row.getValue("name");
+      const name: string = props.row.getValue("name");
+      const id: number = props.row.getValue("id");
       return (
         <div className="text-primary-foreground font-medium">
-          <Link href={`/targetsv2/${props.row.id}`}>{name}</Link>
+          <Link href={`/targetsv2/${id}`}>{name}</Link>
         </div>
       );
     },

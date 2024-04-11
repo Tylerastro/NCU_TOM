@@ -32,7 +32,7 @@ class TargetsView(APIView):
         if target_id:
             target_filter = {} if is_admin_or_faculty else {'user': request.user}
             target = get_object_or_404(Target, id=target_id, **target_filter)
-            serializer = TargetGetSerializer(target)
+            serializer = TargetGetSerializer([target], many=True)
         else:
             targets_filter = Target.objects.all(
             ) if is_admin_or_faculty else Target.objects.filter(user=request.user)

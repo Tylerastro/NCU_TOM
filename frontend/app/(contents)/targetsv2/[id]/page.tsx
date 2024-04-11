@@ -1,6 +1,8 @@
-import { Metadata } from "next";
+"use client";
 import Image from "next/image";
 
+import { fetchTargets } from "@/apis/targets";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,13 +19,22 @@ import { RecentSales } from "./recent-sales";
 import { Search } from "./search";
 import TeamSwitcher from "./team-switcher";
 import { UserNav } from "./user-nav";
+import { Target } from "@/models/targets";
+import * as React from "react";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Example dashboard app built using the components.",
-};
+export default function DashboardPage(params: { params: { id: number } }) {
+  const [target, setTarget] = React.useState<Target | null>(null);
 
-export default function DashboardPage() {
+  React.useEffect(() => {
+    fetchTargets(params.params.id)
+      .then((data) => {
+        setTarget(data[0]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <>
       <div className="md:hidden">
@@ -45,23 +56,19 @@ export default function DashboardPage() {
       <div className="hidden flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            <div className="flex items-center space-x-2">
-              <CalendarDateRangePicker />
-              <Button>Download</Button>
-            </div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              {target?.name}
+            </h2>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="reports" disabled>
-                Reports
+                Observations
               </TabsTrigger>
               <TabsTrigger value="notifications" disabled>
-                Notifications
+                Others
               </TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-4">
@@ -69,32 +76,45 @@ export default function DashboardPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Revenue
+                      Coords
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
                       fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
                       stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
+                      className="w-6 h-6"
                     >
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                      />
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">$45,231.89</div>
-                    <p className="text-xs text-muted-foreground">
-                      +20.1% from last month
-                    </p>
+                    <div className="flex justify-between">
+                      <div className="text-xl font-bold">
+                        <span>Ra:</span>{" "}
+                        <span className="text-base">{target?.ra}</span>
+                      </div>
+                      <div className="text-xl font-bold">
+                        <span>Dec:</span>{" "}
+                        <span className="text-base">{target?.dec}</span>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Subscriptions
+                      Observations
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -112,40 +132,54 @@ export default function DashboardPage() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+2350</div>
+                    <div className="text-2xl font-bold">
+                      {target?.observations?.length}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +180.1% from last month
+                      Finished: {target?.observations?.length}
                     </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                    <CardTitle className="text-sm font-medium">Tags</CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
                       fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
                       stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
+                      className="w-6 h-6"
                     >
-                      <rect width="20" height="14" x="2" y="5" rx="2" />
-                      <path d="M2 10h20" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 6h.008v.008H6V6Z"
+                      />
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+12,234</div>
-                    <p className="text-xs text-muted-foreground">
-                      +19% from last month
-                    </p>
+                    {target?.tags && target?.tags?.length > 0 ? (
+                      target?.tags?.map((tag) => (
+                        <Badge key={tag.id} className="mr-1">
+                          {" "}
+                          {tag.name}{" "}
+                        </Badge>
+                      ))
+                    ) : (
+                      <div className="text-sm font-medium">No tags found</div>
+                    )}
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Active Now
+                      Citations
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -179,10 +213,10 @@ export default function DashboardPage() {
                 </Card>
                 <Card className="col-span-3">
                   <CardHeader>
-                    <CardTitle>Recent Sales</CardTitle>
-                    <CardDescription>
+                    <CardTitle>Recent Observations</CardTitle>
+                    {/* <CardDescription>
                       You made 265 sales this month.
-                    </CardDescription>
+                    </CardDescription> */}
                   </CardHeader>
                   <CardContent>
                     <RecentSales />

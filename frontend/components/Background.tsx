@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Background() {
   return (
     <Image
-      alt="Mountains"
+      alt="Earth at night time, observed from space"
       src="/nasa-Q1p7bh3SHj8-unsplash.jpg"
       quality={100}
       width={1920}

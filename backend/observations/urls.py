@@ -4,7 +4,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'observations', views.ObservationsView,
-                basename='observaitons')
+                basename='observations')
 
 
 # Wire up our API using automatic URL routing.
