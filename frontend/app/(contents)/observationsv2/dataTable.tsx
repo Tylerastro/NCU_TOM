@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,20 +11,18 @@ import {
 } from "@/components/ui/table";
 import {
   ColumnDef,
-  flexRender,
   ColumnFiltersState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
-  getCoreRowModel,
-  getFacetedUniqueValues,
-  VisibilityState,
-  getFacetedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
 import { DataTableToolbar } from "./tooltip";
-import { Button } from "@/components/ui/button";
-import { Target } from "@/models/targets";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -68,21 +67,6 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="pb-4 flex flex-col gap-4">
         <DataTableToolbar table={table} />
-        <Button
-          variant="outline"
-          disabled={!table.getIsSomeRowsSelected()}
-          className="w-[200px] hover:bg-red-500 hover:border-red-500"
-          onClick={() =>
-            hanldeDelete(
-              table
-                .getSelectedRowModel()
-                .flatRows.map((row) => (row.original as Target).id)
-                .filter((id): id is number => id !== undefined)
-            )
-          }
-        >
-          Delete
-        </Button>
       </div>
       <div className="rounded-md border ">
         <Table>

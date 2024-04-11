@@ -17,6 +17,21 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
+const status = [
+  {
+    label: "Low",
+    value: "low",
+  },
+  {
+    label: "Medium",
+    value: "medium",
+  },
+  {
+    label: "High",
+    value: "high",
+  },
+];
+
 function transformTagToOption(tag: Tag) {
   return {
     value: tag,
@@ -62,6 +77,7 @@ export function DataTableToolbar<TData>({
             options={tagOptions}
           />
         )}
+
         {isFiltered && (
           <Button
             variant="ghost"

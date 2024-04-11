@@ -1,7 +1,7 @@
 "use client";
 
 import { badgeVariants } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { getObservatoryLabel, getStatusLabel } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
 import { ColumnDef } from "@tanstack/react-table";
@@ -65,8 +65,13 @@ export const columns: ColumnDef<Observation>[] = [
     accessorKey: "observatory",
     header: "Observatory",
     cell(props) {
-      const ra: number = props.row.getValue("observatory");
-      return <div className="text-primary-foreground font-medium">{ra}</div>;
+      const observatory: number = props.row.getValue("observatory");
+
+      return (
+        <div className="text-primary-foreground font-medium">
+          {getObservatoryLabel(observatory)}
+        </div>
+      );
     },
   },
   {
@@ -75,9 +80,8 @@ export const columns: ColumnDef<Observation>[] = [
     cell(props) {
       console.log(props.row);
       const startDate: string = props.row.getValue("start_date");
-      return (
-        <div className="text-primary-foreground font-medium">{startDate}</div>
-      );
+      const date = new Date(startDate).toISOString().split("T")[0];
+      return <div className="text-primary-foreground font-medium">{date}</div>;
     },
   },
   {
@@ -85,14 +89,13 @@ export const columns: ColumnDef<Observation>[] = [
     header: "End Date",
     cell(props) {
       const endDate: string = props.row.getValue("end_date");
-      return (
-        <div className="text-primary-foreground font-medium">{endDate}</div>
-      );
+      const date = new Date(endDate).toISOString().split("T")[0];
+      return <div className="text-primary-foreground font-medium">{date}</div>;
     },
   },
   {
     accessorKey: "tags",
-    header: "tags",
+    header: "Tags",
     cell(props) {
       const tags: Tag[] = props.row.getValue("tags");
       return tags.map((tag) => (
@@ -119,7 +122,10 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Status",
     cell(props) {
       const status: number = props.row.getValue("status");
-      return <div>{status}</div>;
+      return <div>{getStatusLabel(status)}</div>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
 ];
