@@ -11,7 +11,6 @@ export default function ObservationsTable() {
   React.useEffect(() => {
     getObservations()
       .then((data) => {
-        console.log(data);
         setData(data);
       })
       .catch((error) => {

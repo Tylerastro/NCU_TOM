@@ -20,37 +20,37 @@ interface DataTableToolbarProps<TData> {
 const statuses = [
   {
     label: "Prep.",
-    value: "Prep.",
+    value: "1",
   },
   {
     label: "Pending",
-    value: "Pending",
+    value: "2",
   },
   {
     label: "In progress",
-    value: "In progress",
+    value: "3",
   },
   {
     label: "Done",
-    value: "Done",
+    value: "4",
   },
   {
     label: "EXPIRED",
-    value: "EXPIRED",
+    value: "5",
   },
   {
     label: "DENIED",
-    value: "DENIED",
+    value: "6",
   },
   {
     label: "Postponed",
-    value: "Postponed",
+    value: "7",
   },
 ];
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag.name,
+    value: tag.id?.toString() || "",
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -79,7 +79,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter targets..."
+          placeholder="Filter observations..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
@@ -91,6 +91,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("tags")}
             title="Tags"
             options={tagOptions}
+            autoCounter={false}
           />
         )}
         {table.getColumn("status") && (
@@ -98,6 +99,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("status")}
             title="Status"
             options={statuses}
+            autoCounter={true}
           />
         )}
         {isFiltered && (

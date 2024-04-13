@@ -11,7 +11,6 @@ import { Tag } from "@/models/helpers";
 import { Observation } from "@/models/observations";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import * as React from "react";
@@ -54,7 +53,6 @@ export default function DataTable() {
     }
 
     if (selectedStatus) {
-      console.log(selectedStatus);
       rows = rows.filter((row) => row.status === selectedStatus);
     }
 

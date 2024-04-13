@@ -30,12 +30,14 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
+  autoCounter: boolean;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  autoCounter,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
@@ -44,14 +46,14 @@ export function DataTableFacetedFilter<TData, TValue>({
   );
 
   React.useEffect(() => {
-    if (facets) {
+    if (facets && !autoCounter) {
       const counts = new Map<string, number>();
       facets.forEach((value, key: Tag[]) => {
         if (Array.isArray(key)) {
           key.forEach((element: Tag) => {
             if (element.id !== undefined) {
-              const count = counts.get(element.name) ?? 0;
-              counts.set(element.name, count + 1);
+              const count = counts.get(element.id.toString()) ?? 0;
+              counts.set(element.id.toString(), count + 1);
             }
           });
         }
@@ -85,7 +87,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.label))
+                    .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
                         variant="secondary"
@@ -108,16 +110,15 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected: boolean = selectedValues.has(option.label);
+                const isSelected: boolean = selectedValues.has(option.value);
                 return (
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
-                      console.log("clicked");
                       if (isSelected) {
-                        selectedValues.delete(option.label);
+                        selectedValues.delete(option.value);
                       } else {
-                        selectedValues.add(option.label);
+                        selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(
@@ -139,11 +140,17 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
-                    {occurrences?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {occurrences.get(option.value ?? 0)}
-                      </span>
-                    )}
+                    {autoCounter
+                      ? facets?.get(option.value) && (
+                          <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                            {facets.get(option.value)}
+                          </span>
+                        )
+                      : occurrences?.get(option.value) && (
+                          <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                            {occurrences.get(option.value ?? 0)}
+                          </span>
+                        )}
                   </CommandItem>
                 );
               })}

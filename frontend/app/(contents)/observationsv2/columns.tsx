@@ -78,7 +78,6 @@ export const columns: ColumnDef<Observation>[] = [
     accessorKey: "start_date",
     header: "Start Date",
     cell(props) {
-      console.log(props.row);
       const startDate: string = props.row.getValue("start_date");
       const date = new Date(startDate).toISOString().split("T")[0];
       return <div className="text-primary-foreground font-medium">{date}</div>;
@@ -111,9 +110,7 @@ export const columns: ColumnDef<Observation>[] = [
     filterFn: (row, id, value) => {
       const tags: Tag[] = row.original.tags;
       return value.some((filter: string) =>
-        tags.some((tag) =>
-          tag.name.toLowerCase().includes(filter.toLowerCase())
-        )
+        tags.some((tag) => tag.id?.toString().includes(filter.toLowerCase()))
       );
     },
   },
@@ -125,7 +122,10 @@ export const columns: ColumnDef<Observation>[] = [
       return <div>{getStatusLabel(status)}</div>;
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+      const rowValue = row.getValue(id);
+      return value.some(
+        (filterValue: string) => rowValue === parseInt(filterValue, 10)
+      );
     },
   },
 ];

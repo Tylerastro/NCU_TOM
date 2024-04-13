@@ -95,9 +95,7 @@ export const columns: ColumnDef<Target>[] = [
     filterFn: (row, id, value) => {
       const tags: Tag[] = row.original.tags;
       return value.some((filter: string) =>
-        tags.some((tag) =>
-          tag.name.toLowerCase().includes(filter.toLowerCase())
-        )
+        tags.some((tag) => tag.id?.toString().includes(filter.toLowerCase()))
       );
     },
   },

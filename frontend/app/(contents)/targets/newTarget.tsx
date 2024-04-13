@@ -93,7 +93,6 @@ export default function NewTargetForm({
       };
 
       const res = await createTarget(newTarget);
-      console.log(res.status);
       if (res.status === 201) {
         toast.success("Target created successfully");
       } else {
@@ -102,7 +101,6 @@ export default function NewTargetForm({
       handleClose();
       await refreshData();
     } catch (error) {
-      console.error("Error creating target:", error);
       toast.error("An error occurred while creating the target");
     }
   };

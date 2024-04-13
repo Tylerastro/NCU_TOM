@@ -46,10 +46,6 @@ export function NewTargetFrom() {
     setSelectedTags(tags);
   };
 
-  React.useEffect(() => {
-    console.log(selectedTags);
-  }, [selectedTags]);
-
   const formSchema = z.object({
     name: z.string(),
     ra: z.preprocess(

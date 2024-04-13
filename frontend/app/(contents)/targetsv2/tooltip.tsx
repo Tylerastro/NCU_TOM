@@ -19,7 +19,7 @@ interface DataTableToolbarProps<TData> {
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag.name,
+    value: tag.id?.toString() || "",
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -60,6 +60,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("tags")}
             title="Tags"
             options={tagOptions}
+            autoCounter={false}
           />
         )}
         {isFiltered && (
