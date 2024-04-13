@@ -1,5 +1,5 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
-import { Tag, Comments, User } from "./helpers";
+import { Comments, Tag, User } from "./helpers";
 import { Target } from "./targets";
 export interface Observation {
   id: number;
@@ -19,8 +19,8 @@ export interface Observation {
 }
 
 export interface NewObservation {
-  name: string;
-  observatory: string;
+  name?: string;
+  observatory: number;
   priority: number;
   status?: number;
   start_date: string;
@@ -28,7 +28,7 @@ export interface NewObservation {
   created_at?: Date;
   updated_at?: Date;
   tags: Tag[];
-  targets: number[];
+  targets?: number[];
   code?: string;
 }
 

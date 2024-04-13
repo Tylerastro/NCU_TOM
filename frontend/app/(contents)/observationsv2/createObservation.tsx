@@ -1,5 +1,6 @@
-import { createTarget } from "@/apis/targets";
+import { createObservation } from "@/apis/observations";
 import { TagOptions } from "@/components/TagOptions";
+import { TargetOptions } from "@/components/TargetOptions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,23 +18,32 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import FileUpload from "./fileUpload";
 
 export function NewTargetFrom() {
   const [open, setOpen] = React.useState(false);
+  const [selectTargets, setSelectTargets] = React.useState<
+    z.infer<typeof formSchema>["targets"]
+  >([]);
   const [selectedTags, setSelectedTags] = React.useState<
     z.infer<typeof formSchema>["tags"]
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    createTarget(values)
+    createObservation(values)
       .then(() => {
-        toast.success("Target created successfully");
+        toast.success("Observation created successfully");
       })
       .catch((error) => {
         for (const key in error.data) {
@@ -47,15 +57,12 @@ export function NewTargetFrom() {
   };
 
   const formSchema = z.object({
-    name: z.string(),
-    ra: z.preprocess(
-      (val) => parseFloat(val as string),
-      z.number().min(0).max(360)
-    ),
-    dec: z.preprocess(
-      (val) => parseFloat(val as string),
-      z.number().min(-90).max(90)
-    ),
+    name: z.string().optional(),
+    observatory: z.string().transform(Number),
+    priority: z.string().transform(Number),
+    targets: z.array(z.number()),
+    start_date: z.string(),
+    end_date: z.string(),
     tags: z.array(
       z.object({
         name: z.string(),
@@ -69,8 +76,11 @@ export function NewTargetFrom() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      ra: 0,
-      dec: 0,
+      observatory: 1,
+      priority: 1,
+      targets: [],
+      start_date: "",
+      end_date: "",
       tags: selectedTags,
     },
   });
@@ -79,15 +89,14 @@ export function NewTargetFrom() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
-          Create target
+          Create observation
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px]">
         <DialogHeader>
           <DialogTitle>New Target info</DialogTitle>
           <DialogDescription>
-            Enter the {`target's`} info to create a new target. We also support
-            csv file for bulk upload.
+            Enter the basic {`observation's`} info to create a new observation.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -106,51 +115,78 @@ export function NewTargetFrom() {
                   <FormControl>
                     <Input
                       className="text-primary-foreground"
-                      placeholder="Target name"
+                      placeholder="Observation name"
                       {...field}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <div className="grid grid-cols-2 gap-4">
+              {" "}
               <FormField
                 control={form.control}
-                name="ra"
+                name="observatory"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      RA
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-primary-foreground w-full"
-                        placeholder="ra"
-                        {...field}
-                      />
-                    </FormControl>
+                    <FormLabel>Observatory</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a observatory" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={"1"}>Lulin</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="dec"
+                name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      Dec
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-primary-foreground w-full"
-                        placeholder="Dec"
-                        {...field}
-                      />
-                    </FormControl>
+                    <FormLabel>Priority</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={"1"}>High</SelectItem>
+                        <SelectItem value={"2"}>Medium</SelectItem>
+                        <SelectItem value={"3"}>Low</SelectItem>
+                        <SelectItem value={"4"}>Too</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="targets"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary-foreground">
+                    Targets
+                  </FormLabel>
+                  <FormControl>
+                    <TargetOptions {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="tags"
@@ -167,6 +203,7 @@ export function NewTargetFrom() {
             />
             <div className="text-center w-full">
               <Button
+                disabled
                 className="w-full text-primary-foreground bg-primary"
                 type="submit"
               >
@@ -175,7 +212,6 @@ export function NewTargetFrom() {
             </div>
           </form>
         </Form>
-        <FileUpload setOpen={setOpen} />
       </DialogContent>
     </Dialog>
   );

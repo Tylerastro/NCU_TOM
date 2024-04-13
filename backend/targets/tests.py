@@ -90,9 +90,10 @@ class TargetApiTest(TestCase):
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['name'], self.student_target.name)
-        self.assertEqual(response.data['notes'], self.student_target.notes)
-        self.assertEqual(response.data['notes'],
+        response_data = response.data[0]
+        self.assertEqual(response_data['name'], self.student_target.name)
+        self.assertEqual(response_data['notes'], self.student_target.notes)
+        self.assertEqual(response_data['notes'],
                          "Velit consequat fugiat lorem laborum")
 
     def test_admin_get_student_target(self):

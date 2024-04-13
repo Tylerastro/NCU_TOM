@@ -3,7 +3,7 @@ import { getObservations } from "@/apis/observations";
 import { Observation } from "@/models/observations";
 import * as React from "react";
 import { columns } from "./columns";
-import { NewTargetFrom } from "./createTargets";
+import { NewTargetFrom } from "./createObservation";
 import { DataTable } from "./dataTable";
 
 export default function ObservationsTable() {

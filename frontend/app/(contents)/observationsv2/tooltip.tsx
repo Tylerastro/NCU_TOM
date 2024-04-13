@@ -20,37 +20,37 @@ interface DataTableToolbarProps<TData> {
 const statuses = [
   {
     label: "Prep.",
-    value: "1",
+    value: 1,
   },
   {
     label: "Pending",
-    value: "2",
+    value: 2,
   },
   {
     label: "In progress",
-    value: "3",
+    value: 3,
   },
   {
     label: "Done",
-    value: "4",
+    value: 4,
   },
   {
     label: "EXPIRED",
-    value: "5",
+    value: 5,
   },
   {
     label: "DENIED",
-    value: "6",
+    value: 6,
   },
   {
     label: "Postponed",
-    value: "7",
+    value: 7,
   },
 ];
 
 function transformTagToOption(tag: Tag) {
   return {
-    value: tag.id?.toString() || "",
+    value: tag.id || 0,
     label: tag.name,
     icon: QuestionMarkCircledIcon,
   };
@@ -62,7 +62,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<
-    { value: string; label: string; icon: React.ComponentType<any> }[]
+    { value: number; label: string; icon: React.ComponentType<any> }[]
   >([]);
 
   React.useEffect(() => {

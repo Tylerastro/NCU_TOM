@@ -27,7 +27,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   title?: string;
   options: {
     label: string;
-    value: string;
+    value: number;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
   autoCounter: boolean;
@@ -40,20 +40,20 @@ export function DataTableFacetedFilter<TData, TValue>({
   autoCounter,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
-  const [occurrences, setOccurrences] = React.useState<Map<string, number>>(
+  const selectedValues = new Set(column?.getFilterValue() as number[]);
+  const [occurrences, setOccurrences] = React.useState<Map<number, number>>(
     new Map()
   );
 
   React.useEffect(() => {
     if (facets && !autoCounter) {
-      const counts = new Map<string, number>();
+      const counts = new Map<number, number>();
       facets.forEach((value, key: Tag[]) => {
         if (Array.isArray(key)) {
           key.forEach((element: Tag) => {
             if (element.id !== undefined) {
-              const count = counts.get(element.id.toString()) ?? 0;
-              counts.set(element.id.toString(), count + 1);
+              const count = counts.get(element.id) ?? 0;
+              counts.set(element.id, count + 1);
             }
           });
         }

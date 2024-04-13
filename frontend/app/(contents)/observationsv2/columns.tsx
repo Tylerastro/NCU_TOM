@@ -109,8 +109,8 @@ export const columns: ColumnDef<Observation>[] = [
     },
     filterFn: (row, id, value) => {
       const tags: Tag[] = row.original.tags;
-      return value.some((filter: string) =>
-        tags.some((tag) => tag.id?.toString().includes(filter.toLowerCase()))
+      return value.some((filter: number) =>
+        tags.some((tag) => tag.id === filter)
       );
     },
   },
@@ -122,7 +122,7 @@ export const columns: ColumnDef<Observation>[] = [
       return <div>{getStatusLabel(status)}</div>;
     },
     filterFn: (row, id, value) => {
-      const rowValue = row.getValue(id);
+      const rowValue: number = row.getValue(id);
       return value.some(
         (filterValue: string) => rowValue === parseInt(filterValue, 10)
       );
