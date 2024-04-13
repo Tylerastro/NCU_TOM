@@ -1,5 +1,5 @@
 import { Target } from "@/models/targets";
-import { getStatusLabel, StatusNumber } from "@/models/enums";
+import { getStatusLabel } from "@/models/enums";
 import Link from "next/link";
 
 type Props = {
@@ -18,9 +18,7 @@ export default function Observations(props: Props) {
             <dd className="mt-1 text-sm leading-6 text-gray-300 sm:col-span-2 sm:mt-0">
               {props.target?.observations?.map((observation, index) => {
                 let className;
-                const statusLabel = getStatusLabel(
-                  observation.status as StatusNumber
-                );
+                const statusLabel = getStatusLabel(observation.status);
 
                 switch (statusLabel) {
                   case "Prep.":

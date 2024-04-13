@@ -14,7 +14,6 @@ import Container from "@mui/material/Container";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import * as React from "react";
-import FormDialog from "./newObservation";
 
 export default function DataTable() {
   const [allRows, setAllRows] = React.useState<Observation[]>([]);
@@ -176,7 +175,6 @@ export default function DataTable() {
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
           Observations
         </h1>
-        <FormDialog />
       </Container>
       <Container
         maxWidth={false}

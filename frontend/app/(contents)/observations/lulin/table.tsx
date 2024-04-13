@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getStatusLabel, StatusNumber } from "@/models/enums";
+import { getStatusLabel } from "@/models/enums";
 import Link from "next/link";
 import { Observation } from "@/models/observations";
 
@@ -123,7 +123,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
               <td className="px-6 py-4">{observation.targets?.length ?? 0}</td>
               <td className="px-6 py-4">
                 <div className="font-medium text-blue-600 dark:text-blue-500">
-                  {getStatusLabel(observation.status as StatusNumber)}
+                  {getStatusLabel(observation.status)}
                 </div>
               </td>
             </tr>
