@@ -62,10 +62,6 @@ export function DataTableFacetedFilter<TData, TValue>({
     }
   }, [facets]);
 
-  React.useEffect(() => {
-    console.log(facets);
-  }, [facets]);
-
   return (
     <Popover>
       <PopoverTrigger asChild>

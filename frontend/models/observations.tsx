@@ -23,8 +23,8 @@ export interface NewObservation {
   observatory: number;
   priority: number;
   status?: number;
-  start_date: string;
-  end_date: string;
+  start_date: Date;
+  end_date: Date;
   created_at?: Date;
   updated_at?: Date;
   tags: Tag[];

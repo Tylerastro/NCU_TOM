@@ -2,6 +2,7 @@ import { createObservation } from "@/apis/observations";
 import { TagOptions } from "@/components/TagOptions";
 import { TargetOptions } from "@/components/TargetOptions";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +20,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/components/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -41,6 +50,7 @@ export function NewTargetFrom() {
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     createObservation(values)
       .then(() => {
         toast.success("Observation created successfully");
@@ -58,11 +68,11 @@ export function NewTargetFrom() {
 
   const formSchema = z.object({
     name: z.string().optional(),
-    observatory: z.string().transform(Number),
-    priority: z.string().transform(Number),
+    observatory: z.number().transform(Number),
+    priority: z.number().transform(Number),
     targets: z.array(z.number()),
-    start_date: z.string(),
-    end_date: z.string(),
+    start_date: z.date(),
+    end_date: z.date(),
     tags: z.array(
       z.object({
         name: z.string(),
@@ -79,8 +89,8 @@ export function NewTargetFrom() {
       observatory: 1,
       priority: 1,
       targets: [],
-      start_date: "",
-      end_date: "",
+      start_date: new Date(),
+      end_date: new Date(),
       tags: selectedTags,
     },
   });
@@ -94,7 +104,7 @@ export function NewTargetFrom() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px]">
         <DialogHeader>
-          <DialogTitle>New Target info</DialogTitle>
+          <DialogTitle>New Observation</DialogTitle>
           <DialogDescription>
             Enter the basic {`observation's`} info to create a new observation.
           </DialogDescription>
@@ -154,7 +164,7 @@ export function NewTargetFrom() {
                   <FormItem>
                     <FormLabel>Priority</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => field.onChange(Number(value))}
                       defaultValue={field.value.toString()}
                     >
                       <FormControl>
@@ -201,9 +211,48 @@ export function NewTargetFrom() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="start_date"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Start date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
             <div className="text-center w-full">
               <Button
-                disabled
                 className="w-full text-primary-foreground bg-primary"
                 type="submit"
               >
