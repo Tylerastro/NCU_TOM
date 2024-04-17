@@ -54,9 +54,24 @@ export const columns: ColumnDef<Observation>[] = [
     cell(props) {
       const name: string = props.row.getValue("name");
       const id: number = props.row.getValue("id");
+      const observatory: number = props.row.getValue("observatory");
+      const start_date: string = props.row.getValue("start_date");
+      const end_date: string = props.row.getValue("end_date");
       return (
         <div className="text-primary-foreground font-medium">
-          <Link href={`/targetsv2/${id}`}>{name}</Link>
+          <Link
+            href={{
+              pathname: `/observationsv2/edit`,
+              query: {
+                id: id,
+                observatory: observatory,
+                start_date: start_date,
+                end_date: end_date,
+              },
+            }}
+          >
+            {name}
+          </Link>
         </div>
       );
     },
