@@ -1,6 +1,7 @@
 from django.contrib.auth.models import (AbstractUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
+from django.db.models import UniqueConstraint
 
 
 class Observatories(models.IntegerChoices):
@@ -12,6 +13,9 @@ class Tags(models.Model):
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        UniqueConstraint(fields=['user', 'name'], name='user_unique_tag')
 
 
 class Comments(models.Model):

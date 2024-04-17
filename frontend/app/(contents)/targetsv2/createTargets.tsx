@@ -34,6 +34,7 @@ export function NewTargetFrom() {
     createTarget(values)
       .then(() => {
         toast.success("Target created successfully");
+        setOpen(false);
       })
       .catch((error) => {
         for (const key in error.data) {

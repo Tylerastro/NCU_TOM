@@ -50,10 +50,10 @@ export function NewTargetFrom() {
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     createObservation(values)
       .then(() => {
         toast.success("Observation created successfully");
+        setOpen(false);
       })
       .catch((error) => {
         for (const key in error.data) {
