@@ -3,7 +3,6 @@
 import json
 
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from helpers.models import RequestLog
 
 User = get_user_model()

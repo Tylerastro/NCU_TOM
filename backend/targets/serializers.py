@@ -98,10 +98,14 @@ class TargetPostSerializer(serializers.ModelSerializer):
                 target.tags.remove(tag)
 
 
-class AltAzDataSerializer(serializers.Serializer):
-    time = serializers.ListField(child=serializers.DateTimeField())
-    alt = serializers.ListField(child=serializers.FloatField())
-    az = serializers.ListField(child=serializers.FloatField())
+class NestedAltAzDataSerializer(serializers.Serializer):
+    time = serializers.DateTimeField()
+    alt = serializers.FloatField()
+    az = serializers.FloatField()
+
+
+class AltAzDataSerializer(serializers.ListField):
+    child = NestedAltAzDataSerializer()
 
 
 class TargetAltAzSerializer(serializers.Serializer):
@@ -203,4 +207,6 @@ class TargetSEDSerializer(serializers.Serializer):
         """
         if value is not None and (math.isinf(value) or math.isnan(value)):
             return None
+        return value
+        return value
         return value

@@ -60,7 +60,7 @@ export default function MoonAltAz(props: {
         );
 
         // Fetch target data (list of objects)
-        const targetData = await getObservationAltAz(
+        const targetData: TargetAltAz[] = await getObservationAltAz(
           props.observation_id,
           props.start_date,
           props.end_date
@@ -70,11 +70,7 @@ export default function MoonAltAz(props: {
         const combinedData: TargetAltAz[] = [
           {
             name: "Moon",
-            data: {
-              time: moonData.data.time,
-              alt: moonData.data.alt,
-              az: moonData.data.az,
-            },
+            data: moonData.data, // Assuming the new data structure
           },
           ...targetData,
         ];
@@ -84,27 +80,20 @@ export default function MoonAltAz(props: {
         console.error("Failed to fetch data:", error);
       }
     }
+
     fetchData();
   }, [props.start_date, props.end_date, props.observation_id]);
-
-  React.useEffect(() => {
-    console.log(AltAz);
-  }, [AltAz]);
 
   return (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart width={500} height={300}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="category"
-          type="category"
-          allowDuplicatedCategory={false}
-        />
-        <YAxis dataKey="value" />
+        <XAxis dataKey="time" type="category" allowDuplicatedCategory={false} />
+        <YAxis dataKey="alt" />
         <Tooltip />
         <Legend />
-        {series.map((s) => (
-          <Line dataKey="value" data={s.data} name={s.name} key={s.name} />
+        {AltAz.map((s) => (
+          <Line dataKey="alt" data={s.data} name={s.name} key={s.name} />
         ))}
       </LineChart>
     </ResponsiveContainer>

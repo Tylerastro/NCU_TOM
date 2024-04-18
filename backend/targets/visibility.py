@@ -20,13 +20,17 @@ class TargetAltAz:
         self.altaz = data
 
     def to_dict(self):
+        data = []
+        for i in range(len(self.altaz.time)):
+            data.append({
+                'time': self.altaz.time[i],
+                'alt': self.altaz.alt[i],
+                'az': self.altaz.az[i]
+            })
+
         return {
             'name': self.name,
-            'data': {
-                'time': self.altaz.time,
-                'alt': self.altaz.alt,
-                'az': self.altaz.az
-            }
+            'data': data
         }
 
 

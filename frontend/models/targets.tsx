@@ -17,14 +17,14 @@ export interface Target {
 }
 
 interface AltAzData {
-  time: string[];
-  alt: number[];
-  az: number[];
+  time: string;
+  alt: number;
+  az: number;
 }
 
 export interface TargetAltAz {
   name: string;
-  data: AltAzData;
+  data: AltAzData[];
 }
 
 export interface TargetSimbad {
