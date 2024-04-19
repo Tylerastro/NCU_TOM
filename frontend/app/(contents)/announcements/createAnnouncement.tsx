@@ -1,4 +1,5 @@
-import { createTarget } from "@/apis/targets";
+"use client";
+import { createAnnouncement } from "@/apis/announcements";
 import { TagOptions } from "@/components/TagOptions";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,11 +10,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
   FormField,
+  FormMessage,
   FormItem,
+  FormDescription,
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -22,7 +33,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import FileUpload from "./fileUpload";
 
 function isHourAngleFormat(input: string) {
   const hourAnglePattern = /^\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?$/;
@@ -69,16 +79,13 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
   return decimalDegrees;
 }
 
-export function NewTargetFrom() {
+export function NewAnnouncementForm() {
   const [open, setOpen] = React.useState(false);
-  const [selectedTags, setSelectedTags] = React.useState<
-    z.infer<typeof formSchema>["tags"]
-  >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    createTarget(values)
+    createAnnouncement(values)
       .then(() => {
-        toast.success("Target created successfully");
+        toast.success("New announcement released successfully");
         setOpen(false);
       })
       .catch((error) => {
@@ -88,33 +95,17 @@ export function NewTargetFrom() {
       });
   }
 
-  const handleTagChange = (tags: z.infer<typeof formSchema>["tags"]) => {
-    setSelectedTags(tags);
-  };
-
   const formSchema = z.object({
-    name: z.string(),
-    ra: z.preprocess(convertHourAngleToDegrees, z.number().min(0).max(360)),
-    dec: z.preprocess(
-      convertSexagesimalDegreesToDecimal,
-      z.number().min(-90).max(90)
-    ),
-    tags: z.array(
-      z.object({
-        name: z.string(),
-        targets: z.array(z.number()),
-        observations: z.array(z.number()),
-      })
-    ),
+    title: z.string(),
+    context: z.string(),
+    type: z.coerce.number(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      ra: 0,
-      dec: 0,
-      tags: selectedTags,
+      title: "Inspire Everyone!",
+      type: 1,
     },
   });
 
@@ -122,16 +113,12 @@ export function NewTargetFrom() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
-          Create target
+          New Announcement
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px]">
         <DialogHeader>
-          <DialogTitle>New Target info</DialogTitle>
-          <DialogDescription>
-            Enter the {`target's`} info to create a new target. We also support
-            csv file for bulk upload.
-          </DialogDescription>
+          <DialogTitle>Details</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -140,85 +127,64 @@ export function NewTargetFrom() {
           >
             <FormField
               control={form.control}
-              name="name"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-primary-foreground">
-                    Name
+                    Title
                   </FormLabel>
                   <FormControl>
                     <Input
                       className="text-primary-foreground"
-                      placeholder="Target name"
+                      placeholder="Insipring Title"
                       {...field}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="ra"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      RA
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-primary-foreground w-full"
-                        placeholder="ra"
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="dec"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      Dec
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-primary-foreground w-full"
-                        placeholder="Dec"
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
             <FormField
               control={form.control}
-              name="tags"
+              name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Tags
-                  </FormLabel>
+                  <FormLabel>Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue="1">
+                    <FormControl className="w-2/12">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a verified email to display" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="1">Info</SelectItem>
+                      <SelectItem value="2">Warning</SelectItem>
+                      <SelectItem value="3">Error</SelectItem>
+                      <SelectItem value="4">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="context"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Context</FormLabel>
                   <FormControl>
-                    <TagOptions {...field} />
+                    <Textarea
+                      placeholder="Inspire Everyone! "
+                      className="resize-none"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <div className="text-center w-full">
-              <Button
-                className="w-full text-primary-foreground bg-primary"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
+            <Button type="submit">Submit</Button>
           </form>
         </Form>
-        <FileUpload setOpen={setOpen} />
       </DialogContent>
     </Dialog>
   );

@@ -1,30 +1,36 @@
+"use client";
 import {
   Accordion,
   AccordionContent,
+  AccordionDate,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/Accordion";
 
-export function AccordionDemo() {
+import { Announcements } from "@/models/helpers";
+import { fetchAnnouncements } from "@/apis/announcements";
+import * as React from "react";
+
+export function AccordionAnnoucemnets() {
+  const [data, setData] = React.useState<Announcements[]>([]);
+
+  React.useEffect(() => {
+    fetchAnnouncements().then((data) => {
+      setData(data);
+    });
+  }, []);
+
   return (
     <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Is it accessible?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It adheres to the WAI-ARIA design pattern.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-2">
-        <AccordionTrigger>Is it styled?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It comes with default styles that matches the other
-          components&apos; aesthetic.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-3">
-        <AccordionTrigger>Is it animated?</AccordionTrigger>
-        <AccordionContent>Lorem, ipsum.</AccordionContent>
-      </AccordionItem>
+      {data.map((item, index) => (
+        <AccordionItem key={item.id} value={`item-${index}`}>
+          <AccordionTrigger>{item.title}</AccordionTrigger>
+          <AccordionDate>
+            {new Date(item.created_at).toUTCString()}
+          </AccordionDate>
+          <AccordionContent>{item.context}</AccordionContent>
+        </AccordionItem>
+      ))}
     </Accordion>
   );
 }

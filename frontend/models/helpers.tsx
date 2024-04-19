@@ -28,6 +28,15 @@ export interface Comments {
   updated_at: string;
 }
 
+export interface Announcements {
+  id?: number;
+  user?: User;
+  title: string;
+  context: string;
+  created_at?: Date;
+  type: number;
+}
+
 export interface PersonalInfo {
   name: string;
   image?: string;

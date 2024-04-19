@@ -53,4 +53,17 @@ class AnnouncementsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Announcements
-        fields = '__all__'
+        fields = 'user', 'title', 'context', 'type', 'created_at'
+
+
+class AnnouncementsPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcements
+        fields = 'user', 'title', 'context', 'type'
+        extra_kwargs = {'user': {'read_only': True}}
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        target = Announcements.objects.create(**validated_data, user=user)
+
+        return target

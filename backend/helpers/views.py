@@ -10,8 +10,8 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
 from .models import Announcements, Tags
-from .serializers import (AnnouncementsSerializer, TagsGetSerializer,
-                          TagsSerializer)
+from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
+                          TagsGetSerializer, TagsSerializer)
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -120,3 +120,11 @@ class AnnouncementsView(APIView):
         announcements = Announcements.objects.all()
         serializer = AnnouncementsSerializer(announcements, many=True)
         return Response(serializer.data, status=200)
+
+    def post(self, request):
+        serializer = AnnouncementsPostSerializer(
+            data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
