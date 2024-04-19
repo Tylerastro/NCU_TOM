@@ -24,6 +24,51 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 import FileUpload from "./fileUpload";
 
+function isHourAngleFormat(input: string) {
+  const hourAnglePattern = /^\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?$/;
+  return hourAnglePattern.test(input);
+}
+function convertHourAngleToDegrees(hourAngle: unknown) {
+  if (typeof hourAngle !== "string") {
+    return 0;
+  }
+  if (!isHourAngleFormat(hourAngle)) {
+    return parseFloat(hourAngle);
+  }
+
+  const parts = hourAngle.split(":");
+  if (parts.length !== 3) {
+    return 0;
+  }
+
+  const hours = parseFloat(parts[0]);
+  const minutes = parseFloat(parts[1]);
+  const seconds = parseFloat(parts[2]);
+
+  const degrees = (hours + minutes / 60 + seconds / 3600) * 15;
+  return degrees;
+}
+
+function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
+  if (typeof sexagesimal !== "string") {
+    return 0;
+  }
+  if (!isHourAngleFormat(sexagesimal)) {
+    return parseFloat(sexagesimal);
+  }
+
+  const parts = sexagesimal.split(":");
+  if (parts.length !== 3) {
+    return 0;
+  }
+
+  const degrees = parseFloat(parts[0]);
+  const minutes = parseFloat(parts[1]);
+  const seconds = parseFloat(parts[2]);
+  const decimalDegrees = degrees + minutes / 60 + seconds / 3600;
+  return decimalDegrees;
+}
+
 export function NewTargetFrom() {
   const [open, setOpen] = React.useState(false);
   const [selectedTags, setSelectedTags] = React.useState<
@@ -31,6 +76,7 @@ export function NewTargetFrom() {
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     createTarget(values)
       .then(() => {
         toast.success("Target created successfully");
@@ -49,12 +95,9 @@ export function NewTargetFrom() {
 
   const formSchema = z.object({
     name: z.string(),
-    ra: z.preprocess(
-      (val) => parseFloat(val as string),
-      z.number().min(0).max(360)
-    ),
+    ra: z.preprocess(convertHourAngleToDegrees, z.number().min(0).max(360)),
     dec: z.preprocess(
-      (val) => parseFloat(val as string),
+      convertSexagesimalDegreesToDecimal,
       z.number().min(-90).max(90)
     ),
     tags: z.array(
