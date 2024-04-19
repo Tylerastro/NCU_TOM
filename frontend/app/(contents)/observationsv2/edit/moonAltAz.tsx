@@ -16,32 +16,14 @@ import { getMoonAltAz } from "@/apis/targets";
 import { TargetAltAz } from "@/models/targets";
 import { getObservationAltAz } from "@/apis/observations";
 
-const series = [
-  {
-    name: "Series 1",
-    data: [
-      { category: "A", value: Math.random() },
-      { category: "B", value: Math.random() },
-      { category: "C", value: Math.random() },
-    ],
-  },
-  {
-    name: "Series 2",
-    data: [
-      { category: "B", value: Math.random() },
-      { category: "C", value: Math.random() },
-      { category: "D", value: Math.random() },
-    ],
-  },
-  {
-    name: "Series 3",
-    data: [
-      { category: "C", value: Math.random() },
-      { category: "D", value: Math.random() },
-      { category: "E", value: Math.random() },
-    ],
-  },
-];
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
 export default function MoonAltAz(props: {
   start_date: string;
@@ -70,9 +52,47 @@ export default function MoonAltAz(props: {
         const combinedData: TargetAltAz[] = [
           {
             name: "Moon",
-            data: moonData.data, // Assuming the new data structure
+            data: moonData.data.map((d) => {
+              const millisecondPattern = /\.\d{3}/;
+              let date = new Date(d.time);
+              if (millisecondPattern.test(d.time)) {
+                date = new Date(date.getTime() + 60000);
+              }
+              return {
+                time: date.toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hourCycle: "h23",
+                }),
+                alt: d.alt,
+                az: d.az,
+              };
+            }),
           },
-          ...targetData,
+          ...targetData.map((d) => {
+            return {
+              name: d.name,
+              data: d.data.map((dd) => {
+                const millisecondPattern = /\.\d{3}/;
+                let date = new Date(dd.time);
+                if (millisecondPattern.test(dd.time)) {
+                  date = new Date(date.getTime() + 60000);
+                }
+                const formattedDate = date.toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hourCycle: "h23",
+                });
+                return {
+                  time: formattedDate,
+                  alt: dd.alt,
+                  az: dd.az,
+                };
+              }),
+            };
+          }),
         ];
 
         setAltAz(combinedData);
@@ -84,16 +104,35 @@ export default function MoonAltAz(props: {
     fetchData();
   }, [props.start_date, props.end_date, props.observation_id]);
 
+  React.useEffect(() => {
+    console.log(AltAz);
+  }, [AltAz]);
+
   return (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart width={500} height={300}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" type="category" allowDuplicatedCategory={false} />
+        <XAxis
+          padding={{ left: 30, right: 30 }}
+          dataKey="time"
+          angle={-30}
+          type="category"
+          allowDuplicatedCategory={false}
+        />
         <YAxis dataKey="alt" />
         <Tooltip />
         <Legend />
         {AltAz.map((s) => (
-          <Line dataKey="alt" data={s.data} name={s.name} key={s.name} />
+          <Line
+            dataKey="alt"
+            data={s.data}
+            name={s.name}
+            key={s.name}
+            stroke={getRandomColor()}
+            dot={false}
+            activeDot={false}
+            hide={false}
+          />
         ))}
       </LineChart>
     </ResponsiveContainer>

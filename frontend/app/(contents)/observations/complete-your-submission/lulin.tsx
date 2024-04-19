@@ -59,11 +59,7 @@ export default function Lulin(props: {
         const combinedData: TargetAltAz[] = [
           {
             name: "Moon",
-            data: {
-              time: moonData.data.time,
-              alt: moonData.data.alt,
-              az: moonData.data.az,
-            },
+            data: moonData.data,
           },
           ...targetData,
         ];
@@ -88,16 +84,16 @@ export default function Lulin(props: {
       labels: [], // These labels represent each line segment
       datasets: targetAltAz.map((target) => ({
         label: target.name,
-        data: target.data.time.map((time, index) => {
+        data: target.data.map((data, index) => {
           // Check if time string contains milliseconds
           const millisecondPattern = /\.\d{3}/;
-          let date = new Date(time);
-          if (millisecondPattern.test(time)) {
+          let date = new Date(data.time);
+          if (millisecondPattern.test(data.time)) {
             date = new Date(date.getTime() + 60000);
           }
           return {
             x: date.getTime(),
-            y: target.data.alt[index],
+            y: data.alt,
           };
         }),
         borderColor: getRandomColor(),
