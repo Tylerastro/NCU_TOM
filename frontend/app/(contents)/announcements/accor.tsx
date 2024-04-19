@@ -26,7 +26,9 @@ export function AccordionAnnoucemnets() {
         <AccordionItem key={item.id} value={`item-${index}`}>
           <AccordionTrigger>{item.title}</AccordionTrigger>
           <AccordionDate>
-            {new Date(item.created_at).toUTCString()}
+            {item.created_at
+              ? new Date(item.created_at).toLocaleDateString()
+              : ""}
           </AccordionDate>
           <AccordionContent>{item.context}</AccordionContent>
         </AccordionItem>
