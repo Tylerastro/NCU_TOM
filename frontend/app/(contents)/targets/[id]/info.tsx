@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Target, TargetSimbad } from "@/models/targets";
 import { getTargetSimbad } from "@/apis/targets";
 import Divider from "@mui/material/Divider";
@@ -74,9 +74,9 @@ export default function Info(props: Props) {
               Views
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-300 sm:col-span-2 sm:mt-0">
-              <React.Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<div>Loading...</div>}>
                 <Aladin target={props.target} />
-              </React.Suspense>
+              </Suspense>
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, SyntheticEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { fetchTargets } from "@/apis/targets";
 import { Target } from "@/models/targets";
 import AdsClickOutlinedIcon from "@mui/icons-material/AdsClickOutlined";
@@ -7,42 +10,33 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useRouter } from "next/navigation";
 import PopDialog from "@/components/Dialog";
-import * as React from "react";
 import Info from "./info";
 import Detail from "./detail";
 import Observations from "./observations";
 
 export default function Page({ params }: { params: { id: number } }) {
-  const [value, setValue] = React.useState(0);
-  const [target, setTarget] = React.useState<Target | null>(null);
-
+  const [value, setValue] = useState(0);
   const router = useRouter();
 
-  React.useEffect(() => {
-    fetchTargets(params.id)
-      .then((data) => {
-        setTarget(data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-        router.push("/targets");
-      });
-  }, [params.id, router]);
+  const { data: targetData } = useQuery({
+    queryKey: ["getTarget"],
+    queryFn: () => fetchTargets(params.id),
+    initialData: {} as Target,
+  });
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const renderTabContent = () => {
     switch (value) {
       case 0:
-        return <Info target={target} />;
+        return <Info target={targetData} />;
       case 1:
-        return <Observations target={target} />;
+        return <Observations target={targetData} />;
       case 2:
-        return <Detail target={target} />;
+        return <Detail target={targetData} />;
       default:
         return <div>Loading...</div>;
     }
@@ -53,9 +47,11 @@ export default function Page({ params }: { params: { id: number } }) {
       <PopDialog />
       <div className="mx-auto max-w-2xl lg:text-center">
         <p className="mt-2 text-5xl font-bold tracking-tight text-[#96fb4d] sm:text-5xl">
-          {target?.name}
+          {targetData?.name}
         </p>
-        <p className="mt-6 text-lg leading-8 text-gray-600">{target?.notes}</p>
+        <p className="mt-6 text-lg leading-8 text-gray-600">
+          {targetData?.notes}
+        </p>
       </div>
       <div className="mx-auto max-w-2xl lg:max-w-none flex items-center justify-center">
         <Tabs
