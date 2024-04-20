@@ -24,7 +24,7 @@ export async function fetchTargets(targetId?: number): Promise<Target[]> {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
