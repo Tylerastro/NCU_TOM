@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import { Target, TargetSimbad } from "@/models/targets";
-import Aladin from "./aladin";
-import Simbad from "./simbad";
 import { getTargetSimbad } from "@/apis/targets";
-import * as React from "react";
 import Divider from "@mui/material/Divider";
 import ScatterSED from "./scatterSED";
+import Aladin from "./aladin";
+import Simbad from "./simbad";
 
 type Props = {
   target?: Target | null;
@@ -17,10 +17,10 @@ declare global {
 }
 
 export default function Info(props: Props) {
-  const [targetSimbad, setTargetSimbad] = React.useState<TargetSimbad | null>();
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [targetSimbad, setTargetSimbad] = useState<TargetSimbad | null>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props.target && props.target.id) {
       getTargetSimbad(props.target.id)
         .then((targetSimbad) => {

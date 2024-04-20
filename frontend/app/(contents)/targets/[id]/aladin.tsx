@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
 import Script from "next/script";
+import { useEffect, useState, Suspense } from "react";
 import { Target } from "@/models/targets";
-import { Suspense } from "react";
 
 export default function Aladin(props: { target?: Target | null }) {
   const [aladinInitialized, setAladinInitialized] = useState(false);
