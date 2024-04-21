@@ -1,5 +1,5 @@
-import Block from "@/components/Block";
 import Image from "next/image";
+import Block from "@/components/Block";
 import styles from "./page.module.css";
 
 export default function Home() {
