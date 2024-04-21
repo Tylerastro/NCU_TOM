@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, SyntheticEvent } from "react";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { fetchTargets } from "@/apis/targets";
+import PopDialog from "@/components/Dialog";
 import { Target } from "@/models/targets";
 import AdsClickOutlinedIcon from "@mui/icons-material/AdsClickOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import PopDialog from "@/components/Dialog";
-import Info from "./info";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { SyntheticEvent, useState } from "react";
 import Detail from "./detail";
+import Info from "./info";
 import Observations from "./observations";
 
 export default function Page({ params }: { params: { id: number } }) {
@@ -22,7 +22,7 @@ export default function Page({ params }: { params: { id: number } }) {
   const { data: targetData } = useQuery({
     queryKey: ["getTarget"],
     queryFn: () => fetchTargets(params.id),
-    initialData: {} as Target,
+    initialData: [] as Target[],
   });
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -32,11 +32,11 @@ export default function Page({ params }: { params: { id: number } }) {
   const renderTabContent = () => {
     switch (value) {
       case 0:
-        return <Info target={targetData} />;
+        return <Info target={targetData[0]} />;
       case 1:
-        return <Observations target={targetData} />;
+        return <Observations target={targetData[0]} />;
       case 2:
-        return <Detail target={targetData} />;
+        return <Detail target={targetData[0]} />;
       default:
         return <div>Loading...</div>;
     }
@@ -47,10 +47,10 @@ export default function Page({ params }: { params: { id: number } }) {
       <PopDialog />
       <div className="mx-auto max-w-2xl lg:text-center">
         <p className="mt-2 text-5xl font-bold tracking-tight text-[#96fb4d] sm:text-5xl">
-          {targetData?.name}
+          {targetData[0]?.name}
         </p>
         <p className="mt-6 text-lg leading-8 text-gray-600">
-          {targetData?.notes}
+          {targetData[0]?.notes}
         </p>
       </div>
       <div className="mx-auto max-w-2xl lg:max-w-none flex items-center justify-center">
