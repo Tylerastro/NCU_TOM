@@ -1,23 +1,10 @@
 import { Announcements } from "@/models/helpers";
+import api from "./wrapper";
 
 export async function fetchAnnouncements() {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/announcements/`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data: Announcements[] = await response.json();
-    return data;
+    const response = await api.get("/api/announcements/");
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -25,21 +12,8 @@ export async function fetchAnnouncements() {
 
 export async function createAnnouncement(newAnnouncement: Announcements) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/announcements/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newAnnouncement),
-        credentials: "include",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+    const response = await api.post("/api/announcements/", newAnnouncement);
+    return response.data;
   } catch (error) {
     throw error;
   }

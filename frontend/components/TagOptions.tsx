@@ -48,8 +48,8 @@ export function TagOptions(props: TagOptionsProps) {
 
   React.useEffect(() => {
     fetchTags()
-      .then((data) => {
-        setTags(data);
+      .then((tags) => {
+        setTags(tags.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);

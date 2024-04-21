@@ -1,30 +1,17 @@
 import {
-  LulinObservations,
   LulinObservationsUpdate,
-  ObservationUpdate,
   NewObservation,
-  Observation,
+  ObservationUpdate,
 } from "@/models/observations";
+
+import api from "./wrapper";
 
 export async function createObservation(newObservation: NewObservation) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newObservation),
-        credentials: "include",
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const createdObservation = await response.json();
-    return createdObservation;
+    const response = await api.post("/api/observations/", newObservation);
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -34,45 +21,23 @@ export async function putObservation(
   observation: ObservationUpdate
 ) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/edit/`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(observation),
-        credentials: "include",
-      }
+    const response = await api.put(
+      "/api/observations/" + id + "/",
+      observation
     );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const updatedObservation = await response.json();
-    return updatedObservation;
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
 
 export async function deleteObservation(id: number) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/delete/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const deletedObservation = await response.json();
-    return deletedObservation;
+    const response = await api.post("/api/observations/" + id + "/delete/");
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -84,35 +49,20 @@ export async function getObservations(observationId?: number) {
       url += `?observation_id=${observationId}`;
     }
 
-    const response = await fetch(url, {
-      method: "GET",
-      credentials: "include",
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+    const response = await api.get(url);
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
 
 export async function getLulin(id: number) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data: LulinObservations[] = await response.json();
-    return data;
+    const response = await api.get("/api/observations/lulin/" + id);
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -122,23 +72,13 @@ export async function putLulin(
   updateData: LulinObservationsUpdate
 ) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/lulin/${pk}/`, // Include the pk in the URL
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-        credentials: "include",
-      }
+    const response = await api.put(
+      "/api/observations/lulin/" + pk + "/",
+      updateData
     );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data: LulinObservations = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -149,16 +89,10 @@ export async function getLulinCode(id: number, refresh: boolean = false) {
       `${process.env.NEXT_PUBLIC_API_URL}/api/observations/lulin/${id}/code/`
     );
     url.searchParams.append("refresh", refresh ? "true" : "false");
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      credentials: "include",
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data: string = await response.text();
-    return data;
+    const response = await api.get(url.toString());
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -169,46 +103,26 @@ export async function getObservationAltAz(
   end_time: string
 ) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/lulin/${id}/altaz/`,
-      {
-        method: "POST",
-        body: JSON.stringify({ start_time: start_time, end_time: end_time }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+    const response = await api.post("/api/observations/" + id + "/altaz/", {
+      start_time: start_time,
+      end_time: end_time,
+    });
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
 
 export async function postObservationMessages(id: number, message: string) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/messages/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: message }),
-        credentials: "include",
-      }
+    const response = await api.post(
+      "/api/observations/" + id + "/messages/",
+      message
     );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }

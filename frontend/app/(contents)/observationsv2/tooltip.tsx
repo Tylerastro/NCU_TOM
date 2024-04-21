@@ -67,7 +67,7 @@ export function DataTableToolbar<TData>({
 
   React.useEffect(() => {
     fetchTags().then((tags) => {
-      setTags(tags);
+      setTags(tags.data);
     });
   }, []);
 
