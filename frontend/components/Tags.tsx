@@ -25,7 +25,7 @@ export default function TagOptions(props: {
   React.useEffect(() => {
     fetchTags()
       .then((data) => {
-        setTags(data);
+        setTags(data.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
