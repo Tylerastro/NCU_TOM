@@ -3,24 +3,12 @@ import Image from "next/image";
 
 import { fetchTargets } from "@/apis/targets";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDateRangePicker } from "./date-range-picker";
-import { Overview } from "./overview";
-import { MainNav } from "./main-nav";
-import { RecentSales } from "./recent-sales";
-import { Search } from "./search";
-import TeamSwitcher from "./team-switcher";
-import { UserNav } from "./user-nav";
 import { Target } from "@/models/targets";
 import * as React from "react";
+import { Overview } from "./overview";
+import { RecentSales } from "./recent-sales";
 
 export default function DashboardPage(params: { params: { id: number } }) {
   const [target, setTarget] = React.useState<Target | null>(null);

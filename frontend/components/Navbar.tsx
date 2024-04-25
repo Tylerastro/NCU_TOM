@@ -1,21 +1,19 @@
 "use client";
-import UnAuthTooltip from "@/components/UnauthNavBarTooltip";
-import { useAppSelector } from "@/redux/hook";
-import { buttonVariants } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
 import { AuthTooltip } from "@/components/AuthNavBarTooltip";
+import UnAuthTooltip from "@/components/UnauthNavBarTooltip";
+import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/redux/hook";
 import Link from "next/link";
-import * as React from "react";
 
 const pages = [
   {
     name: "Targets",
-    link: "/targets",
+    link: "/targetsv2",
     enabled: true,
   },
   {
     name: "Observations",
-    link: "/observations",
+    link: "/observationsv2",
     enabled: true,
   },
   {

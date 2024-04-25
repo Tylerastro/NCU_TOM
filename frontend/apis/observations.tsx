@@ -1,4 +1,5 @@
 import {
+  LulinObservations,
   LulinObservationsUpdate,
   NewObservation,
   ObservationUpdate,
@@ -22,7 +23,7 @@ export async function putObservation(
 ) {
   try {
     const response = await api.put(
-      "/api/observations/" + id + "/",
+      `/api/observations/${id}/edit/`,
       observation
     );
     return response.data;
@@ -57,9 +58,9 @@ export async function getObservations(observationId?: number) {
   }
 }
 
-export async function getLulin(id: number) {
+export async function getLulin(id: number): Promise<LulinObservations[]> {
   try {
-    const response = await api.get("/api/observations/lulin/" + id);
+    const response = await api.get(`/api/observations/${id}/lulin/`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -72,10 +73,7 @@ export async function putLulin(
   updateData: LulinObservationsUpdate
 ) {
   try {
-    const response = await api.put(
-      "/api/observations/lulin/" + pk + "/",
-      updateData
-    );
+    const response = await api.put(`/api/observations/${pk}/edit/`, updateData);
     return response.data;
   } catch (error) {
     console.error(error);

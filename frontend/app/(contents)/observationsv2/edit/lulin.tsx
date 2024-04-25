@@ -1,8 +1,6 @@
-import { getLulin, getObservationAltAz } from "@/apis/observations";
-import { getMoonAltAz } from "@/apis/targets";
+import { getLulin } from "@/apis/observations";
 import { LulinObservations } from "@/models/observations";
-import { TargetAltAz } from "@/models/targets";
-import { Box, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import CodeBlock from "./codeblock";
 import LulinData from "./lulinData";
@@ -23,7 +21,6 @@ export default function Lulin(props: {
   end_date: string;
   observation_id: number;
 }) {
-  const [targetAltAz, setTargetAltAz] = React.useState<TargetAltAz[]>([]);
   const [dataReady, setDataReady] = React.useState(true);
   const [codeUpdate, setCodeUpdate] = React.useState(false);
 
@@ -32,33 +29,19 @@ export default function Lulin(props: {
     datasets: [],
   };
 
-  React.useEffect(() => {
-    if (targetAltAz && targetAltAz.length > 0) {
-      setDataReady(true);
-    }
-  }, [targetAltAz]);
-
-  const [lulinObservations, setLulinObservations] = React.useState<
-    LulinObservations[]
-  >([]);
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getLulin(props.observation_id);
-        setLulinObservations(data);
-      } catch (error) {
-        console.error("Failed to fetch Lulin observations", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { data: lulinObservations } = useQuery({
+    queryKey: ["getLulin"],
+    queryFn: () => getLulin(props.observation_id),
+    initialData: [] as LulinObservations[],
+  });
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Typography variant="h4">Edit your submission</Typography>
-      </Box>
+      <div>
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+          Edit your submission
+        </h1>
+      </div>
       {/* <DynamicHorizontalBarChart data={chartData} /> */}
       {dataReady ? (
         <MoonAltAz

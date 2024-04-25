@@ -5,7 +5,6 @@ export async function fetchTargets(targetId?: number): Promise<Target[]> {
   try {
     let url = "/api/targets/";
 
-    // Append query parameter if targetId is provided
     if (targetId) {
       url += `?target_id=${encodeURIComponent(targetId)}`;
     }

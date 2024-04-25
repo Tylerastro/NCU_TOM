@@ -15,6 +15,6 @@ urlpatterns = [
     path('targets/<int:pk>/edit/', views.TargetsView.as_view()),
     path('targets/bulk/', views.BulkTargetCreation),
     path('targets/<int:pk>/delete/', views.DeleteTarget),
-    path('targets/getMoon/', views.GetMoonAltAz),
+    path('targets/moon/altaz/', views.GetMoonAltAz),
     path('targets/delete/bulk/', views.DeleteBulkTargets),
 ]

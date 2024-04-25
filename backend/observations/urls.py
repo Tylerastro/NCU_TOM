@@ -15,7 +15,7 @@ urlpatterns = [
     path('observations/<int:pk>/messages/',
          views.ObservationMessagesView.as_view()),
     path('observations/<int:pk>/edit/', views.ObservationsView.as_view()),
-    path('observations/lulin/<int:pk>/altaz/', views.GetObservationAltAz),
+    path('observations/<int:pk>/altaz/', views.GetObservationAltAz),
     path('observations/lulin/<int:id>/code/', views.CodeView.as_view()),
     path('observations/lulin/code/', views.GetCodes),
     path('observations/<int:pk>/lulin/', views.LulinView.as_view()),
