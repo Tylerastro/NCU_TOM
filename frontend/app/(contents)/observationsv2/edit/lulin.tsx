@@ -37,30 +37,33 @@ export default function Lulin(props: {
 
   return (
     <>
-      <div>
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-          Edit your submission
-        </h1>
-      </div>
-      {/* <DynamicHorizontalBarChart data={chartData} /> */}
-      {dataReady ? (
-        <MoonAltAz
-          start_date={props.start_date}
-          end_date={props.end_date}
-          observation_id={props.observation_id}
-        />
-      ) : (
-        <p>Loading data</p>
-      )}
+      <div className="container mx-auto px-4 h-200 max-h-200 w-full">
+        <div>
+          <h1 className="my-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+            Edit your submission
+          </h1>
+        </div>
+        {/* <DynamicHorizontalBarChart data={chartData} /> */}
+        {dataReady ? (
+          <MoonAltAz
+            start_date={props.start_date}
+            end_date={props.end_date}
+            observation_id={props.observation_id}
+          />
+        ) : (
+          <p>Loading data</p>
+        )}
 
-      {lulinObservations.map((observation, index) => (
-        <LulinData key={index} {...observation} setCodeUpdate={setCodeUpdate} />
-      ))}
-      <CodeBlock
-        observation_id={props.observation_id}
-        codeUpdate={codeUpdate}
-        setCodeUpdate={setCodeUpdate}
-      />
+        <div className="flex justify-center">
+          <LulinData data={lulinObservations} setCodeUpdate={setCodeUpdate} />
+        </div>
+
+        <CodeBlock
+          observation_id={props.observation_id}
+          codeUpdate={codeUpdate}
+          setCodeUpdate={setCodeUpdate}
+        />
+      </div>
     </>
   );
 }
