@@ -82,12 +82,22 @@ jobs:
     steps:
       - name: Set Result Emojis
         run: |
-          echo "FRONTEND_EMOJI=${{ needs.frontend.result == 'success' && ':white_check_mark:' || ':x:' }}" >> $GITHUB_ENV
-          echo "BACKEND_EMOJI=${{ needs.backend.result == 'success' && ':white_check_mark:' || ':x:' }}" >> $GITHUB_ENV
-      - name: Format commit message
-        run: |
-          COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
-          echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          FRONTEND_STATUS=${{ needs.frontend.result }}
+          BACKEND_STATUS=${{ needs.backend.result }}
+          if [[ "$FRONTEND_STATUS" == "success" ]]; then
+            echo "FRONTEND_EMOJI=:white_check_mark:" >> $GITHUB_ENV
+          else
+            echo "FRONTEND_EMOJI=:x:" >> $GITHUB_ENV
+          fi
+          if [[ "$BACKEND_STATUS" == "success" ]]; then
+            echo "BACKEND_EMOJI=:white_check_mark:" >> $GITHUB_ENV
+          else
+            echo "BACKEND_EMOJI=:x:" >> $GITHUB_ENV
+          fi
+            - name: Format commit message
+              run: |
+                COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
+                echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Post to Slack
         id: slack

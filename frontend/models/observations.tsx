@@ -36,12 +36,14 @@ export interface LulinObservations {
   id: number;
   observation: string;
   priority: number;
+  filters: { [key: string]: boolean };
+  binning: number;
+  frames: number;
+  instruments: { [key: string]: boolean };
+  exposure_time: number;
   start_date: string;
   end_date: string;
-  filters: { [key: string]: boolean };
-  instruments: { [key: string]: boolean };
   target: Target;
-  exposure_time: number;
 }
 
 export interface LulinObservationsUpdate {
