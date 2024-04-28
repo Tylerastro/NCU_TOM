@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - dev
+      - actions
   pull_request:
     branches:
       - dev
@@ -19,6 +20,8 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
     continue-on-error: true
+    outputs:
+      status: ${{ job.status }}
 
     services:
       postgres:
@@ -74,6 +77,8 @@ jobs:
         run: |
           cd frontend
           npm run build
+    outputs:
+      status: ${{ job.status }}
 
   summary_send:
     runs-on: ubuntu-latest
@@ -82,8 +87,8 @@ jobs:
     steps:
       - name: Set Result Emojis
         run: |
-          FRONTEND_STATUS=${{ needs.frontend.result }}
-          BACKEND_STATUS=${{ needs.backend.result }}
+          FRONTEND_STATUS=${{ needs.frontend.outputs.status }}
+          BACKEND_STATUS=${{ needs.backend.outputs.status }}
           if [[ "$FRONTEND_STATUS" == "success" ]]; then
             echo "FRONTEND_EMOJI=:white_check_mark:" >> $GITHUB_ENV
           else
@@ -94,10 +99,10 @@ jobs:
           else
             echo "BACKEND_EMOJI=:x:" >> $GITHUB_ENV
           fi
-            - name: Format commit message
-              run: |
-                COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
-                echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+      - name: Format commit message
+        run: |
+          COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Post to Slack
         id: slack
@@ -121,7 +126,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":pencil2: branch ${{github.ref_name}}"
+                    "text": ":pencil2: branch ${{github.ref}}"
                   }
                 },
                 {
