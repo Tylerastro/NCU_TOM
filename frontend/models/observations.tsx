@@ -41,8 +41,8 @@ export interface LulinObservations {
   frames: number;
   instruments: { [key: string]: boolean };
   exposure_time: number;
-  start_date: string;
-  end_date: string;
+  start_date: Date;
+  end_date: Date;
   target: Target;
 }
 
@@ -50,8 +50,8 @@ export interface LulinObservationsUpdate {
   id?: number;
   observation?: string;
   priority?: number;
-  start_date?: string;
-  end_date?: string;
+  start_date?: Date;
+  end_date?: Date;
   filters?: { [key: string]: boolean };
   instruments?: { [key: string]: boolean };
   target?: Target;

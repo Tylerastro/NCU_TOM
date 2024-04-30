@@ -130,8 +130,8 @@ class LulinView(APIView):
             lulin_instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_BAD_REQUEST)
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400.)
 
 
 @permission_classes((IsAuthenticated, ))

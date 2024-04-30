@@ -174,7 +174,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "- Frontend: ${{ env.FRONTEND_EMOJI }} ${{ needs.frontend.result }} \n- Backend: ${{ env.BACKEND_EMOJI }} ${{ needs.backend.result }}"
+                    "text": "- Frontend: ${{ env.FRONTEND_EMOJI }} ${{needs.frontend.outputs.status}} \n- Backend: ${{ env.BACKEND_EMOJI }} ${{needs.backend.outputs.status}}"
                   }
                 },
                 {

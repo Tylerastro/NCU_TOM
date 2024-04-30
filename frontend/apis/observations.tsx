@@ -73,7 +73,10 @@ export async function putLulin(
   updateData: LulinObservationsUpdate
 ) {
   try {
-    const response = await api.put(`/api/observations/${pk}/edit/`, updateData);
+    const response = await api.put(
+      `/api/observations/${pk}/lulin/`,
+      updateData
+    );
     return response.data;
   } catch (error) {
     console.error(error);

@@ -73,6 +73,8 @@ class ObservationPostSerializer(serializers.ModelSerializer):
                 Lulin.objects.get_or_create(
                     observation=observation,
                     target=target_instance,
+                    start_date=observation.start_date,
+                    end_date=observation.end_date
                 )
 
         if tags_data:

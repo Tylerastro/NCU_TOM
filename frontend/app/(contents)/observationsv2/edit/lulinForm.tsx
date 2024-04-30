@@ -1,5 +1,6 @@
 "use client";
 
+import { putLulin } from "@/apis/observations";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,6 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 const filters = [
@@ -76,8 +78,8 @@ const formSchema = z.object({
   frames: z.number().int().min(1).default(1),
   instruments: z.record(z.boolean()).default({}),
   exposure_time: z.number().int().default(10),
-  start_date: z.string(),
-  end_date: z.string(),
+  start_date: z.date(),
+  end_date: z.date(),
 });
 
 export function TargetLulinForm({
@@ -94,15 +96,22 @@ export function TargetLulinForm({
       frames: observation.frames,
       instruments: observation.instruments,
       exposure_time: observation.exposure_time,
-      start_date: observation.start_date || "",
-      end_date: observation.end_date || "",
+      start_date: new Date(observation.start_date),
+      end_date: new Date(observation.end_date),
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
+    putLulin(observation.id, values)
+      .then(() => {
+        toast.success("Observation updated successfully");
+      })
+      .catch((error) => {
+        for (const key in error.data) {
+          toast.error(`${key}: ${error.data[key][0]}`);
+        }
+      });
   }
 
   return (

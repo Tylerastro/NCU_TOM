@@ -6,16 +6,6 @@ import CodeBlock from "./codeblock";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
 
-interface LineChartData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: { x: number; y: number }[];
-    borderColor: string;
-    fill: boolean;
-  }[];
-}
-
 export default function Lulin(props: {
   start_date: string;
   end_date: string;
@@ -23,11 +13,6 @@ export default function Lulin(props: {
 }) {
   const [dataReady, setDataReady] = React.useState(true);
   const [codeUpdate, setCodeUpdate] = React.useState(false);
-
-  let LineChartData: LineChartData = {
-    labels: [], // These labels represent each line segment
-    datasets: [],
-  };
 
   const { data: lulinObservations } = useQuery({
     queryKey: ["getLulin"],
