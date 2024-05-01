@@ -58,8 +58,8 @@ const filters = [
 
 const instruments = [
   {
-    id: "LST",
-    label: "LST",
+    id: "LOT",
+    label: "LOT",
   },
   {
     id: "SLT",
@@ -74,8 +74,8 @@ const instruments = [
 const formSchema = z.object({
   priority: z.number().int().min(1).max(10).default(5),
   filters: z.record(z.boolean()).default({}),
-  binning: z.number().int().min(1).default(1),
-  frames: z.number().int().min(1).default(1),
+  binning: z.coerce.number().int().min(1).default(1),
+  frames: z.coerce.number().int().min(1).default(1),
   instruments: z.record(z.boolean()).default({}),
   exposure_time: z.number().int().default(10),
   start_date: z.date(),
@@ -102,10 +102,10 @@ export function TargetLulinForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     putLulin(observation.id, values)
       .then(() => {
         toast.success("Observation updated successfully");
+        Object.assign(observation, values);
       })
       .catch((error) => {
         for (const key in error.data) {
@@ -127,7 +127,9 @@ export function TargetLulinForm({
             <FormItem>
               <FormLabel>Priority</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={(value) => {
+                  field.onChange(parseInt(value));
+                }}
                 defaultValue={field.value.toString()}
               >
                 <FormControl>
@@ -241,7 +243,7 @@ export function TargetLulinForm({
                 <FormField
                   key={item.id}
                   control={form.control}
-                  name="filters"
+                  name="instruments"
                   render={({ field }) => {
                     return (
                       <FormItem
