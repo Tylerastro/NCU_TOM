@@ -1,8 +1,12 @@
 from typing import List
 
 from django.conf import settings
+from django.core.mail import send_mail
+from django.http import HttpRequest
 from djoser.social.views import ProviderAuthView
 from rest_framework import status
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -114,6 +118,7 @@ class TagsDetailView(APIView):
             return Response({"detail": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@permission_classes((AllowAny,))
 class AnnouncementsView(APIView):
 
     def get(self, request) -> List[Announcements]:
@@ -128,3 +133,18 @@ class AnnouncementsView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+
+def send_observation_mail(request: HttpRequest):
+
+    try:
+        send_mail(
+            'New Observation',
+            'A new observation has been created.',
+            settings.EMAIL_HOST_USER,
+            ['to@gmail.com'],
+            fail_silently=True if settings.DEBUG else False
+        )
+        return Response(status=200)
+    except:
+        return Response(status=400)

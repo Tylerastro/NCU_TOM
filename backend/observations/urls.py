@@ -1,5 +1,6 @@
 import observations.views as views
 from django.urls import path
+from helpers.views import send_observation_mail
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -20,4 +21,5 @@ urlpatterns = [
     path('observations/lulin/code/', views.GetCodes),
     path('observations/<int:pk>/lulin/', views.LulinView.as_view()),
     path('observations/lulin/', views.LulinView.as_view()),
+    path('observations/submit/lulin/', send_observation_mail),
 ]

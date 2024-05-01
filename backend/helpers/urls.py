@@ -3,7 +3,8 @@ from rest_framework import routers
 
 from .views import (AnnouncementsView, LogoutView, TagsDetailView, TagsView,
                     TomProviderAuthView, TomTokenObtainPairView,
-                    TomTokenRefreshView, TomTokenVerifyView)
+                    TomTokenRefreshView, TomTokenVerifyView,
+                    send_observation_mail)
 
 router = routers.DefaultRouter()
 
