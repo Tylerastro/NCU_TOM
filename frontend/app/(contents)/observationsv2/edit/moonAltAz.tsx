@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { getMoonAltAz } from "@/apis/targets";
+import { useQuery } from "@tanstack/react-query";
 import { TargetAltAz } from "@/models/targets";
 import { getObservationAltAz } from "@/apis/observations";
 
@@ -32,81 +33,67 @@ export default function MoonAltAz(props: {
 }) {
   const [AltAz, setAltAz] = React.useState<TargetAltAz[]>([]);
 
-  React.useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch moon data
-        const moonData: TargetAltAz = await getMoonAltAz(
-          props.start_date,
-          props.end_date
-        );
+  const { data: moonData } = useQuery({
+    queryKey: ["getMoonAltAz", props.start_date, props.end_date],
+    queryFn: async () => {
+      const result: TargetAltAz = await getMoonAltAz(
+        props.start_date,
+        props.end_date
+      );
+      return result.data.map((d) => ({
+        ...d,
+        time: new Date(d.time).toLocaleDateString("en-US", {
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        }),
+      }));
+    },
+    initialData: [],
+  });
 
-        // Fetch target data (list of objects)
-        const targetData: TargetAltAz[] = await getObservationAltAz(
-          props.observation_id,
-          props.start_date,
-          props.end_date
-        );
-
-        // Combine moon data with target data into a single list
-        const combinedData: TargetAltAz[] = [
-          {
-            name: "Moon",
-            data: moonData.data.map((d) => {
-              const millisecondPattern = /\.\d{3}/;
-              let date = new Date(d.time);
-              if (millisecondPattern.test(d.time)) {
-                date = new Date(date.getTime() + 60000);
-              }
-              return {
-                time: date.toLocaleDateString("en-US", {
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hourCycle: "h23",
-                }),
-                alt: d.alt,
-                az: d.az,
-              };
-            }),
-          },
-          ...targetData.map((d) => {
-            return {
-              name: d.name,
-              data: d.data.map((dd) => {
-                const millisecondPattern = /\.\d{3}/;
-                let date = new Date(dd.time);
-                if (millisecondPattern.test(dd.time)) {
-                  date = new Date(date.getTime() + 60000);
-                }
-                const formattedDate = date.toLocaleDateString("en-US", {
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hourCycle: "h23",
-                });
-                return {
-                  time: formattedDate,
-                  alt: dd.alt,
-                  az: dd.az,
-                };
-              }),
-            };
+  const { data: targetData } = useQuery({
+    queryKey: [
+      "getObservationAltAz",
+      props.observation_id,
+      props.start_date,
+      props.end_date,
+    ],
+    queryFn: async () => {
+      const result: TargetAltAz[] = await getObservationAltAz(
+        props.observation_id,
+        props.start_date,
+        props.end_date
+      );
+      return result.map((d) => ({
+        name: d.name,
+        data: d.data.map((dd) => ({
+          ...dd,
+          time: new Date(dd.time).toLocaleDateString("en-US", {
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
           }),
-        ];
-
-        setAltAz(combinedData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    }
-
-    fetchData();
-  }, [props.start_date, props.end_date, props.observation_id]);
+        })),
+      }));
+    },
+    initialData: [],
+  });
 
   React.useEffect(() => {
-    console.log(AltAz);
-  }, [AltAz]);
+    if (moonData && targetData) {
+      const combinedData = [
+        {
+          name: "Moon",
+          data: moonData,
+        },
+        ...targetData,
+      ];
+      setAltAz(combinedData);
+    }
+  }, [moonData, targetData]);
 
   return (
     <ResponsiveContainer width="100%" height={350}>
