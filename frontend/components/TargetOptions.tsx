@@ -42,7 +42,7 @@ interface TargetOptionsProps {
   value: z.infer<typeof formSchema>["targets"];
 }
 
-export const TargetOptions = React.forwardRef(
+export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
   (props: TargetOptionsProps, ref) => {
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
@@ -154,3 +154,5 @@ export const TargetOptions = React.forwardRef(
     );
   }
 );
+
+TargetOptions.displayName = "TargetOptions";
