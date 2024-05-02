@@ -39,7 +39,7 @@ interface TagOptionsProps {
   value: z.infer<typeof formSchema>["tags"];
 }
 
-export function TagOptions(props: TagOptionsProps) {
+export const TagOptions = React.forwardRef((props: TagOptionsProps, ref) => {
   const { onChange, value } = props;
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -152,4 +152,4 @@ export function TagOptions(props: TagOptionsProps) {
       </PopoverContent>
     </Popover>
   );
-}
+});
