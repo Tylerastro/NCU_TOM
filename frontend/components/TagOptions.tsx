@@ -7,6 +7,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
+  CommandList,
   CommandItem,
   CommandSeparator,
 } from "@/components/ui/command";
@@ -91,68 +92,70 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className="w-full p-0" align="start">
           <Command>
             <CommandInput
               value={search}
               onValueChange={setSearch}
               placeholder="Search tag..."
             />
-            <CommandEmpty>
-              <Button className="w-[90%]" onClick={() => createTag(search)}>
-                {search}
-              </Button>
-            </CommandEmpty>
-            <CommandGroup>
-              {tags.map((tag) => (
-                <CommandItem
-                  key={tag.id}
-                  value={tag.name}
-                  onSelect={(currentValue) => {
-                    setSelectedTags((prevSelectedTags) => {
-                      if (
-                        prevSelectedTags.some((t) => t.name === currentValue)
-                      ) {
-                        return prevSelectedTags.filter(
-                          (t) => t.name !== currentValue
-                        );
-                      } else {
-                        const newTag = tags.find(
-                          (t) => t.name === currentValue
-                        );
-                        if (newTag) {
-                          return [...prevSelectedTags, newTag];
-                        }
-                        return prevSelectedTags;
-                      }
-                    });
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedTags.some((t) => t.name === tag.name)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  {tag.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-            {selectedTags.length > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup>
+            <CommandList>
+              <CommandEmpty>
+                <Button className="w-[90%]" onClick={() => createTag(search)}>
+                  {search}
+                </Button>
+              </CommandEmpty>
+              <CommandGroup>
+                {tags.map((tag) => (
                   <CommandItem
-                    onSelect={() => setSelectedTags([])}
-                    className="justify-center text-center"
+                    key={tag.id}
+                    value={tag.name}
+                    onSelect={(currentValue) => {
+                      setSelectedTags((prevSelectedTags) => {
+                        if (
+                          prevSelectedTags.some((t) => t.name === currentValue)
+                        ) {
+                          return prevSelectedTags.filter(
+                            (t) => t.name !== currentValue
+                          );
+                        } else {
+                          const newTag = tags.find(
+                            (t) => t.name === currentValue
+                          );
+                          if (newTag) {
+                            return [...prevSelectedTags, newTag];
+                          }
+                          return prevSelectedTags;
+                        }
+                      });
+                    }}
                   >
-                    Clear filters
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedTags.some((t) => t.name === tag.name)
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                    {tag.name}
                   </CommandItem>
-                </CommandGroup>
-              </>
-            )}
+                ))}
+              </CommandGroup>
+              {selectedTags.length > 0 && (
+                <>
+                  <CommandSeparator />
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={() => setSelectedTags([])}
+                      className="justify-center text-center"
+                    >
+                      Clear tags
+                    </CommandItem>
+                  </CommandGroup>
+                </>
+              )}
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

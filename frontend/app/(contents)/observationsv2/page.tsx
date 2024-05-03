@@ -3,20 +3,16 @@ import { getObservations } from "@/apis/observations";
 import { Observation } from "@/models/observations";
 import * as React from "react";
 import { columns } from "./columns";
-import { NewTargetFrom } from "./createObservation";
+import { NewObservationFrom } from "./createObservation";
+import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "./dataTable";
 
 export default function ObservationsTable() {
-  const [data, setData] = React.useState<Observation[]>([]);
-  React.useEffect(() => {
-    getObservations()
-      .then((data) => {
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+  const { data: observations, refetch } = useQuery({
+    queryKey: ["observations"],
+    queryFn: () => getObservations(),
+    initialData: () => [] as Observation[],
+  });
 
   return (
     <>
@@ -28,12 +24,12 @@ export default function ObservationsTable() {
         </div>
 
         <div className="flex gap-2">
-          <NewTargetFrom />
+          <NewObservationFrom refetch={refetch} />
         </div>
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={observations} />
       </div>
     </>
   );

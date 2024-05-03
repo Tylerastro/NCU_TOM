@@ -5,28 +5,19 @@ import * as React from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
+import { useQuery } from "@tanstack/react-query";
 
 export default function TargetsTable() {
-  const [data, setData] = React.useState<Target[]>([]);
-  React.useEffect(() => {
-    fetchTargets()
-      .then((data) => {
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+  const { data: targets, refetch } = useQuery({
+    queryKey: ["targets"],
+    queryFn: () => fetchTargets(),
+    initialData: () => [] as Target[],
+  });
 
   const handleDelete = async (ids: number[]) => {
     try {
       await deleteBulkTarget(ids);
-
-      const updatedData = data.filter(
-        (target) => target.id !== undefined && !ids.includes(target.id)
-      );
-
-      setData(updatedData);
+      await refetch();
     } catch (error) {
       console.error("Error deleting data:", error);
     }
@@ -42,12 +33,12 @@ export default function TargetsTable() {
         </div>
 
         <div className="flex gap-2">
-          <NewTargetFrom />
+          <NewTargetFrom refetch={refetch} />
         </div>
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <DataTable columns={columns} data={data} onDelete={handleDelete} />
+        <DataTable columns={columns} data={targets} onDelete={handleDelete} />
       </div>
     </>
   );

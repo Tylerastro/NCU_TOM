@@ -120,7 +120,6 @@ class TagsDetailView(APIView):
 
 @permission_classes((AllowAny,))
 class AnnouncementsView(APIView):
-
     def get(self, request) -> List[Announcements]:
         announcements = Announcements.objects.all()
         serializer = AnnouncementsSerializer(announcements, many=True)
@@ -136,7 +135,6 @@ class AnnouncementsView(APIView):
 
 
 def send_observation_mail(request: HttpRequest):
-
     try:
         send_mail(
             'New Observation',

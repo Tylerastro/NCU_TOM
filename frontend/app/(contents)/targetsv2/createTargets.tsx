@@ -69,7 +69,7 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
   return decimalDegrees;
 }
 
-export function NewTargetFrom() {
+export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = React.useState(false);
   const [selectedTags, setSelectedTags] = React.useState<
     z.infer<typeof formSchema>["tags"]
@@ -80,6 +80,7 @@ export function NewTargetFrom() {
       .then(() => {
         toast.success("Target created successfully");
         setOpen(false);
+        refetch();
       })
       .catch((error) => {
         for (const key in error.data) {
@@ -87,10 +88,6 @@ export function NewTargetFrom() {
         }
       });
   }
-
-  const handleTagChange = (tags: z.infer<typeof formSchema>["tags"]) => {
-    setSelectedTags(tags);
-  };
 
   const formSchema = z.object({
     name: z.string(),
@@ -119,7 +116,7 @@ export function NewTargetFrom() {
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} modal={false}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
           Create target

@@ -40,11 +40,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-export function NewTargetFrom() {
+export function NewObservationFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = React.useState(false);
-  const [selectTargets, setSelectTargets] = React.useState<
-    z.infer<typeof formSchema>["targets"]
-  >([]);
   const [selectedTags, setSelectedTags] = React.useState<
     z.infer<typeof formSchema>["tags"]
   >([]);
@@ -54,6 +51,7 @@ export function NewTargetFrom() {
       .then(() => {
         toast.success("Observation created successfully");
         setOpen(false);
+        refetch();
       })
       .catch((error) => {
         for (const key in error.data) {
@@ -61,10 +59,6 @@ export function NewTargetFrom() {
         }
       });
   }
-
-  const handleTagChange = (tags: z.infer<typeof formSchema>["tags"]) => {
-    setSelectedTags(tags);
-  };
 
   const formSchema = z.object({
     name: z.string().optional(),
