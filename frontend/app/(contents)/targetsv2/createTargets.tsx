@@ -25,20 +25,29 @@ import { z } from "zod";
 import FileUpload from "./fileUpload";
 
 function isHourAngleFormat(input: string) {
-  const hourAnglePattern = /^\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?$/;
-  return hourAnglePattern.test(input);
+  const hourMinSecPattern = /^(\d{1,2}h)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
+  const decMinSecPattern = /^(\+|-)?(\d{1,3}d)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
+  const decimalPattern =
+    /^(\+|-)?(\d{1,2})\s+(\d{1,2})\s+(\d{1,2}(\.\d+)?)\s*$/;
+
+  return (
+    hourMinSecPattern.test(input) ||
+    decMinSecPattern.test(input) ||
+    decimalPattern.test(input)
+  );
 }
+
 function convertHourAngleToDegrees(hourAngle: unknown) {
   if (typeof hourAngle !== "string") {
-    return 0;
+    return Error("Invalid hour angle format");
   }
   if (!isHourAngleFormat(hourAngle)) {
     return parseFloat(hourAngle);
   }
 
-  const parts = hourAngle.split(":");
+  const parts = hourAngle.split(/:|h|m|s|\s/).slice(0, 3); // Match colon, h, m, s, or whitespace
   if (parts.length !== 3) {
-    return 0;
+    return Error("Invalid hour angle format");
   }
 
   const hours = parseFloat(parts[0]);
@@ -51,15 +60,18 @@ function convertHourAngleToDegrees(hourAngle: unknown) {
 
 function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
   if (typeof sexagesimal !== "string") {
-    return 0;
+    return Error("Invalid sexagesimal format");
   }
   if (!isHourAngleFormat(sexagesimal)) {
     return parseFloat(sexagesimal);
   }
 
-  const parts = sexagesimal.split(":");
+  const parts = sexagesimal
+    .slice(0, -1)
+    .split(/:|d|m|s|\s/)
+    .slice(0, 3);
   if (parts.length !== 3) {
-    return 0;
+    return Error("Invalid sexagesimal format");
   }
 
   const degrees = parseFloat(parts[0]);
@@ -90,11 +102,26 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   }
 
   const formSchema = z.object({
-    name: z.string(),
-    ra: z.preprocess(convertHourAngleToDegrees, z.number().min(0).max(360)),
+    name: z.string({ required_error: "Name is required" }),
+    ra: z.preprocess(
+      convertHourAngleToDegrees,
+      z
+        .number({
+          required_error: "RA is required",
+          invalid_type_error: "Not recognized coordinates",
+        })
+        .min(0)
+        .max(360)
+    ),
     dec: z.preprocess(
       convertSexagesimalDegreesToDecimal,
-      z.number().min(-90).max(90)
+      z
+        .number({
+          required_error: "DEC is required",
+          invalid_type_error: "Not recognized coordinates",
+        })
+        .min(-90)
+        .max(90)
     ),
     tags: z.array(
       z.object({
@@ -108,9 +135,6 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      ra: 0,
-      dec: 0,
       tags: selectedTags,
     },
   });
@@ -122,7 +146,7 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
           Create target
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px]">
+      <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[720px]">
         <DialogHeader>
           <DialogTitle>New Target info</DialogTitle>
           <DialogDescription>
@@ -165,7 +189,7 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                     <FormControl>
                       <Input
                         className="text-primary-foreground w-full"
-                        placeholder="ra"
+                        placeholder="165.3224 in degree"
                         {...field}
                       />
                     </FormControl>
@@ -183,7 +207,7 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                     <FormControl>
                       <Input
                         className="text-primary-foreground w-full"
-                        placeholder="Dec"
+                        placeholder="10:56:28.9208702274"
                         {...field}
                       />
                     </FormControl>
@@ -215,7 +239,9 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
             </div>
           </form>
         </Form>
-        <FileUpload setOpen={setOpen} />
+        <div className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[720px]">
+          <FileUpload setOpen={setOpen} />
+        </div>
       </DialogContent>
     </Dialog>
   );
