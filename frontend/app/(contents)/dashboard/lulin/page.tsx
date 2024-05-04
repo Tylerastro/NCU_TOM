@@ -10,10 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Target } from "@/models/targets";
 import { CalendarForm } from "./dateForm";
-import * as React from "react";
+import ObservationMonitor from "./observationMonitor";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
@@ -54,10 +52,8 @@ export default function DashboardPage() {
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Observations
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
+              <TabsTrigger value="observations">Observations</TabsTrigger>
+              <TabsTrigger value="proposals" disabled>
                 Proposals
               </TabsTrigger>
               <TabsTrigger value="notifications" disabled>
@@ -191,6 +187,9 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+            <TabsContent value="observations">
+              <ObservationMonitor />
             </TabsContent>
           </Tabs>
         </div>

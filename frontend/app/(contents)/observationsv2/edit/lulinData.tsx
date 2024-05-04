@@ -56,7 +56,7 @@ export default function LulinData(props: LulinDataProps) {
       <CarouselContent>
         {props.data.map((observation, index) => (
           <CarouselItem className={basis} key={index}>
-            <Sheet>
+            <Sheet modal={false}>
               <Card>
                 <CardContent className="flex aspect-square items-center justify-center h-full p-6">
                   <SheetTrigger>

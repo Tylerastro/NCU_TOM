@@ -1,7 +1,7 @@
 import { Announcements } from "@/models/helpers";
 import api from "./wrapper";
 
-export async function fetchAnnouncements() {
+export async function fetchAnnouncements(): Promise<Announcements[]> {
   try {
     const response = await api.get("/api/announcements/");
     return response.data;

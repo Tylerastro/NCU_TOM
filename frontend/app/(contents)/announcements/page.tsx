@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { AccordionAnnoucemnets } from "./accor";
 import { NewAnnouncementForm } from "./createAnnouncement";
 export default function Announcements() {

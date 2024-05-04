@@ -7,22 +7,20 @@ import {
   AccordionTrigger,
 } from "@/components/Accordion";
 
-import { Announcements } from "@/models/helpers";
 import { fetchAnnouncements } from "@/apis/announcements";
-import * as React from "react";
+import { Announcements } from "@/models/helpers";
+import { useQuery } from "@tanstack/react-query";
 
 export function AccordionAnnoucemnets() {
-  const [data, setData] = React.useState<Announcements[]>([]);
-
-  React.useEffect(() => {
-    fetchAnnouncements().then((data) => {
-      setData(data);
-    });
-  }, []);
+  const { data: announcements, refetch } = useQuery({
+    queryKey: ["announcements"],
+    queryFn: () => fetchAnnouncements(),
+    initialData: () => [] as Announcements[],
+  });
 
   return (
     <Accordion type="single" collapsible className="w-full">
-      {data.map((item, index) => (
+      {announcements.map((item, index) => (
         <AccordionItem key={item.id} value={`item-${index}`}>
           <AccordionTrigger>{item.title}</AccordionTrigger>
           <AccordionDate>
