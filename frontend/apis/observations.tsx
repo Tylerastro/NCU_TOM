@@ -2,6 +2,7 @@ import {
   LulinObservations,
   LulinObservationsUpdate,
   NewObservation,
+  Observation,
   ObservationUpdate,
 } from "@/models/observations";
 
@@ -43,7 +44,9 @@ export async function deleteObservation(id: number) {
   }
 }
 
-export async function getObservations(observationId?: number) {
+export async function getObservations(
+  observationId?: number
+): Promise<Observation[]> {
   try {
     let url = `${process.env.NEXT_PUBLIC_API_URL}/api/observations/`;
     if (observationId) {

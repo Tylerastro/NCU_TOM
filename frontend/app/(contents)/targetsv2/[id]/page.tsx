@@ -5,23 +5,17 @@ import { fetchTargets } from "@/apis/targets";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target } from "@/models/targets";
-import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
 export default function DashboardPage(params: { params: { id: number } }) {
-  const [target, setTarget] = React.useState<Target | null>(null);
+  const { data: targets } = useQuery({
+    queryKey: ["targets"],
+    queryFn: () => fetchTargets(params.params.id),
+  });
 
-  React.useEffect(() => {
-    fetchTargets(params.params.id)
-      .then((data) => {
-        setTarget(data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const target = targets?.[0];
 
   return (
     <>
