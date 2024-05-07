@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
         <Button
           variant="outline"
           disabled={!table.getIsSomeRowsSelected()}
-          className="w-[200px] hover:bg-red-500 hover:border-red-500"
+          className="w-[150px] dark:hover:bg-red-700/90"
           onClick={() =>
             hanldeDelete(
               table

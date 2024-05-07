@@ -1,14 +1,11 @@
 import * as React from "react";
 import {
   LineChart,
-  CartesianAxis,
   CartesianGrid,
   Legend,
   Line,
   Tooltip,
   ResponsiveContainer,
-  ScatterChart,
-  Scatter,
   XAxis,
   YAxis,
 } from "recharts";
@@ -102,12 +99,12 @@ export default function MoonAltAz(props: {
         <XAxis
           padding={{ left: 30, right: 30 }}
           dataKey="time"
-          angle={-30}
+          angle={-15}
           type="category"
           allowDuplicatedCategory={false}
         />
         <YAxis dataKey="alt" />
-        <Tooltip />
+        {/* <Tooltip /> */}
         <Legend />
         {AltAz.map((s) => (
           <Line

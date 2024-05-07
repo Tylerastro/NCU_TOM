@@ -14,7 +14,24 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionDate,
+} from "@/components/Accordion";
 import { LulinObservations } from "@/models/observations";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import * as React from "react";
 import { TargetLulinForm } from "./lulinForm";
 type Option = {
@@ -52,36 +69,24 @@ export default function LulinData(props: LulinDataProps) {
   }
 
   return (
-    <Carousel className=" max-w-[800px] ">
-      <CarouselContent>
-        {props.data.map((observation, index) => (
-          <CarouselItem className={basis} key={index}>
-            <Sheet modal={false}>
-              <Card>
-                <CardContent className="flex aspect-square items-center justify-center h-full p-6">
-                  <SheetTrigger>
-                    <span className="text-4xl font-semibold">
-                      {observation.target.name}
-                    </span>
-                  </SheetTrigger>
-                </CardContent>
-              </Card>
-
-              <SheetContent className="w-[400px] sm:w-[540px]">
-                <SheetHeader>
-                  <SheetTitle>Edit {observation.target.name}</SheetTitle>
-                  <SheetDescription>
-                    Lorem ipsum dolor sit amet.
-                  </SheetDescription>
-                </SheetHeader>
-                <TargetLulinForm observation={observation} />
-              </SheetContent>
-            </Sheet>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+    <Table>
+      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Target</TableHead>
+          <TableHead>Ra</TableHead>
+          <TableHead>Dec</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell className="font-medium">INV001</TableCell>
+          <TableCell>Paid</TableCell>
+          <TableCell>Credit Card</TableCell>
+          <TableCell className="text-right">$250.00</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   );
 }
