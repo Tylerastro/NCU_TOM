@@ -1,11 +1,11 @@
 import { getLulin, getObservations } from "@/apis/observations";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinObservations } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import CodeBlock from "./codeblock";
+import Feeds from "./feeds";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
 
@@ -47,20 +47,6 @@ export default function Lulin(props: {
 
   return (
     <>
-      <div className="flex space-between justify-between pb-10">
-        <div>
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-            Verify the submission
-          </h1>
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="outline" className="dark:hover:bg-green-600">
-            Verify
-          </Button>
-        </div>
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -128,7 +114,7 @@ export default function Lulin(props: {
             >
               <path
                 strokeLinecap="round"
-                strokeLinejoin-linejoin="round"
+                strokeLinejoin="round"
                 d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
               />
               <path
@@ -180,11 +166,14 @@ export default function Lulin(props: {
         <LulinData data={lulinObservations} setCodeUpdate={setCodeUpdate} />
       </div>
 
-      <CodeBlock
-        observation_id={props.observation_id}
-        codeUpdate={codeUpdate}
-        setCodeUpdate={setCodeUpdate}
-      />
+      <div className="grid grid-cols-2 gap-12 sm:grid-cols-2 py-6">
+        <CodeBlock
+          observation_id={props.observation_id}
+          codeUpdate={codeUpdate}
+          setCodeUpdate={setCodeUpdate}
+        />
+        <Feeds observation_id={props.observation_id} />
+      </div>
     </>
   );
 }

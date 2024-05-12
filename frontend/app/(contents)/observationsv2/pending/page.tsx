@@ -1,8 +1,12 @@
 "use client";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import Lulin from "./lulin";
+import { putObservation } from "@/apis/observations";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { toast } from "react-toastify";
+import Lulin from "./lulin";
 
 function LoadingSkeleton() {
   return (
@@ -32,9 +36,45 @@ function PageContent() {
 }
 
 export default function Page() {
+  const observation_id = useSearchParams().get("id") || "";
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: () => {
+      return putObservation(parseInt(observation_id), { status: 3 });
+    },
+    onSuccess: () => {
+      toast.success("Updated successfully");
+      router.push("/observationsv2");
+    },
+  });
+
+  const handleVerify = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    mutation.mutate();
+  };
+
   return (
-    <Suspense fallback={LoadingSkeleton()}>
-      <PageContent />
-    </Suspense>
+    <>
+      <div className="flex space-between justify-between pb-10">
+        <div>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+            Verify the submission
+          </h1>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            onClick={handleVerify}
+            variant="outline"
+            className="dark:hover:bg-green-600"
+          >
+            Verify
+          </Button>
+        </div>
+      </div>
+      <Suspense fallback={LoadingSkeleton()}>
+        <PageContent />
+      </Suspense>
+    </>
   );
 }

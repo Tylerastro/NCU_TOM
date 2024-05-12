@@ -1,5 +1,6 @@
 import { getLulinCode, putObservation } from "@/apis/observations";
 import { ObservationUpdate } from "@/models/observations";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "react-toastify";
@@ -13,19 +14,17 @@ export default function CodeBlock({
   codeUpdate: boolean;
   setCodeUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [codeBlock, setCodeBlock] = React.useState<string>("");
   const router = useRouter();
+  const [codeBlock, setCodeBlock] = React.useState<string>("");
 
-  React.useEffect(() => {
-    getLulinCode(observation_id)
-      .then((data) => {
+  const { data: code, refetch } = useQuery({
+    queryKey: ["targets"],
+    queryFn: () =>
+      getLulinCode(observation_id).then((data) => {
         setCodeBlock(data);
-        setCodeUpdate(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [codeUpdate, observation_id]);
+        return data;
+      }),
+  });
 
   const countLines = (text: string) => {
     return text.split("\n").length;
@@ -48,13 +47,7 @@ export default function CodeBlock({
 
   const resetCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    getLulinCode(observation_id, true)
-      .then((data) => {
-        setCodeBlock(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    refetch();
   };
 
   const rows = codeBlock ? countLines(codeBlock) + 2 : 1;
@@ -88,7 +81,7 @@ export default function CodeBlock({
             type="submit"
             className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-[#3fefc666] rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-[#b538c366] duration-300 transition ease-in-out"
           >
-            Submit observation
+            Update Script
           </button>
         </div>
       </div>
