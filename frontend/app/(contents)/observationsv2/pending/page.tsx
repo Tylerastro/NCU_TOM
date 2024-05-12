@@ -20,18 +20,23 @@ function LoadingSkeleton() {
   );
 }
 
+// ...
+
 function PageContent() {
   const searchParams = useSearchParams();
   const observatory = searchParams.get("observatory");
   const observation_id = searchParams.get("id") || "";
   const start_date = searchParams.get("start_date") || "";
   const end_date = searchParams.get("end_date") || "";
+
   return (
-    <Lulin
-      start_date={start_date}
-      end_date={end_date}
-      observation_id={parseInt(observation_id)}
-    />
+    <Suspense fallback={<LoadingSkeleton />}>
+      <Lulin
+        start_date={start_date}
+        end_date={end_date}
+        observation_id={parseInt(observation_id)}
+      />
+    </Suspense>
   );
 }
 
@@ -55,27 +60,23 @@ export default function Page() {
 
   return (
     <>
-      <Suspense fallback={LoadingSkeleton()}>
-        <div className="flex space-between justify-between pb-10">
-          <div>
-            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-              Verify the submission
-            </h1>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={handleVerify}
-              variant="outline"
-              className="dark:hover:bg-green-600"
-            >
-              Verify
-            </Button>
-          </div>
+      <div className="flex space-between justify-between pb-10">
+        <div>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+            Verify the submission
+          </h1>
         </div>
-
-        <PageContent />
-      </Suspense>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleVerify}
+            variant="outline"
+            className="dark:hover:bg-green-600"
+          >
+            Verify
+          </Button>
+        </div>
+      </div>
+      <PageContent />
     </>
   );
 }
