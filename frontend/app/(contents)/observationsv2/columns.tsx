@@ -54,14 +54,19 @@ export const columns: ColumnDef<Observation>[] = [
     cell(props) {
       const name: string = props.row.getValue("name");
       const id: number = props.row.getValue("id");
+      const status: number = props.row.getValue("status");
       const observatory: number = props.row.getValue("observatory");
       const start_date: string = props.row.getValue("start_date");
       const end_date: string = props.row.getValue("end_date");
+      const routerMapping: { [key: number]: string } = {
+        1: "edit",
+        2: "pending",
+      };
       return (
         <div className="text-primary-foreground font-medium">
           <Link
             href={{
-              pathname: `/observationsv2/edit`,
+              pathname: `/observationsv2/${routerMapping[status]}`,
               query: {
                 id: id,
                 observatory: observatory,

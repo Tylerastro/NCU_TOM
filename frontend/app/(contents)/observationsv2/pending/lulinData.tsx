@@ -1,39 +1,14 @@
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionDate,
-} from "@/components/Accordion";
-import { LulinObservations } from "@/models/observations";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { LulinObservations } from "@/models/observations";
 
 import * as React from "react";
-import { TargetLulinForm } from "./lulinForm";
 type Option = {
   id: number;
   label: string;

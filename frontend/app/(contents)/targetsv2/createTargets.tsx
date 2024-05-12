@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -87,19 +88,16 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
     z.infer<typeof formSchema>["tags"]
   >([]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    createTarget(values)
-      .then(() => {
-        toast.success("Target created successfully");
-        setOpen(false);
-        refetch();
-      })
-      .catch((error) => {
-        for (const key in error.data) {
-          toast.error(`${key}: ${error.data[key][0]}`);
-        }
-      });
-  }
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      return createTarget(values);
+    },
+    onSuccess: () => {
+      refetch();
+      toast.success("Target created successfully");
+      setOpen(false);
+    },
+  });
 
   const formSchema = z.object({
     name: z.string({ required_error: "Name is required" }),
@@ -156,7 +154,9 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
         </DialogHeader>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit((values) => {
+              mutation.mutate(values);
+            })}
             className="space-y-8 items-center justify-center align-center"
           >
             <FormField
