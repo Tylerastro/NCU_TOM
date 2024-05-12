@@ -1,12 +1,17 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionDate,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/Accordion";
+"use client";
+import { getObservations } from "@/apis/observations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Observation } from "@/models/observations";
+import { useQuery } from "@tanstack/react-query";
+import ObservationTable from "./observationTable";
+
 export default function ObservationMonitor() {
+  const { data: observations, refetch } = useQuery({
+    queryKey: ["observations"],
+    queryFn: () => getObservations(),
+    initialData: () => [] as Observation[],
+  });
+
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -114,22 +119,25 @@ export default function ObservationMonitor() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 grid-cols-2">
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem key={1} value={"1"}>
-            <AccordionTrigger>
-              <div className="flex gap-5 items-center justify-between">
-                <span>Title</span>
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionDate>time</AccordionDate>
-            <AccordionContent>content</AccordionContent>
-          </AccordionItem>
-        </Accordion>
+      <div className="py-7 grid gap-4 grid-cols-3">
+        <div>
+          <span>Pending</span>
+          <ObservationTable
+            observationData={observations.filter((o) => o.status === 2)}
+          />
+        </div>
+        <div>
+          <span className="text-lg">In progress</span>
+          <ObservationTable
+            observationData={observations.filter((o) => o.status === 3)}
+          />
+        </div>
+        <div>
+          <span className="text-lg">Completed</span>
+          <ObservationTable
+            observationData={observations.filter((o) => o.status === 4)}
+          />
+        </div>
       </div>
     </>
   );
