@@ -20,8 +20,6 @@ function LoadingSkeleton() {
   );
 }
 
-// ...
-
 function PageContent() {
   const searchParams = useSearchParams();
   const observatory = searchParams.get("observatory");
@@ -30,18 +28,17 @@ function PageContent() {
   const end_date = searchParams.get("end_date") || "";
 
   return (
-    <Suspense fallback={<LoadingSkeleton />}>
-      <Lulin
-        start_date={start_date}
-        end_date={end_date}
-        observation_id={parseInt(observation_id)}
-      />
-    </Suspense>
+    <Lulin
+      start_date={start_date}
+      end_date={end_date}
+      observation_id={parseInt(observation_id)}
+    />
   );
 }
 
-export default function Page() {
-  const observation_id = useSearchParams().get("id") || "";
+function VerifyButton() {
+  const searchParams = useSearchParams();
+  const observation_id = searchParams.get("id") || "";
   const router = useRouter();
   const mutation = useMutation({
     mutationFn: () => {
@@ -59,6 +56,18 @@ export default function Page() {
   };
 
   return (
+    <Button
+      onClick={handleVerify}
+      variant="outline"
+      className="dark:hover:bg-green-600"
+    >
+      Verify
+    </Button>
+  );
+}
+
+export default function Page() {
+  return (
     <>
       <div className="flex space-between justify-between pb-10">
         <div>
@@ -67,16 +76,14 @@ export default function Page() {
           </h1>
         </div>
         <div className="flex gap-2">
-          <Button
-            onClick={handleVerify}
-            variant="outline"
-            className="dark:hover:bg-green-600"
-          >
-            Verify
-          </Button>
+          <Suspense fallback={<div>Loading...</div>}>
+            <VerifyButton />
+          </Suspense>
         </div>
       </div>
-      <PageContent />
+      <Suspense fallback={<LoadingSkeleton />}>
+        <PageContent />
+      </Suspense>
     </>
   );
 }
