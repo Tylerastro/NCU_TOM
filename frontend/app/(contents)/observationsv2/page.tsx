@@ -1,5 +1,5 @@
 "use client";
-import { getObservations } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import { Observation } from "@/models/observations";
 import * as React from "react";
 import { columns } from "./columns";
@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "./dataTable";
 
 export default function ObservationsTable() {
+  const { getObservations } = ObservationApis();
   const { data: observations, refetch } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(),

@@ -1,8 +1,5 @@
-"use client";
-import { AuthTooltip } from "@/components/AuthNavBarTooltip";
-import UnAuthTooltip from "@/components/UnauthNavBarTooltip";
+import NavTooltip from "./NavTooltip";
 import { Button } from "@/components/ui/button";
-import { useAppSelector } from "@/redux/hook";
 import Link from "next/link";
 
 const pages = [
@@ -34,10 +31,6 @@ const pages = [
 ];
 
 function NavBar() {
-  const { isAuthenticated }: { isAuthenticated: boolean } = useAppSelector(
-    (state) => state.auth
-  );
-
   return (
     <div className="w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
       <div>
@@ -59,7 +52,9 @@ function NavBar() {
           ))}
         </nav>
       </div>
-      <div>{isAuthenticated ? <AuthTooltip /> : <UnAuthTooltip />}</div>
+      <div>
+        <NavTooltip />
+      </div>
     </div>
   );
 }

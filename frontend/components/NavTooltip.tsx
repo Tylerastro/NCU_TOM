@@ -1,12 +1,8 @@
-import {
-  useLogoutMutation,
-  useRetrieveUserQuery,
-} from "@/redux/features/authApiSlice";
-import { logout as setLogout } from "@/redux/features/authSlice";
-import { useAppDispatch } from "@/redux/hook";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import * as React from "react";
+import { auth } from "@/auth";
+import { signOut } from "@/auth";
 
 const settings = [
   { name: "Dashboard", url: "/dashboard/lulin", disabled: false },
@@ -24,25 +20,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function AuthTooltip() {
-  const { data } = useRetrieveUserQuery();
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const [logout] = useLogoutMutation();
-  const handleLogout = () => {
-    logout(undefined)
-      .unwrap()
-      .then(() => {
-        dispatch(setLogout());
-      })
-      .finally(() => {
-        router.push("/");
-      });
-  };
+export default async function NavTooltip() {
+  const session = await auth();
+  return session ? AuthTooltip(session) : UnAuthTooltip();
+}
+
+function UnAuthTooltip() {
+  return (
+    <>
+      <Button asChild variant="secondary">
+        <Link href="/auth/signin">Login</Link>
+      </Button>
+    </>
+  );
+}
+
+function AuthTooltip(session: any) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ButtonUI variant="outline">Hi, {data?.username}</ButtonUI>
+        <ButtonUI variant="outline">Hi, {session?.user.username}</ButtonUI>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -57,9 +54,15 @@ export function AuthTooltip() {
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleLogout()}>
-          {" "}
-          Log Out
+        <DropdownMenuItem>
+          <form
+            action={async (formData) => {
+              "use server";
+              await signOut();
+            }}
+          >
+            <button type="submit">logout</button>
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

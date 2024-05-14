@@ -1,5 +1,5 @@
 import React from "react";
-import { postObservationMessages } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import {
   useLogoutMutation,
   useRetrieveUserQuery,
@@ -8,6 +8,7 @@ import { Observation } from "@/models/observations";
 import { toast } from "react-toastify";
 
 export default function TextBox(props: { observation?: Observation }) {
+  const { postObservationMessages } = ObservationApis();
   const [textBlock, setTextBlock] = React.useState<string>("");
   const { data } = useRetrieveUserQuery();
 

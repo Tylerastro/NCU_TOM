@@ -1,22 +1,33 @@
 import { NewTag } from "@/models/helpers";
-import api from "./wrapper";
+import useAxiosAuth from "@/apis/hooks/useAxiosAuth";
 
-export async function fetchTags() {
-  try {
-    const response = await api.get("/api/tags/");
-    return response;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
+const TagApis = () => {
+  const axiosAuth = useAxiosAuth();
 
-export async function postNewTag(tag: NewTag) {
-  try {
-    const response = await api.post("/api/tags/", tag);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
+  const fetchTags = async () => {
+    try {
+      const response = await axiosAuth.get("/api/tags/");
+      return response;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  const postNewTag = async (tag: NewTag) => {
+    try {
+      const response = await axiosAuth.post("/api/tags/", tag);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  return {
+    fetchTags,
+    postNewTag,
+  };
+};
+
+export default TagApis;

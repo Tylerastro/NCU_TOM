@@ -1,10 +1,11 @@
-import { getObservations } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import { Comments } from "@/models/helpers";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import React from "react";
 
 export default function Feeds(props: { observation_id: number }) {
+  const { getObservations } = ObservationApis();
   const { data: observation } = useQuery({
     queryKey: ["observations", props.observation_id],
     queryFn: () =>

@@ -1,4 +1,4 @@
-import { getLulin, getObservations } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinObservations } from "@/models/observations";
@@ -26,6 +26,7 @@ export default function Lulin(props: {
   end_date: string;
   observation_id: number;
 }) {
+  const { getLulin, getObservations } = ObservationApis();
   const [dataReady, setDataReady] = useState(false);
   const [codeUpdate, setCodeUpdate] = useState(false);
 

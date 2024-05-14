@@ -1,11 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { useLoginMutation } from "@/redux/features/authApiSlice";
-import { login as setAuth } from "@/redux/features/authSlice";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-
+import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,10 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export default function SignIn() {
-  const [login, { isLoading }] = useLoginMutation();
+export default function SignInPage() {
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const formSchema = z.object({
     username: z.string().min(2, {
@@ -41,16 +35,15 @@ export default function SignIn() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    login(values)
-      .unwrap()
+    signIn("credentials", {
+      username: values.username,
+      password: values.password,
+    })
       .then(() => {
-        dispatch(setAuth());
-        toast.success("Logged in successfully");
         router.push("/");
       })
       .catch((error) => {
-        toast.error("Invalid username or password");
-        toast.error(error.data.message);
+        console.log(error);
       });
   }
 

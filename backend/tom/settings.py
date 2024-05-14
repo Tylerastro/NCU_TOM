@@ -201,7 +201,8 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
     "SIGNING_KEY": os.getenv("SIGNING_KEY", None),
     "VERIFYING_KEY": os.getenv("VERIFYING_KEY", None),
-    "ALGORITHM": os.getenv("ALGORITHM", "HS256")
+    "ALGORITHM": os.getenv("ALGORITHM", "HS256"),
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 REST_AUTH = {

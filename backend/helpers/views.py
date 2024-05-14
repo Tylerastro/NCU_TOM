@@ -58,8 +58,6 @@ class TomTokenRefreshView(TokenRefreshView):
 
         if refresh_token:
             request.data['refresh'] = refresh_token
-        else:
-            raise InvalidToken('No token provided')
 
         response = super().post(request, *args, **kwargs)
 
@@ -78,9 +76,6 @@ class TomTokenVerifyView(TokenVerifyView):
         access_token = request.COOKIES.get('access')
         if access_token:
             request.data['token'] = access_token
-        else:
-            raise InvalidToken('No token provided')
-
         return super().post(request, *args, **kwargs)
 
 

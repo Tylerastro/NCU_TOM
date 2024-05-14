@@ -1,5 +1,5 @@
 "use client";
-import { putObservation } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation } from "@tanstack/react-query";
@@ -37,6 +37,7 @@ function PageContent() {
 }
 
 function VerifyButton() {
+  const { putObservation } = ObservationApis();
   const searchParams = useSearchParams();
   const observation_id = searchParams.get("id") || "";
   const router = useRouter();

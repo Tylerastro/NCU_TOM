@@ -1,2 +1,2 @@
-import { handlers } from "@/components/auth/auth";
+import { handlers } from "@/auth";
 export const { GET, POST } = handlers;

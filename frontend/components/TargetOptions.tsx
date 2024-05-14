@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchTargets } from "@/apis/targets";
+import TargetApis from "@/apis/targets";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -44,6 +44,7 @@ interface TargetOptionsProps {
 
 export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
   (props: TargetOptionsProps, ref) => {
+    const { fetchTargets } = TargetApis();
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");

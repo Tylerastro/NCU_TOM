@@ -1,4 +1,4 @@
-import { getLulinCode, putObservation } from "@/apis/observations";
+import ObservationApis from "@/apis/observations";
 import { ObservationUpdate } from "@/models/observations";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -13,6 +13,7 @@ export default function CodeBlock({
   codeUpdate: boolean;
   setCodeUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { getLulinCode, putObservation } = ObservationApis();
   const [codeBlock, setCodeBlock] = React.useState<string>("");
   const router = useRouter();
 

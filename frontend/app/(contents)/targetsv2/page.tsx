@@ -1,5 +1,5 @@
 "use client";
-import { deleteBulkTarget, fetchTargets } from "@/apis/targets";
+import TargetApis from "@/apis/targets";
 import { Target } from "@/models/targets";
 import * as React from "react";
 import { columns } from "./columns";
@@ -8,6 +8,7 @@ import { DataTable } from "./dataTable";
 import { useQuery } from "@tanstack/react-query";
 
 export default function TargetsTable() {
+  const { fetchTargets, deleteBulkTarget } = TargetApis();
   const { data: targets, refetch } = useQuery({
     queryKey: ["targets"],
     queryFn: () => fetchTargets(),

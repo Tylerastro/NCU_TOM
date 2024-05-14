@@ -1,5 +1,5 @@
 import { Announcements } from "@/models/helpers";
-import api from "./wrapper";
+import api from "./axios";
 
 export async function fetchAnnouncements(): Promise<Announcements[]> {
   try {

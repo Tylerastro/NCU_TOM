@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Provider from "@/redux/provider";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import Background from "@/components/Background";
+import NextAuthProvider from "./SessionProvider";
 import { NavBar } from "@/components/Navbar";
-import Setup from "@/components/setup";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,21 +20,20 @@ export default function RootLayout({
     <ReactQueryClientProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <main>
-              <Provider>
-                <Setup />
+          <NextAuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <main>
                 <NavBar />
                 <Background />
                 {children}
-              </Provider>
-            </main>
-          </ThemeProvider>
+              </main>
+            </ThemeProvider>
+          </NextAuthProvider>
         </body>
       </html>
     </ReactQueryClientProvider>
