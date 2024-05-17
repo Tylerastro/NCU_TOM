@@ -41,7 +41,7 @@ export default function CodeBlock({
     try {
       putObservation(observation_id, updateData);
       toast.success("Observation is now on pending.");
-      router.push("/observationsv2");
+      router.push("/observations");
     } catch (error) {
       console.log(error);
     }

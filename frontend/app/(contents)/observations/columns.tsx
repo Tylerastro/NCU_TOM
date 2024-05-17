@@ -66,7 +66,7 @@ export const columns: ColumnDef<Observation>[] = [
         <div className="text-primary-foreground font-medium">
           <Link
             href={{
-              pathname: `/observationsv2/${routerMapping[status]}`,
+              pathname: `/observations/${routerMapping[status]}`,
               query: {
                 id: id,
                 observatory: observatory,
@@ -120,7 +120,7 @@ export const columns: ColumnDef<Observation>[] = [
       return tags.map((tag) => (
         <Link
           key={tag.id}
-          href={`/targetsv2/tags/${tag.id}`}
+          href={`/targets/tags/${tag.id}`}
           className={badgeVariants({ variant: "badge" })}
         >
           {tag.name}

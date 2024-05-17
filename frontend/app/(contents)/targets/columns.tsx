@@ -56,7 +56,7 @@ export const columns: ColumnDef<Target>[] = [
       const id: number = props.row.getValue("id");
       return (
         <div className="text-primary-foreground font-medium">
-          <Link href={`/targetsv2/${id}`}>{name}</Link>
+          <Link href={`/targets/${id}`}>{name}</Link>
         </div>
       );
     },
@@ -85,7 +85,7 @@ export const columns: ColumnDef<Target>[] = [
       return tags.map((tag) => (
         <Link
           key={tag.id}
-          href={`/targetsv2/tags/${tag.id}`}
+          href={`/targets/tags/${tag.id}`}
           className={badgeVariants({ variant: "badge" })}
         >
           {tag.name}

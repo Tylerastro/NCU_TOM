@@ -5,12 +5,12 @@ import Link from "next/link";
 const pages = [
   {
     name: "Targets",
-    link: "/targetsv2",
+    link: "/targets",
     enabled: true,
   },
   {
     name: "Observations",
-    link: "/observationsv2",
+    link: "/observations",
     enabled: true,
   },
   {

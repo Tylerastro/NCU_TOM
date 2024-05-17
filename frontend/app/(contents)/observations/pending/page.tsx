@@ -47,7 +47,7 @@ function VerifyButton() {
     },
     onSuccess: () => {
       toast.success("Updated successfully");
-      router.push("/observationsv2");
+      router.push("/observations");
     },
   });
 

@@ -39,7 +39,9 @@ function AuthTooltip(session: any) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ButtonUI variant="outline">Hi, {session?.user.username}</ButtonUI>
+        <ButtonUI className="dark:bg-primary" variant="outline">
+          Hi, {session?.user.username}
+        </ButtonUI>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
