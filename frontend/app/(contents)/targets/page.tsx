@@ -1,15 +1,31 @@
 "use client";
 import TargetApis from "@/apis/targets";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
-import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
-import { useQuery } from "@tanstack/react-query";
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col space-y-3 py-10">
+      <Skeleton className="h-[250px] w-full rounded-xl" />
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-8/12" />
+        <Skeleton className="h-4 w-6/12" />
+      </div>
+    </div>
+  );
+}
 
 export default function TargetsTable() {
   const { getTargets, deleteBulkTarget } = TargetApis();
-  const { data: targets, refetch } = useQuery({
+  const {
+    data: targets,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["targets"],
     queryFn: () => getTargets(),
     initialData: () => [] as Target[],
@@ -39,7 +55,11 @@ export default function TargetsTable() {
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <DataTable columns={columns} data={targets} onDelete={handleDelete} />
+        {isFetching ? (
+          <LoadingSkeleton />
+        ) : (
+          <DataTable columns={columns} data={targets} onDelete={handleDelete} />
+        )}
       </div>
     </>
   );

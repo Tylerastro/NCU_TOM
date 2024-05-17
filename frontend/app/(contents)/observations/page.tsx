@@ -1,15 +1,30 @@
 "use client";
 import ObservationApis from "@/apis/observations";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Observation } from "@/models/observations";
-import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { columns } from "./columns";
 import { NewObservationFrom } from "./createObservation";
-import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "./dataTable";
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col space-y-3 py-10">
+      <Skeleton className="h-[250px] w-full rounded-xl" />
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-8/12" />
+        <Skeleton className="h-4 w-6/12" />
+      </div>
+    </div>
+  );
+}
 
 export default function ObservationsTable() {
   const { getObservations } = ObservationApis();
-  const { data: observations, refetch } = useQuery({
+  const {
+    data: observations,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(),
     initialData: () => [] as Observation[],
@@ -30,7 +45,11 @@ export default function ObservationsTable() {
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <DataTable columns={columns} data={observations} />
+        {isFetching ? (
+          <LoadingSkeleton />
+        ) : (
+          <DataTable columns={columns} data={observations} />
+        )}
       </div>
     </>
   );

@@ -24,14 +24,12 @@ export default function Lulin(props: {
   observation_id: number;
 }) {
   const { getLulin } = ObservationApis();
-  const [dataReady, setDataReady] = useState(false);
   const [codeUpdate, setCodeUpdate] = useState(false);
 
-  const { data: lulinObservations } = useQuery({
+  const { data: lulinObservations, isFetching } = useQuery({
     queryKey: ["getLulin"],
     queryFn: () =>
       getLulin(props.observation_id).then((data) => {
-        setDataReady(true);
         return data;
       }),
     initialData: [] as LulinObservations[],
@@ -45,14 +43,14 @@ export default function Lulin(props: {
             Edit your submission
           </h1>
         </div>
-        {dataReady ? (
+        {isFetching ? (
+          <LoadingSkeleton />
+        ) : (
           <MoonAltAz
             start_date={props.start_date}
             end_date={props.end_date}
             observation_id={props.observation_id}
           />
-        ) : (
-          <LoadingSkeleton />
         )}
 
         <div className="flex justify-center">
