@@ -6,7 +6,7 @@ export interface User {
   institute: string;
   title: number;
   role: number;
-  created_at: Date;
+  created_at?: Date;
 }
 
 export interface Tag {

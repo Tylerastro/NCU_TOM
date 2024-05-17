@@ -28,7 +28,7 @@ function transformTagToOption(tag: Tag) {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const { fetchTags } = TagApis();
+  const { getTags } = TagApis();
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<
@@ -36,7 +36,7 @@ export function DataTableToolbar<TData>({
   >([]);
 
   React.useEffect(() => {
-    fetchTags().then((tags) => {
+    getTags().then((tags) => {
       setTags(tags.data);
     });
   }, []);

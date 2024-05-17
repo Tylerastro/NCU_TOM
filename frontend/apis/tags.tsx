@@ -4,7 +4,7 @@ import useAxiosAuth from "@/apis/hooks/useAxiosAuth";
 const TagApis = () => {
   const axiosAuth = useAxiosAuth();
 
-  const fetchTags = async () => {
+  const getTags = async () => {
     try {
       const response = await axiosAuth.get("/api/tags/");
       return response;
@@ -25,7 +25,7 @@ const TagApis = () => {
   };
 
   return {
-    fetchTags,
+    getTags,
     postNewTag,
   };
 };

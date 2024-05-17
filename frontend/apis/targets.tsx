@@ -4,7 +4,7 @@ import useAxiosAuth from "@/apis/hooks/useAxiosAuth";
 const TargetApis = () => {
   const axiosAuth = useAxiosAuth();
 
-  const fetchTargets = async (targetId?: number): Promise<Target[]> => {
+  const getTargets = async (targetId?: number): Promise<Target[]> => {
     try {
       let url = "/api/targets/";
       if (targetId) {
@@ -98,7 +98,7 @@ const TargetApis = () => {
   };
 
   return {
-    fetchTargets,
+    getTargets,
     createTarget,
     bulkCreate,
     deleteTarget,

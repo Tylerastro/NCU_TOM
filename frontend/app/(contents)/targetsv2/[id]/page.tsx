@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 
-import { fetchTargets } from "@/apis/targets";
+import TargetApis from "@/apis/targets";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,9 +10,10 @@ import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
 export default function DashboardPage(params: { params: { id: number } }) {
+  const { getTargets } = TargetApis();
   const { data: targets } = useQuery({
     queryKey: ["targets"],
-    queryFn: () => fetchTargets(params.params.id),
+    queryFn: () => getTargets(params.params.id),
   });
 
   const target = targets?.[0];

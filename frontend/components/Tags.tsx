@@ -1,4 +1,4 @@
-import { fetchTags } from "@/apis/tags";
+import TagApis from "@/apis/tags";
 import { Tag } from "@/models/helpers";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
@@ -14,6 +14,7 @@ export default function TagOptions(props: {
   width?: string;
   refreshSignal?: boolean;
 }) {
+  const { getTags } = TagApis();
   const [value, setValue] = React.useState<Tag[]>([]);
   const { placeholder } = props;
   const { width } = props;
@@ -23,7 +24,7 @@ export default function TagOptions(props: {
   const [tags, setTags] = React.useState<Tag[]>([]);
 
   React.useEffect(() => {
-    fetchTags()
+    getTags()
       .then((data) => {
         setTags(data.data);
       })

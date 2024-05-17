@@ -42,7 +42,7 @@ interface TagOptionsProps {
 
 export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
   (props: TagOptionsProps, ref) => {
-    const { fetchTags, postNewTag } = TagApis();
+    const { getTags, postNewTag } = TagApis();
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
@@ -50,7 +50,7 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
     const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
 
     React.useEffect(() => {
-      fetchTags()
+      getTags()
         .then((tags) => {
           setTags(tags.data);
         })

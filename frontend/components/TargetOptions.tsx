@@ -44,7 +44,7 @@ interface TargetOptionsProps {
 
 export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
   (props: TargetOptionsProps, ref) => {
-    const { fetchTargets } = TargetApis();
+    const { getTargets } = TargetApis();
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
@@ -52,7 +52,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
     const [selectedTargets, setSelectedTargets] = React.useState<number[]>([]);
 
     React.useEffect(() => {
-      fetchTargets()
+      getTargets()
         .then((data) => {
           setTargets(data);
         })

@@ -1,16 +1,13 @@
 import React from "react";
 import ObservationApis from "@/apis/observations";
-import {
-  useLogoutMutation,
-  useRetrieveUserQuery,
-} from "@/redux/features/authApiSlice";
 import { Observation } from "@/models/observations";
 import { toast } from "react-toastify";
+import { auth } from "@/auth";
 
-export default function TextBox(props: { observation?: Observation }) {
+export default async function TextBox(props: { observation?: Observation }) {
+  const session = await auth();
   const { postObservationMessages } = ObservationApis();
   const [textBlock, setTextBlock] = React.useState<string>("");
-  const { data } = useRetrieveUserQuery();
 
   const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -22,7 +19,7 @@ export default function TextBox(props: { observation?: Observation }) {
         context: textBlock,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        user: data,
+        user: session?.user,
       });
     } catch (error) {
       console.log(error);

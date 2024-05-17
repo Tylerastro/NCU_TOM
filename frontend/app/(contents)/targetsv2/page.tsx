@@ -8,10 +8,10 @@ import { DataTable } from "./dataTable";
 import { useQuery } from "@tanstack/react-query";
 
 export default function TargetsTable() {
-  const { fetchTargets, deleteBulkTarget } = TargetApis();
+  const { getTargets, deleteBulkTarget } = TargetApis();
   const { data: targets, refetch } = useQuery({
     queryKey: ["targets"],
-    queryFn: () => fetchTargets(),
+    queryFn: () => getTargets(),
     initialData: () => [] as Target[],
   });
 
