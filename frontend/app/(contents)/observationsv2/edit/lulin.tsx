@@ -24,7 +24,7 @@ export default function Lulin(props: {
   observation_id: number;
 }) {
   const { getLulin } = ObservationApis();
-  const [dataReady, setDataReady] = useState(true);
+  const [dataReady, setDataReady] = useState(false);
   const [codeUpdate, setCodeUpdate] = useState(false);
 
   const { data: lulinObservations } = useQuery({
@@ -45,7 +45,6 @@ export default function Lulin(props: {
             Edit your submission
           </h1>
         </div>
-        {/* <DynamicHorizontalBarChart data={chartData} /> */}
         {dataReady ? (
           <MoonAltAz
             start_date={props.start_date}
