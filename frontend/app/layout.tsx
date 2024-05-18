@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import Background from "@/components/Background";
+import { NavBar } from "@/components/Navbar";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import Background from "@/components/Background";
+import type { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import NextAuthProvider from "./SessionProvider";
-import { NavBar } from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,6 +22,7 @@ export default function RootLayout({
     <ReactQueryClientProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
+          <ToastContainer />
           <NextAuthProvider>
             <ThemeProvider
               attribute="class"

@@ -87,6 +87,7 @@ export function TargetLulinForm({
 }: {
   observation: LulinObservations;
 }) {
+  const { putLulin } = ObservationApis();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,7 +103,6 @@ export function TargetLulinForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const { putLulin } = ObservationApis();
     putLulin(observation.id, values)
       .then(() => {
         toast.success("Observation updated successfully");

@@ -199,9 +199,10 @@ class ObservationMessagesView(APIView):
     def post(self, request, pk):
         observation = get_object_or_404(Observation, pk=pk, user=request.user)
         if observation:
+            print(request.data)
             comment = Comments.objects.create(
                 user=request.user,
-                context=request.data['message'],
+                context=request.data,
             )
             observation.comments.add(comment)
             observation.save()

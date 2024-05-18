@@ -3,7 +3,7 @@ import { Comments } from "@/models/helpers";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import React from "react";
-
+import { TextareaForm } from "./comments";
 export default function Feeds(props: { observation_id: number }) {
   const { getObservations } = ObservationApis();
   const { data: observation } = useQuery({
@@ -24,7 +24,7 @@ export default function Feeds(props: { observation_id: number }) {
   }, [observation?.comments]);
 
   return (
-    <>
+    <div>
       <ol className="relative border-s border-gray-200 dark:border-gray-700">
         {sortedComments.map((comment, index) => (
           <li key={index} className="mb-10 ms-6">
@@ -52,6 +52,7 @@ export default function Feeds(props: { observation_id: number }) {
           </li>
         ))}
       </ol>
-    </>
+      <TextareaForm observationId={props.observation_id} />
+    </div>
   );
 }
