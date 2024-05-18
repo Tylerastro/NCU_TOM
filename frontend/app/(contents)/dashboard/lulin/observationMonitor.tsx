@@ -1,13 +1,31 @@
 "use client";
 import ObservationApis from "@/apis/observations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import ObservationTable from "./observationTable";
 
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col space-y-3 py-10">
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-8/12" />
+        <Skeleton className="h-4 w-6/12" />
+        <Skeleton className="h-4 w-4/12" />
+        <Skeleton className="h-4 w-2/12" />
+      </div>
+    </div>
+  );
+}
+
 export default function ObservationMonitor() {
   const { getObservations } = ObservationApis();
-  const { data: observations, refetch } = useQuery({
+  const {
+    data: observations,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(),
     initialData: () => [] as Observation[],
@@ -123,21 +141,33 @@ export default function ObservationMonitor() {
       <div className="py-7 grid gap-4 grid-cols-3">
         <div>
           <span>Pending</span>
-          <ObservationTable
-            observationData={observations.filter((o) => o.status === 2)}
-          />
+          {isFetching ? (
+            <LoadingSkeleton />
+          ) : (
+            <ObservationTable
+              observationData={observations.filter((o) => o.status === 2)}
+            />
+          )}
         </div>
         <div>
           <span className="text-lg">In progress</span>
-          <ObservationTable
-            observationData={observations.filter((o) => o.status === 3)}
-          />
+          {isFetching ? (
+            <LoadingSkeleton />
+          ) : (
+            <ObservationTable
+              observationData={observations.filter((o) => o.status === 3)}
+            />
+          )}
         </div>
         <div>
           <span className="text-lg">Completed</span>
-          <ObservationTable
-            observationData={observations.filter((o) => o.status === 4)}
-          />
+          {isFetching ? (
+            <LoadingSkeleton />
+          ) : (
+            <ObservationTable
+              observationData={observations.filter((o) => o.status === 4)}
+            />
+          )}
         </div>
       </div>
     </>

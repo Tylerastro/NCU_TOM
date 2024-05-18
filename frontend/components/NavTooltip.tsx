@@ -1,8 +1,6 @@
-import Link from "next/link";
+import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
-import * as React from "react";
-import { auth } from "@/auth";
-import { signOut } from "@/auth";
+import Link from "next/link";
 
 const settings = [
   { name: "Dashboard", url: "/dashboard/lulin", disabled: false },
