@@ -1,6 +1,3 @@
-import { Metadata } from "next";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Metadata } from "next";
 import { CalendarForm } from "./dateForm";
 import ObservationMonitor from "./observationMonitor";
 import { Overview } from "./overview";
@@ -16,7 +14,7 @@ import { RecentSales } from "./recent-sales";
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "Example dashboard app built using the components.",
+  description: "Faculty dashboard",
 };
 
 export default function DashboardPage() {
@@ -28,8 +26,6 @@ export default function DashboardPage() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <div className="flex items-center space-x-2">
               <CalendarForm />
-              <Button variant="outline">Preview</Button>
-              <Button>Download</Button>
             </div>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">

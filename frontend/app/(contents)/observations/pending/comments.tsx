@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 const FormSchema = z.object({
@@ -34,11 +35,10 @@ export function TextareaForm({ observationId }: { observationId: number }) {
 
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof FormSchema>) => {
-      console.log(values);
       return postObservationMessages(observationId, values.message);
     },
     onSuccess: () => {
-      console.log("success");
+      toast.success("Sent successfully");
     },
   });
 
@@ -65,11 +65,11 @@ export function TextareaForm({ observationId }: { observationId: number }) {
               </FormItem>
             )}
           />
+          <Button type="submit" className="ml-2">
+            Send <PlaneIcon className="h-5 w-5" />
+          </Button>
         </form>
       </Form>
-      <Button type="submit" className="ml-2">
-        Send <PlaneIcon className="h-5 w-5" />
-      </Button>
     </div>
   );
 }

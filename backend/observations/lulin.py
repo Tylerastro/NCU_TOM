@@ -116,6 +116,6 @@ class LulinScheduler:
         tmp = ""
 
         for obs in observations:
-            tmp += obs.code
+            tmp += obs.code if obs.code else '\n'
 
         return tmp

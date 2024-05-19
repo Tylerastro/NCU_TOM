@@ -25,8 +25,6 @@ export interface NewObservation {
   status?: number;
   start_date: Date;
   end_date: Date;
-  created_at?: Date;
-  updated_at?: Date;
   tags: Tag[];
   targets?: number[];
   code?: string;

@@ -1,3 +1,4 @@
+import useAxiosAuth from "@/apis/hooks/useAxiosAuth";
 import {
   LulinObservations,
   LulinObservationsUpdate,
@@ -5,7 +6,6 @@ import {
   Observation,
   ObservationUpdate,
 } from "@/models/observations";
-import useAxiosAuth from "@/apis/hooks/useAxiosAuth";
 
 const ObservationApis = () => {
   const axiosAuth = useAxiosAuth();
@@ -134,6 +134,25 @@ const ObservationApis = () => {
     }
   };
 
+  const getCodePreview = async (date: Date) => {
+    const start_date = date.toISOString().split("T")[0];
+    const end_date = new Date(date.getTime() + 64 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0];
+    try {
+      const response = await axiosAuth.get("/api/observations/lulin/code/", {
+        params: {
+          start_date: start_date,
+          end_date: end_date,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   return {
     createObservation,
     putObservation,
@@ -144,6 +163,7 @@ const ObservationApis = () => {
     getLulinCode,
     getObservationAltAz,
     postObservationMessages,
+    getCodePreview,
   };
 };
 

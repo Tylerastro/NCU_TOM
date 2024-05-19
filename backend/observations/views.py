@@ -131,7 +131,7 @@ class LulinView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400.)
+        return Response(serializer.errors, status=400)
 
 
 @permission_classes((IsAuthenticated, ))
@@ -145,7 +145,7 @@ class CodeView(APIView):
             else:
                 lulin = Observation.objects.get(id=id, user=request.user)
         except Observation.DoesNotExist:
-            return Response({"detail": "Observation not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Observation not found"}, status=404)
 
         refresh = request.query_params.get('refresh')
         if refresh == 'true' or not lulin.code:
@@ -155,16 +155,17 @@ class CodeView(APIView):
             return HttpResponse(lulin.code, content_type='text/plain')
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def GetCodes(request):
     if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
-        return Response({"detail": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"detail": "Unauthorized"}, status=401)
 
     service = LulinScheduler()
-    start_date = request.data['start_date']
-    end_date = request.data['end_date']
+    print(request.data)
+    start_date = request.query_params.get('start_date')
+    end_date = request.query_params.get('end_date')
     if all([not start_date, not end_date]):
-        return Response({"detail": "start_date and end_date are required"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "start_date and end_date are required"}, status=400)
 
     if start_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
@@ -199,7 +200,6 @@ class ObservationMessagesView(APIView):
     def post(self, request, pk):
         observation = get_object_or_404(Observation, pk=pk, user=request.user)
         if observation:
-            print(request.data)
             comment = Comments.objects.create(
                 user=request.user,
                 context=request.data,
