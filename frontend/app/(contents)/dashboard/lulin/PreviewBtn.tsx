@@ -1,16 +1,17 @@
 "use client";
 
 import ObservationApis from "@/apis/observations";
+
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
+
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ export default function PreviewButton({
   form: ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
 }) {
   const { getCodePreview } = ObservationApis();
+
   const {
     data: scripts,
     isFetching,
@@ -32,9 +34,10 @@ export default function PreviewButton({
     queryFn: () => getCodePreview(form.getValues().doo),
     enabled: false,
   });
+
   const [showAlert, setShowAlert] = useState(false);
+
   const getPreview = () => {
-    console.log("clicked");
     refetch();
     setShowAlert(true);
   };
@@ -45,25 +48,18 @@ export default function PreviewButton({
         Preview
       </Button>
       {showAlert && (
-        <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Preview Generated</AlertDialogTitle>
-              <AlertDialogDescription>
-                <pre className="max-h-96 overflow-auto overflow-x-hidden whitespace-pre-wrap">
-                  {" "}
-                  {/* Added pre tag and max-height */}
+        <Dialog open={showAlert} onOpenChange={setShowAlert}>
+          <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>Preview Script</DialogTitle>
+              <DialogDescription className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px] overflow-auto">
+                <pre className="whitespace-pre max-w-xl overflow-x-auto">
                   {scripts}
                 </pre>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setShowAlert(false)}>
-                Close
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       )}
       <Button variant="outline">Download</Button>
     </div>

@@ -36,13 +36,9 @@ export default function ObservationTable({
         {observationData.map((data) => (
           <TableRow key={data.id}>
             <TableCell>
-              <Button
-                asChild
-                variant="ghost"
-                className="h-8 w-8 p-0"
-                onClick={() => router.push(`/observations/${data.id}`)}
-              >
+              <Button asChild variant="ghost" className="h-8 w-8 p-0">
                 <Link
+                  target="_blank"
                   href={{
                     pathname: `/observations/${routerMapping[data.status]}`,
                     query: {
