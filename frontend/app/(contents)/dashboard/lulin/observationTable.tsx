@@ -21,7 +21,6 @@ export default function ObservationTable({
 }: {
   observationData: Observation[];
 }) {
-  const router = useRouter();
   return (
     <Table>
       <TableHeader>

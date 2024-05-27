@@ -146,7 +146,7 @@ export default function Lulin(props: {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">False</div>
+            <div className="text-2xl font-bold">No</div>
           </CardContent>
         </Card>
       </div>

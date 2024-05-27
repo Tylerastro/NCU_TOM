@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react";
+import * as React from "react";
 import {
   LineChart,
-  CartesianAxis,
   CartesianGrid,
   Legend,
   Line,
   Tooltip,
   ResponsiveContainer,
-  ScatterChart,
-  Scatter,
   XAxis,
   YAxis,
 } from "recharts";
@@ -33,7 +30,8 @@ export default function MoonAltAz(props: {
 }) {
   const { getMoonAltAz } = TargetApis();
   const { getObservationAltAz } = ObservationApis();
-  const [AltAz, setAltAz] = useState<TargetAltAz[]>([]);
+
+  const [AltAz, setAltAz] = React.useState<TargetAltAz[]>([]);
 
   const { data: moonData } = useQuery({
     queryKey: ["getMoonAltAz", props.start_date, props.end_date],
@@ -84,7 +82,7 @@ export default function MoonAltAz(props: {
     initialData: [],
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (moonData && targetData) {
       const combinedData = [
         {
@@ -104,12 +102,12 @@ export default function MoonAltAz(props: {
         <XAxis
           padding={{ left: 30, right: 30 }}
           dataKey="time"
-          angle={-30}
+          angle={-15}
           type="category"
           allowDuplicatedCategory={false}
         />
         <YAxis dataKey="alt" />
-        <Tooltip />
+        {/* <Tooltip /> */}
         <Legend />
         {AltAz.map((s) => (
           <Line

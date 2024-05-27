@@ -5,7 +5,7 @@ export interface Observation {
   id: number;
   user?: User;
   name: string;
-  observatory: string;
+  observatory: number;
   priority: number;
   status: number;
   start_date: string;

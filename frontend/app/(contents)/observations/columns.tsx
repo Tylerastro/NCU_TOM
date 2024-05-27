@@ -58,6 +58,7 @@ export const columns: ColumnDef<Observation>[] = [
       const observatory: number = props.row.getValue("observatory");
       const start_date: string = props.row.getValue("start_date");
       const end_date: string = props.row.getValue("end_date");
+
       const routerMapping: { [key: number]: string } = {
         1: "edit",
         2: "pending",
@@ -66,7 +67,12 @@ export const columns: ColumnDef<Observation>[] = [
         <div className="text-primary-foreground font-medium">
           <Link
             href={{
-              pathname: `/observations/${routerMapping[status]}`,
+              pathname:
+                status === 1
+                  ? `/observations/${routerMapping[1]}`
+                  : status === 2
+                  ? `/observations/${routerMapping[2]}`
+                  : `/observations/${props.row.id}`,
               query: {
                 id: id,
                 observatory: observatory,
