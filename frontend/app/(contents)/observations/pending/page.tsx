@@ -5,8 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { UserRole } from "@/models/enums";
 import { toast } from "react-toastify";
 import Lulin from "./lulin";
+import { useSession } from "next-auth/react";
+import { User } from "lucide-react";
 
 function LoadingSkeleton() {
   return (
@@ -37,6 +40,7 @@ function PageContent() {
 }
 
 function VerifyButton() {
+  const { data: session } = useSession();
   const { putObservation } = ObservationApis();
   const searchParams = useSearchParams();
   const observation_id = searchParams.get("id") || "";
@@ -46,7 +50,7 @@ function VerifyButton() {
       return putObservation(parseInt(observation_id), { status: 3 });
     },
     onSuccess: () => {
-      toast.success("Updated successfully");
+      toast.success("Observation has been verified");
       router.push("/observations");
     },
   });
@@ -59,6 +63,7 @@ function VerifyButton() {
   return (
     <Button
       onClick={handleVerify}
+      disabled={session?.user?.role === UserRole.User}
       variant="outline"
       className="dark:hover:bg-green-600"
     >

@@ -1,9 +1,9 @@
 "use client";
 
 import { badgeVariants } from "@/components/ui/badge";
-import { getObservatoryLabel, getStatusLabel } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
+import { Observatory, Status } from "@/models/enums";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
@@ -86,10 +86,10 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Observatory",
     cell(props) {
       const observatory: number = props.row.getValue("observatory");
-
+      console.log(Observatory[observatory]);
       return (
         <div className="text-primary-foreground font-medium">
-          {getObservatoryLabel(observatory)}
+          {Observatory[observatory]}
         </div>
       );
     },
@@ -139,7 +139,7 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Status",
     cell(props) {
       const status: number = props.row.getValue("status");
-      return <div>{getStatusLabel(status)}</div>;
+      return <div>{Status[status]}</div>;
     },
     filterFn: (row, id, value) => {
       const rowValue: number = row.getValue(id);
