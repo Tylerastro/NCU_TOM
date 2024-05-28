@@ -84,7 +84,7 @@ class Users(AbstractUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     use_demo_targets = models.BooleanField(default=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'

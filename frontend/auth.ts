@@ -62,6 +62,31 @@ const config = {
   },
   callbacks: {
     async jwt({ token, user }) {
+      async function parseJwt(token: string): Promise<
+        | {
+            exp: number;
+            jti: string;
+            user_id: number;
+            token_type: string;
+            iat: number;
+          }
+        | undefined
+      > {
+        if (!token) {
+          return;
+        }
+        const Buffer = require("buffer").Buffer;
+        const base64 = token.split(".")[1];
+        const decodedValue = Buffer.from(base64, "base64");
+        return JSON.parse(decodedValue.toString("ascii"));
+      }
+      if (token.refreshToken) {
+        const jwt = await parseJwt(token.refreshToken);
+        if (jwt && jwt.exp < Date.now() / 1000) {
+          return null;
+        }
+      }
+
       return {
         ...token,
         ...user,
