@@ -13,9 +13,9 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
-from .models import Announcements, Tags
+from .models import Announcements, Tags, Users
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
-                          TagsGetSerializer, TagsSerializer)
+                          TagsGetSerializer, TagsSerializer, UserSerializer)
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -141,3 +141,13 @@ def send_observation_mail(request: HttpRequest):
         return Response(status=200)
     except:
         return Response(status=400)
+
+
+class UserView(APIView):
+    def get(self, request) -> Users:
+        if request.user.role != Users.roles.ADMIN:
+            return Response({"detail": "Forbidden"}, status=403)
+
+        users = Users.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=200)

@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import (AnnouncementsView, LogoutView, TagsDetailView, TagsView,
                     TomProviderAuthView, TomTokenObtainPairView,
-                    TomTokenRefreshView, TomTokenVerifyView,
+                    TomTokenRefreshView, TomTokenVerifyView, UserView,
                     send_observation_mail)
 
 router = routers.DefaultRouter()
@@ -22,4 +22,5 @@ urlpatterns = [
     path("tags/", TagsView.as_view(), name="tags"),
     path("announcements/", AnnouncementsView.as_view(), name="announcements"),
     path("tags/<int:pk>/", TagsDetailView.as_view(),),
+    path("list/users/", UserView.as_view()),
 ]
