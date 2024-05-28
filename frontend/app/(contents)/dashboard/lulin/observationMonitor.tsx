@@ -1,5 +1,5 @@
 "use client";
-import ObservationApis from "@/apis/observations";
+import { getObservations } from "@/apis/observations/getObservations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Observation } from "@/models/observations";
@@ -20,7 +20,6 @@ function LoadingSkeleton() {
 }
 
 export default function ObservationMonitor() {
-  const { getObservations } = ObservationApis();
   const {
     data: observations,
     refetch,

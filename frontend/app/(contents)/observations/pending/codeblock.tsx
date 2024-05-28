@@ -1,4 +1,5 @@
-import ObservationApis from "@/apis/observations";
+import { getLulinCode } from "@/apis/observations/getLulinCode";
+import { putObservation } from "@/apis/observations/putObservation";
 import { ObservationUpdate } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,6 @@ export default function CodeBlock({
   codeUpdate: boolean;
   setCodeUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { getLulinCode, putObservation } = ObservationApis();
   const router = useRouter();
   const [codeBlock, setCodeBlock] = React.useState<string>("");
 

@@ -1,4 +1,4 @@
-import TargetApis from "@/apis/targets";
+import { bulkCreate } from "@/apis/targets/bulkTargetCreate";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -8,7 +8,6 @@ function FileUpload({
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [file, setFile] = useState<File | null>(null);
-  const { bulkCreate } = TargetApis();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {

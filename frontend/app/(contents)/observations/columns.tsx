@@ -1,9 +1,9 @@
 "use client";
 
 import { badgeVariants } from "@/components/ui/badge";
+import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
-import { Observatory, Status } from "@/models/enums";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
@@ -92,7 +92,6 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Observatory",
     cell(props) {
       const observatory: number = props.row.getValue("observatory");
-      console.log(Observatory[observatory]);
       return (
         <div className="text-primary-foreground font-medium">
           {Observatory[observatory]}

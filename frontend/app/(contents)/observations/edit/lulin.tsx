@@ -1,4 +1,4 @@
-import ObservationApis from "@/apis/observations";
+import { getLulin } from "@/apis/observations/getLulin";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinObservations } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
@@ -23,7 +23,6 @@ export default function Lulin(props: {
   end_date: string;
   observation_id: number;
 }) {
-  const { getLulin } = ObservationApis();
   const [codeUpdate, setCodeUpdate] = useState(false);
 
   const { data: lulinObservations, isFetching } = useQuery({

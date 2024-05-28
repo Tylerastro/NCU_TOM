@@ -1,16 +1,14 @@
 "use client";
-import Image from "next/image";
-
-import TargetApis from "@/apis/targets";
+import { getTargets } from "@/apis/targets/getTargets";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
 export default function DashboardPage(params: { params: { id: number } }) {
-  const { getTargets } = TargetApis();
   const { data: targets } = useQuery({
     queryKey: ["targets"],
     queryFn: () => getTargets(params.params.id),

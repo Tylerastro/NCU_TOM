@@ -1,4 +1,4 @@
-import ObservationApis from "@/apis/observations";
+import { createObservation } from "@/apis/observations/createObservation";
 import { TagOptions } from "@/components/TagOptions";
 import { TargetOptions } from "@/components/TargetOptions";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,6 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 
 export function NewObservationFrom({ refetch }: { refetch: () => void }) {
-  const { createObservation } = ObservationApis();
   const [open, setOpen] = React.useState(false);
   const [selectedTags, setSelectedTags] = React.useState<
     z.infer<typeof formSchema>["tags"]

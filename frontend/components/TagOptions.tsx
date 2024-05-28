@@ -1,14 +1,15 @@
 "use client";
 
-import TagApis from "@/apis/tags";
+import { createNewTag } from "@/apis/tags/createTag";
+import { getTags } from "@/apis/tags/getTags";
 import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandList,
   CommandItem,
+  CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
 import {
@@ -42,7 +43,6 @@ interface TagOptionsProps {
 
 export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
   (props: TagOptionsProps, ref) => {
-    const { getTags, postNewTag } = TagApis();
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
@@ -63,7 +63,7 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
       const NewTag: NewTag = {
         name: name,
       };
-      postNewTag(NewTag)
+      createNewTag(NewTag)
         .then((data) => {
           setTags((prevTags) => [...prevTags, data]);
           setSelectedTags((prevSelectedTags) => [...prevSelectedTags, data]);

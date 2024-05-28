@@ -1,18 +1,17 @@
+import { getObservationAltAz } from "@/apis/observations/getObservationAltAz";
+import { getMoonAltAz } from "@/apis/targets/getMoonAltAz";
+import { TargetAltAz } from "@/models/targets";
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import {
-  LineChart,
   CartesianGrid,
   Legend,
   Line,
-  Tooltip,
+  LineChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import { TargetAltAz } from "@/models/targets";
-import TargetApis from "@/apis/targets";
-import ObservationApis from "@/apis/observations";
 
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
@@ -28,9 +27,6 @@ export default function MoonAltAz(props: {
   end_date: string;
   observation_id: number;
 }) {
-  const { getMoonAltAz } = TargetApis();
-  const { getObservationAltAz } = ObservationApis();
-
   const [AltAz, setAltAz] = React.useState<TargetAltAz[]>([]);
 
   const { data: moonData } = useQuery({

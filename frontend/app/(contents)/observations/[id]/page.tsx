@@ -1,8 +1,5 @@
 "use client";
-import { Skeleton } from "@/components/ui/skeleton";
-import ObservationApis from "@/apis/observations";
-import { useQuery } from "@tanstack/react-query";
-import PageContent from "./pageContent";
+import { getObservations } from "@/apis/observations/getObservations";
 import {
   Select,
   SelectContent,
@@ -10,9 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import PageContent from "./pageContent";
 
-import { Observation } from "@/models/observations";
 import { Status } from "@/models/enums";
+import { Observation } from "@/models/observations";
 
 function LoadingSkeleton() {
   return (
@@ -27,7 +27,7 @@ function LoadingSkeleton() {
 }
 
 export default function Page({ params }: { params: { id: number } }) {
-  const { getObservations } = ObservationApis();
+  console.log(params.id);
   const { data: observation, isFetching } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(params.id),

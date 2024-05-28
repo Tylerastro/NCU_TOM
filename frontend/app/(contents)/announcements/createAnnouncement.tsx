@@ -1,5 +1,5 @@
 "use client";
-import { createAnnouncement } from "@/apis/announcements";
+import { createAnnouncement } from "@/apis/announcements/createAnnouncement";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

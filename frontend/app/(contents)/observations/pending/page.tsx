@@ -1,15 +1,14 @@
 "use client";
-import ObservationApis from "@/apis/observations";
+import { putObservation } from "@/apis/observations/putObservation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserRole } from "@/models/enums";
 import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { UserRole } from "@/models/enums";
 import { toast } from "react-toastify";
 import Lulin from "./lulin";
-import { useSession } from "next-auth/react";
-import { User } from "lucide-react";
 
 function LoadingSkeleton() {
   return (
@@ -41,7 +40,6 @@ function PageContent() {
 
 function VerifyButton() {
   const { data: session } = useSession();
-  const { putObservation } = ObservationApis();
   const searchParams = useSearchParams();
   const observation_id = searchParams.get("id") || "";
   const router = useRouter();

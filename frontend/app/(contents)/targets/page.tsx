@@ -1,5 +1,6 @@
 "use client";
-import TargetApis from "@/apis/targets";
+import { deleteBulkTarget } from "@/apis/targets/bulkTargetDelete";
+import { getTargets } from "@/apis/targets/getTargets";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +21,6 @@ function LoadingSkeleton() {
 }
 
 export default function TargetsTable() {
-  const { getTargets, deleteBulkTarget } = TargetApis();
   const {
     data: targets,
     refetch,

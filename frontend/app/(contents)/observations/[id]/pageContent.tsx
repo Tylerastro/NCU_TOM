@@ -1,15 +1,8 @@
 "use client";
-import Link from "next/link";
+import { getLulin } from "@/apis/observations/getLulin";
 import { Button } from "@/components/ui/button";
-import { Observatory, Status } from "@/models/enums";
-import React from "react";
-import ObservationApis from "@/apis/observations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LulinObservations, Observation } from "@/models/observations";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import Feeds from "./feeds";
 import {
   Table,
   TableBody,
@@ -18,6 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Observatory, Status } from "@/models/enums";
+import { LulinObservations, Observation } from "@/models/observations";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useState } from "react";
+import Feeds from "./feeds";
 import MoonAltAz from "./moonAltAz";
 
 function LoadingSkeleton() {
@@ -38,7 +37,6 @@ export default function PageContent({
   observation: Observation;
 }) {
   const [dataReady, setDataReady] = useState(false);
-  const { getLulin, getObservations } = ObservationApis();
   const { data: lulinObservations } = useQuery({
     queryKey: ["getLulin"],
     queryFn: () =>

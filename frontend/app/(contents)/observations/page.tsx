@@ -1,5 +1,5 @@
 "use client";
-import ObservationApis from "@/apis/observations";
+import { getObservations } from "@/apis/observations/getObservations";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
@@ -19,7 +19,6 @@ function LoadingSkeleton() {
 }
 
 export default function ObservationsTable() {
-  const { getObservations } = ObservationApis();
   const {
     data: observations,
     refetch,

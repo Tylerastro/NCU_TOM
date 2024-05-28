@@ -1,6 +1,6 @@
 "use client";
+import { putLulin } from "@/apis/observations/putLulin";
 
-import ObservationApis from "@/apis/observations";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -87,7 +87,6 @@ export function TargetLulinForm({
 }: {
   observation: LulinObservations;
 }) {
-  const { putLulin } = ObservationApis();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

@@ -1,5 +1,5 @@
 "use client";
-import TargetApis from "@/apis/targets";
+import { createTarget } from "@/apis/targets/createTarget";
 import { TagOptions } from "@/components/TagOptions";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,7 +84,6 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
 }
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
-  const { createTarget } = TargetApis();
   const [open, setOpen] = React.useState(false);
   const [selectedTags, setSelectedTags] = React.useState<
     z.infer<typeof formSchema>["tags"]

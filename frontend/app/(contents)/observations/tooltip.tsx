@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./viewOptions";
 
-import TagApis from "@/apis/tags";
+import { getTags } from "@/apis/tags/getTags";
 import { Tag } from "@/models/helpers";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import * as React from "react";
@@ -59,7 +59,6 @@ function transformTagToOption(tag: Tag) {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const { getTags } = TagApis();
   const isFiltered = table.getState().columnFilters.length > 0;
   const [tags, setTags] = React.useState<Tag[]>([]);
   const [tagOptions, setTagOptions] = React.useState<

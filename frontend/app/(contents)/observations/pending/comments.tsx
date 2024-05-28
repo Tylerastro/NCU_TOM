@@ -1,6 +1,6 @@
 "use client";
 
-import ObservationApis from "@/apis/observations";
+import { postObservationMessages } from "@/apis/observations/putObservationMessage";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,7 +28,6 @@ const FormSchema = z.object({
 });
 
 export function TextareaForm({ observationId }: { observationId: number }) {
-  const { postObservationMessages } = ObservationApis();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });

@@ -7,14 +7,14 @@ import {
   AccordionTrigger,
 } from "@/components/Accordion";
 
-import { fetchAnnouncements } from "@/apis/announcements";
+import { getAnnouncements } from "@/apis/announcements/getAnnouncements";
 import { Announcements } from "@/models/helpers";
 import { useQuery } from "@tanstack/react-query";
 
 export function AccordionAnnoucemnets() {
   const { data: announcements, refetch } = useQuery({
     queryKey: ["announcements"],
-    queryFn: () => fetchAnnouncements(),
+    queryFn: () => getAnnouncements(),
     initialData: () => [] as Announcements[],
   });
 

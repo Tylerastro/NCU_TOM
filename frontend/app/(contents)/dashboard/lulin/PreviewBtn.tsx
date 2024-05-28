@@ -1,7 +1,6 @@
 "use client";
 
-import ObservationApis from "@/apis/observations";
-
+import { getCodePreview } from "@/apis/observations/getCodePreview";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +22,6 @@ export default function PreviewButton({
 }: {
   form: ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
 }) {
-  const { getCodePreview } = ObservationApis();
-
   const {
     data: scripts,
     isFetching,

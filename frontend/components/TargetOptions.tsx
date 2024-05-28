@@ -1,6 +1,5 @@
 "use client";
 
-import TargetApis from "@/apis/targets";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -21,6 +20,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { z } from "zod";
 
+import { getTargets } from "@/apis/targets/getTargets";
 const formSchema = z.object({
   name: z.string().optional(),
   observatory: z.string().transform(Number),
@@ -44,7 +44,6 @@ interface TargetOptionsProps {
 
 export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
   (props: TargetOptionsProps, ref) => {
-    const { getTargets } = TargetApis();
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
