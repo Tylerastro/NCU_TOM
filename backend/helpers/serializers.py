@@ -10,6 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
                   'role', 'created_at', 'is_active')
 
 
+class FullUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ('id', 'username', 'institute', 'email',
+                  'role', 'created_at', 'is_active', 'last_login')
+
+
 class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags

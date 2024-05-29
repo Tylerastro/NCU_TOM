@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/table";
 import { Observation } from "@/models/observations";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const routerMapping: { [key: number]: string } = {
   1: "edit",

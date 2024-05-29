@@ -2,20 +2,23 @@ from typing import List
 
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from djoser.social.views import ProviderAuthView
+from helpers.models import Users
 from rest_framework import status
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
 from .models import Announcements, Tags, Users
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
-                          TagsGetSerializer, TagsSerializer, UserSerializer)
+                          FullUserSerializer, TagsGetSerializer,
+                          TagsSerializer)
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -149,5 +152,18 @@ class UserView(APIView):
             return Response({"detail": "Forbidden"}, status=403)
 
         users = Users.objects.all()
-        serializer = UserSerializer(users, many=True)
+        serializer = FullUserSerializer(users, many=True)
         return Response(serializer.data, status=200)
+
+
+@api_view(['PUT'])
+@permission_classes((IsAuthenticated, ))
+def EditUserRole(request, pk):
+    if request.user.role != Users.roles.ADMIN:
+        return Response({"detail": "Forbidden"}, status=403)
+
+    user = Users.objects.get(id=pk)
+    user.role = request.data['role']
+    user.save()
+
+    return Response(status=200)

@@ -23,6 +23,7 @@ enum UserRole {
   Admin = 1,
   Faculty,
   User,
+  Visitor,
 }
 
 export { Priority, Status, Observatory, UserRole };
