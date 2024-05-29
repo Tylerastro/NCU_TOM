@@ -1,5 +1,6 @@
 "use client";
 import { getObservations } from "@/apis/observations/getObservations";
+import { putObservation } from "@/apis/observations/putObservation";
 import {
   Select,
   SelectContent,
@@ -8,11 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import PageContent from "./pageContent";
-
 import { Status } from "@/models/enums";
 import { Observation } from "@/models/observations";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import PageContent from "./pageContent";
 
 function LoadingSkeleton() {
   return (
@@ -34,9 +35,14 @@ export default function Page({ params }: { params: { id: number } }) {
     initialData: () => [] as Observation[],
   });
 
-  const statusValues = Object.values(Status).filter(
-    (value) => typeof value === "string"
-  );
+  const mutation = useMutation({
+    mutationFn: (values: { status: number }) => {
+      return putObservation(params.id, values);
+    },
+    onSuccess: () => {
+      toast.success("Status updated successfully");
+    },
+  });
 
   return (
     <>
@@ -54,16 +60,22 @@ export default function Page({ params }: { params: { id: number } }) {
           {isFetching ? (
             <LoadingSkeleton />
           ) : (
-            <Select defaultValue={Status[observation[0].status]}>
+            <Select
+              onValueChange={(status) =>
+                mutation.mutate({ status: Number(status) })
+              }
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={Status[observation[0].status]} />
               </SelectTrigger>
               <SelectContent>
-                {statusValues.map((status) => (
-                  <SelectItem key={status} value={status.toString()}>
-                    {status}
-                  </SelectItem>
-                ))}
+                {Object.values(Status)
+                  .filter((value) => typeof value === "number")
+                  .map((stat) => (
+                    <SelectItem key={stat} value={String(stat)}>
+                      {Status[stat as number]}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           )}

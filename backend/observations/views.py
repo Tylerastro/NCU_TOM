@@ -61,7 +61,11 @@ class ObservationsView(APIView):
         return Response(serializer.errors, status=400)
 
     def put(self, request, pk):
-        observation = get_object_or_404(Observation, pk=pk, user=request.user)
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observation = get_object_or_404(Observation, pk=pk)
+        else:
+            observation = get_object_or_404(
+                Observation, pk=pk, user=request.user)
         serializer = ObservationPutSerializer(
             observation, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():

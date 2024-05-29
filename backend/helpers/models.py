@@ -89,7 +89,7 @@ class Users(AbstractUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name', 'last_name',
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'role',
                        'institute', 'email', 'use_demo_targets']
 
     def __str__(self):
