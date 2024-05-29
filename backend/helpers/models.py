@@ -74,13 +74,14 @@ class Users(AbstractUser, PermissionsMixin):
         ADMIN = 1
         FACULTY = 2
         USER = 3
+        VISITOR = 4
 
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     institute = models.CharField(max_length=100)
     email = models.EmailField(unique=True, verbose_name='email address')
-    role = models.IntegerField(choices=roles.choices)
+    role = models.IntegerField(choices=roles.choices, default=roles.VISITOR)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     use_demo_targets = models.BooleanField(default=True)
@@ -89,7 +90,7 @@ class Users(AbstractUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name',
-                       'institute', 'email', 'role', 'use_demo_targets']
+                       'institute', 'email', 'use_demo_targets']
 
     def __str__(self):
         return self.username

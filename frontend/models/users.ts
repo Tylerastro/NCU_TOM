@@ -12,7 +12,6 @@ export interface UserProfile {
 export interface NewUser {
   first_name: string;
   last_name: string;
-  role: number;
   email: string;
   institute: string;
   username: string;

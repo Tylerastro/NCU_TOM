@@ -3,20 +3,9 @@ from typing import List
 
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import HttpRequest
-from djoser.social.views import ProviderAuthView
-from rest_framework import status
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import InvalidToken
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView, TokenVerifyView)
 
-from .models import Announcements, Comments, Tags, Users
-from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
-                          TagsGetSerializer, TagsSerializer)
+from .models import Users
 
 # TODO # This is a basic template which requires more design and customization
 

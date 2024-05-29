@@ -17,23 +17,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
 
 export default function SignUp() {
   const router = useRouter();
-
-  const roleMap = {
-    Admin: 1,
-    Faculty: 2,
-    User: 3,
-  };
-
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      return createUser(values);
+    },
+    onSuccess: () => {
+      router.push("/auth/signin");
+      toast.success("User created successfully");
+    },
+  });
   const formSchema = z.object({
     first_name: z.string(),
     last_name: z.string(),
@@ -45,9 +41,6 @@ export default function SignUp() {
     re_password: z.string(),
     email: z.string().email(),
     use_demo_targets: z.boolean().default(true),
-    role: z
-      .enum(["Admin", "Faculty", "User"])
-      .transform((role) => roleMap[role]),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,21 +54,8 @@ export default function SignUp() {
       re_password: "",
       email: "12345@gmail.com",
       use_demo_targets: true,
-      role: roleMap["User"],
     },
   });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    createUser(values)
-      .then(() => {
-        toast.success("User created successfully");
-        router.push("/auth/signin");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
 
   return (
     <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
@@ -103,7 +83,9 @@ export default function SignUp() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit((values) => {
+              mutation.mutate(values);
+            })}
             className="space-y-8 items-center justify-center align-center"
           >
             <FormField
@@ -220,31 +202,7 @@ export default function SignUp() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Role
-                  </FormLabel>
-                  <Select onValueChange={field.onChange}>
-                    <FormControl className="text-primary-foreground">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Admin"> Admin</SelectItem>
-                      <SelectItem value="Faculty">Faculty</SelectItem>
-                      <SelectItem value="User">User</SelectItem>
-                    </SelectContent>
-                  </Select>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="use_demo_targets"
