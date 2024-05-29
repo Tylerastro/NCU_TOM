@@ -11,6 +11,7 @@ export interface User {
 
 export interface Tag {
   id?: number;
+  user?: User;
   name: string;
   targets: number[]; // Assuming Target is an array, adjust as needed
   observations: number[];

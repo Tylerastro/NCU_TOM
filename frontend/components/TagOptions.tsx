@@ -1,7 +1,9 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { createNewTag } from "@/apis/tags/createTag";
 import { getTags } from "@/apis/tags/getTags";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -46,18 +48,17 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
-    const [tags, setTags] = React.useState<Tag[]>([]);
     const [selectedTags, setSelectedTags] = React.useState<Tag[]>([]);
-
-    React.useEffect(() => {
-      getTags()
-        .then((tags) => {
-          setTags(tags.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    }, []);
+    const { data: session } = useSession();
+    const { data: tags, refetch } = useQuery({
+      queryKey: ["tags"],
+      queryFn: () => getTags(),
+      initialData: () => [] as Tag[],
+      select: (data) =>
+        data
+          .filter((tag) => tag.user?.username === session?.user.username)
+          .map((target) => target),
+    });
 
     const createTag = (name: string) => {
       const NewTag: NewTag = {
@@ -65,7 +66,7 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
       };
       createNewTag(NewTag)
         .then((data) => {
-          setTags((prevTags) => [...prevTags, data]);
+          refetch();
           setSelectedTags((prevSelectedTags) => [...prevSelectedTags, data]);
           setOpen(false);
         })
@@ -107,10 +108,10 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
                 </Button>
               </CommandEmpty>
               <CommandGroup>
-                {tags.map((tag) => (
+                {tags?.map((tag) => (
                   <CommandItem
-                    key={tag.id}
-                    value={tag.name}
+                    key={tag?.id}
+                    value={tag?.name}
                     onSelect={(currentValue) => {
                       setSelectedTags((prevSelectedTags) => {
                         if (
