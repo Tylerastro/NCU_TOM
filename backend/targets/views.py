@@ -120,8 +120,13 @@ def DeleteBulkTargets(request):
             data = json.loads(request.body.decode('utf-8'))
             target_ids = data.get('target_ids', [])
             target_ids = [int(target_id) for target_id in target_ids]
-            Target.objects.filter(
-                id__in=target_ids, user=request.user).delete()
+            if request.user.role == Users.roles.ADMIN:
+                targets = Target.objects.filter(id__in=target_ids)
+            else:
+                targets = Target.objects.filter(
+                    id__in=target_ids, user=request.user)
+            for target in targets:
+                target.delete()
             return JsonResponse({'message': 'Targets deleted successfully'})
         except Exception as e:
             return JsonResponse({'error': f'Error deleting targets: {str(e)}'}, status=500)

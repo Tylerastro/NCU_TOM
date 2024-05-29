@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const settings = [
-  { name: "Dashboard", url: "/dashboard/lulin", disabled: false },
+  { name: "Dashboard", url: "/dashboard/", disabled: false },
   { name: "Settings", url: "/settings", disabled: true },
 ];
 

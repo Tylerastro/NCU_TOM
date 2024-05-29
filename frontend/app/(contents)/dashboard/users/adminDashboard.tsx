@@ -1,6 +1,6 @@
 import React from "react";
 import UserTable from "./usersTable";
 
-export default function Page() {
+export default function AdminDashboard() {
   return <UserTable />;
 }
