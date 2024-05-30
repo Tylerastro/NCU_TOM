@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Status } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import Link from "next/link";
 
@@ -38,7 +39,12 @@ export default function ObservationTable({
                 <Link
                   target="_blank"
                   href={{
-                    pathname: `/observations/${routerMapping[data.status]}`,
+                    pathname:
+                      data.status === Status.Prep
+                        ? `/observations/${routerMapping[1]}`
+                        : data.status === Status.Pending
+                        ? `/observations/${routerMapping[2]}`
+                        : `/observations/${data.id}`,
                     query: {
                       id: data.id,
                       observatory: data.observatory,

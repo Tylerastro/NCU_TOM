@@ -68,11 +68,11 @@ export const columns: ColumnDef<Observation>[] = [
           <Link
             href={{
               pathname:
-                status === 1
+                status === Status.Prep
                   ? `/observations/${routerMapping[1]}`
-                  : status === 2
+                  : status === Status.Pending
                   ? `/observations/${routerMapping[2]}`
-                  : `/observations/${props.row.id}`,
+                  : `/observations/${id}`,
               query: {
                 id: id,
                 observatory: observatory,

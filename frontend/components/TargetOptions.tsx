@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import {
   Command,
   CommandEmpty,
@@ -47,18 +49,18 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
     const { onChange, value } = props;
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
-    const [targets, setTargets] = React.useState<Target[]>([]);
     const [selectedTargets, setSelectedTargets] = React.useState<number[]>([]);
-
-    React.useEffect(() => {
-      getTargets()
-        .then((data) => {
-          setTargets(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    }, []);
+    const { data: session } = useSession();
+    const { data: targets, refetch } = useQuery({
+      queryKey: ["targets"],
+      queryFn: () => getTargets(),
+      initialData: () => [] as Target[],
+      select: (data) =>
+        data
+          .filter((target) => target.user?.username === session?.user.username)
+          .map((target) => target),
+      refetchOnWindowFocus: false,
+    });
 
     React.useEffect(() => {
       onChange(selectedTargets);
