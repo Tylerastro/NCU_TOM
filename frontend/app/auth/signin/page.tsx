@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,9 +15,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useEffect } from "react";
 
-export default function SignInPage() {
+export default function SignInPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const router = useRouter();
+  useEffect(() => {
+    if (searchParams.error === "CredentialsSignin") {
+      toast.error("Invalid username or password");
+    }
+  }, []);
 
   const formSchema = z.object({
     username: z.string().min(2, {
@@ -38,7 +50,7 @@ export default function SignInPage() {
     signIn("credentials", {
       username: values.username,
       password: values.password,
-      redirectTo: "/",
+      callbackUrl: "/",
     })
       .then(() => {
         router.push("/");

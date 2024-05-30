@@ -61,7 +61,7 @@ const config = {
 
           if (!access) {
             console.log("Access token not found.");
-            return null; // Return null to indicate authentication failure
+            return null;
           }
 
           // Get user model
@@ -69,7 +69,7 @@ const config = {
 
           if (!user) {
             console.log("User not found.");
-            return null; // Return null to indicate authentication failure
+            return null;
           }
 
           return {
@@ -79,7 +79,7 @@ const config = {
           };
         } catch (error) {
           console.error("Authentication error:", error);
-          return null; // Return null to indicate authentication failure
+          return null;
         }
       },
     }),
@@ -89,6 +89,11 @@ const config = {
     maxAge: 7 * 24 * 60 * 60,
   },
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      if (user === null || user === undefined)
+        return "/auth/error?error=CredentialsSignin";
+      return true;
+    },
     async jwt({ token, user }) {
       if (token.accessToken) {
         const jwt = await parseJwt(token.accessToken);
