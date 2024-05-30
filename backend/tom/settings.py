@@ -91,7 +91,7 @@ ROOT_URLCONF = 'tom.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'frontend', 'build')],
+        'DIRS': [os.path.join(BASE_DIR, 'frontend', 'build'), os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,6 +103,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'tom.wsgi.application'
 
@@ -158,6 +159,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = False
 
+DOMAIN = os.getenv("DOMAIN", "localhost")
+SITE_NAME = os.getenv("SITE_NAME", "NCU TOM")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -212,12 +215,16 @@ REST_AUTH = {
 
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': False,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'SEND_ACTIVATION_EMAIL': True,
     'PASSWORD_CHANGE_EMAIL_CONFIRMATION': False,
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'TOKEN_MODEL': None,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': os.getenv('REDIRECT').split(','),
+    # Email templates
+    'password_reset': 'helpers.email.PasswordResetEmail',
+    'activation': 'helpers.email.ActivationEmail',
 }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_OAUTH2_KEY", None)
