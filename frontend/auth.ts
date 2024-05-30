@@ -53,26 +53,34 @@ const config = {
 
         let user = null;
 
-        // Get token
-        const { username, password } = await signInSchema.parseAsync(
-          credentials
-        );
-        const { refresh, access } = await getToken(username, password);
-        if (!access) {
-          console.log("access not found");
-        }
+        try {
+          const { username, password } = await signInSchema.parseAsync(
+            credentials
+          );
+          const { refresh, access } = await getToken(username, password);
 
-        // Get user model
-        user = await getUser(access);
-        if (!user) {
-          throw new Error("User not found.");
-        }
+          if (!access) {
+            console.log("Access token not found.");
+            return null; // Return null to indicate authentication failure
+          }
 
-        return {
-          ...user,
-          accessToken: access,
-          refreshToken: refresh,
-        };
+          // Get user model
+          user = await getUser(access);
+
+          if (!user) {
+            console.log("User not found.");
+            return null; // Return null to indicate authentication failure
+          }
+
+          return {
+            ...user,
+            accessToken: access,
+            refreshToken: refresh,
+          };
+        } catch (error) {
+          console.error("Authentication error:", error);
+          return null; // Return null to indicate authentication failure
+        }
       },
     }),
   ],
