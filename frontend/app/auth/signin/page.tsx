@@ -38,6 +38,7 @@ export default function SignInPage() {
     signIn("credentials", {
       username: values.username,
       password: values.password,
+      redirectTo: "/",
     })
       .then(() => {
         router.push("/");

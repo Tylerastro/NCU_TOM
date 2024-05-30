@@ -58,7 +58,7 @@ function AuthTooltip(session: any) {
           <form
             action={async (formData) => {
               "use server";
-              await signOut();
+              await signOut({ redirectTo: "/" });
             }}
           >
             <button type="submit">logout</button>
