@@ -19,6 +19,7 @@ export default function Page({
     onSuccess: () => {
       toast.success("Account activated");
       toast.success("Redirecting to login page");
+      toast.warning("Please contact manager for more permissions");
     },
   });
 
@@ -39,6 +40,7 @@ export default function Page({
         <h1 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Activating your account...
         </h1>
+        <span className="loader"></span>
       </div>
     </div>
   );
