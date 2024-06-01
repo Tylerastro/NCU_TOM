@@ -218,7 +218,7 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'SEND_ACTIVATION_EMAIL': True,
     'PASSWORD_CHANGE_EMAIL_CONFIRMATION': False,
-    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'ACTIVATION_URL': 'activation/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'TOKEN_MODEL': None,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': os.getenv('REDIRECT').split(','),

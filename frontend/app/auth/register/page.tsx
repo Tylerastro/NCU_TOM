@@ -1,10 +1,11 @@
 "use client";
+import { createUser } from "@/apis/auth/createUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { createUser } from "@/apis/auth/createUser";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
@@ -19,6 +20,10 @@ import {
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
 
+interface ErrorResponse {
+  [key: string]: string[];
+}
+
 export default function SignUp() {
   const router = useRouter();
   const mutation = useMutation({
@@ -29,7 +34,21 @@ export default function SignUp() {
       router.push("/auth/signin");
       toast.success("User created successfully");
     },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      const responseData = error.response?.data;
+      if (responseData) {
+        Object.keys(responseData).forEach((key) => {
+          responseData[key].forEach((message: string) => {
+            toast.error(message);
+          });
+        });
+      } else {
+        toast.error("Error creating user");
+      }
+      console.error(responseData);
+    },
   });
+
   const formSchema = z.object({
     first_name: z.string(),
     last_name: z.string(),
