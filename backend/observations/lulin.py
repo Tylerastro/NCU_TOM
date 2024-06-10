@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 import astropy.units as u
@@ -106,15 +106,18 @@ class LulinScheduler:
 
         return code
 
-    def get_codes(self, start_date: datetime, end_date: datetime):
+    def get_codes(self, start_date: str, end_date: str):
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%fZ')
+        end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%fZ')
 
         observations = Observation.objects.filter(
-            start_date__gte=start_date,
-            end_date__lte=end_date
+            start_date__lte=start_date,
+            end_date__gte=end_date,
+            status=Observation.statuses.IN_PROGRESS
+
         )
-
         tmp = ""
-
         for obs in observations:
             tmp += obs.code if obs.code else '\n'
 

@@ -142,9 +142,8 @@ class LulinView(APIView):
 class CodeView(APIView):
     def get(self, request, id):
         service = LulinScheduler()
-
         try:
-            if request.user in (Users.roles.ADMIN, Users.roles.FACULTY):
+            if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
                 lulin = Observation.objects.get(id=id)
             else:
                 lulin = Observation.objects.get(id=id, user=request.user)
@@ -170,10 +169,10 @@ def GetCodes(request):
     if all([not start_date, not end_date]):
         return Response({"detail": "start_date and end_date are required"}, status=400)
 
-    if start_date:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    if end_date:
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    # if start_date:
+    #     start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    # if end_date:
+    #     end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
     return HttpResponse(service.get_codes(
         start_date, end_date), content_type='text/plain')
@@ -182,9 +181,15 @@ def GetCodes(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def GetObservationAltAz(request, pk):
-    observation = Observation.objects.get(id=pk, user=request.user)
-    observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
-        'observation', 'observation__user')
+    if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+        observation = Observation.objects.get(id=pk, user=request.user)
+        observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
+            'observation', 'observation__user')
+    else:
+        observation = Observation.objects.get(id=pk)
+        observations = Lulin.objects.filter(observation__id=pk).select_related(
+            'observation', 'observation__user')
+
     targets = [x.target for x in observations]
 
     data: List[TargetAltAz] = GetTargetsAltAz(
