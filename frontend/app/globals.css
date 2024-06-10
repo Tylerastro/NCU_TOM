@@ -61,8 +61,8 @@ main {
 }
 
 .loader {
-  width: 48px;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: inline-block;
   position: relative;
@@ -71,6 +71,55 @@ main {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
+
+.loader2 {
+  position: relative;
+}
+
+.loader2:before,
+.loader2:after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  display: block;
+  position: relative;
+  border-radius: 50%;
+  background: #fff;
+  animation: left 1s infinite ease-in-out;
+}
+
+.loader2:after {
+  background: #FF3D00;
+  animation: right 1s infinite ease-in-out;
+}
+
+
+@keyframes right {
+
+  0%,
+  100% {
+    transform: translate(-15px)
+  }
+
+  50% {
+    transform: translate(15px)
+  }
+}
+
+@keyframes left {
+
+  0%,
+  100% {
+    transform: translate(15px)
+  }
+
+  50% {
+    transform: translate(-15px)
+  }
+}
+
+
+
 
 .loader::after {
   content: '';

@@ -13,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { AuthError } from "next-auth";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -26,7 +25,6 @@ export default function SignInPage({
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const router = useRouter();
   useEffect(() => {
     if (searchParams.error === "CredentialsSignin") {
       toast.error("Invalid username or password");

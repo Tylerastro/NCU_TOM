@@ -19,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import SubmitLoader from "./submitLoader";
 
 interface ErrorResponse {
   [key: string]: string[];
@@ -28,9 +30,13 @@ const validDomains = ["gmail.com", "astro.ncu.edu.tw", "edu.tw", "edu"];
 
 export default function SignUp() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof formSchema>) => {
       return createUser(values);
+    },
+    onMutate(variables) {
+      setIsSubmitting(true);
     },
     onSuccess: () => {
       router.push("/auth/signin");
@@ -97,6 +103,7 @@ export default function SignUp() {
 
   return (
     <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
+      {isSubmitting && <SubmitLoader isSubmitting={isSubmitting} />}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
