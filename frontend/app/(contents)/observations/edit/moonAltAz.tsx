@@ -1,5 +1,7 @@
 import { getObservationAltAz } from "@/apis/observations/getObservationAltAz";
+import { getObservations } from "@/apis/observations/getObservations";
 import { getMoonAltAz } from "@/apis/targets/getMoonAltAz";
+import { Observation } from "@/models/observations";
 import { TargetAltAz } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -23,19 +25,24 @@ function getRandomColor() {
   return color;
 }
 
-export default function MoonAltAz(props: {
-  start_date: string;
-  end_date: string;
-  observation_id: number;
-}) {
+export default function MoonAltAz(props: { observation_id: number }) {
   const [AltAz, setAltAz] = useState<TargetAltAz[]>([]);
 
+  const { data: observation } = useQuery({
+    queryKey: ["observation", props.observation_id],
+    queryFn: async () =>
+      getObservations(props.observation_id).then((data) => {
+        return data[0];
+      }),
+    initialData: {} as Observation,
+  });
+
   const { data: moonData } = useQuery({
-    queryKey: ["getMoonAltAz", props.start_date, props.end_date],
+    queryKey: ["getMoonAltAz", observation.start_date, observation.end_date],
     queryFn: async () => {
       const result: TargetAltAz = await getMoonAltAz(
-        props.start_date,
-        props.end_date
+        observation.start_date,
+        observation.end_date
       );
       return result.data.map((d) => ({
         ...d,
@@ -48,20 +55,19 @@ export default function MoonAltAz(props: {
       }));
     },
     initialData: [],
+    enabled: Boolean(observation.start_date && observation.end_date),
   });
 
   const { data: targetData } = useQuery({
     queryKey: [
       "getObservationAltAz",
       props.observation_id,
-      props.start_date,
-      props.end_date,
+      observation.start_date,
+      observation.end_date,
     ],
     queryFn: async () => {
       const result: TargetAltAz[] = await getObservationAltAz(
-        props.observation_id,
-        props.start_date,
-        props.end_date
+        props.observation_id
       );
       return result.map((d) => ({
         name: d.name,

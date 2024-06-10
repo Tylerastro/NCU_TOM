@@ -22,11 +22,7 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Lulin(props: {
-  start_date: string;
-  end_date: string;
-  observation_id: number;
-}) {
+export default function Lulin(props: { observation_id: number }) {
   const [dataReady, setDataReady] = useState(false);
   const [codeUpdate, setCodeUpdate] = useState(false);
 
@@ -153,11 +149,7 @@ export default function Lulin(props: {
 
       {dataReady ? (
         <div className="flex justify-center w-full py-5">
-          <MoonAltAz
-            start_date={props.start_date}
-            end_date={props.end_date}
-            observation_id={props.observation_id}
-          />
+          <MoonAltAz observation_id={props.observation_id} />
         </div>
       ) : (
         LoadingSkeleton()

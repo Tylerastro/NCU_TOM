@@ -29,13 +29,7 @@ function PageContent() {
   const start_date = searchParams.get("start_date") || "";
   const end_date = searchParams.get("end_date") || "";
 
-  return (
-    <Lulin
-      start_date={start_date}
-      end_date={end_date}
-      observation_id={parseInt(observation_id)}
-    />
-  );
+  return <Lulin observation_id={parseInt(observation_id)} />;
 }
 
 function VerifyButton() {

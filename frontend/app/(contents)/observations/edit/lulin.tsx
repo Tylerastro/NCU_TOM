@@ -18,11 +18,7 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Lulin(props: {
-  start_date: string;
-  end_date: string;
-  observation_id: number;
-}) {
+export default function Lulin(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
 
   const { data: lulinObservations, isFetching } = useQuery({
@@ -45,11 +41,7 @@ export default function Lulin(props: {
         {isFetching ? (
           <LoadingSkeleton />
         ) : (
-          <MoonAltAz
-            start_date={props.start_date}
-            end_date={props.end_date}
-            observation_id={props.observation_id}
-          />
+          <MoonAltAz observation_id={props.observation_id} />
         )}
 
         <div className="flex justify-center">

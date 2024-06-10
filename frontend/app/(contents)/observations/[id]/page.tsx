@@ -28,7 +28,6 @@ function LoadingSkeleton() {
 }
 
 export default function Page({ params }: { params: { id: number } }) {
-  console.log(params.id);
   const { data: observation, isFetching } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(params.id),

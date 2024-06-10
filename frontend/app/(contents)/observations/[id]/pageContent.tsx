@@ -222,11 +222,7 @@ export default function PageContent({
 
       {dataReady ? (
         <div className="flex justify-center w-full py-5">
-          <MoonAltAz
-            start_date={observation.start_date}
-            end_date={observation.end_date}
-            observation_id={observation.id}
-          />
+          <MoonAltAz observation_id={observation.id} />
         </div>
       ) : (
         LoadingSkeleton()

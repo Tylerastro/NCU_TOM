@@ -165,7 +165,6 @@ def GetCodes(request):
         return Response({"detail": "Unauthorized"}, status=401)
 
     service = LulinScheduler()
-    print(request.data)
     start_date = request.query_params.get('start_date')
     end_date = request.query_params.get('end_date')
     if all([not start_date, not end_date]):
@@ -181,13 +180,15 @@ def GetCodes(request):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
 def GetObservationAltAz(request, pk):
+    observation = Observation.objects.get(id=pk, user=request.user)
     observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
         'observation', 'observation__user')
     targets = [x.target for x in observations]
 
     data: List[TargetAltAz] = GetTargetsAltAz(
-        targets, request.data['start_time'], request.data['end_time'])
+        targets, observation.start_date, observation.end_date)
 
     return JsonResponse(data, safe=False)
 

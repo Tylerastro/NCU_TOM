@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, toZonedTime } from "date-fns-tz";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -47,6 +47,16 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
   >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // * UI is using observatory local time,
+    values.start_date = toZonedTime(
+      new Date(format(values.start_date, "yyyy-MM-dd" + " 18:00:00")),
+      "Asia/Taipei"
+    );
+    values.end_date.setDate(values.end_date.getDate() + 1);
+    values.end_date = toZonedTime(
+      new Date(format(values.end_date, "yyyy-MM-dd" + " 08:00:00")),
+      "Asia/Taipei"
+    );
     createObservation(values)
       .then(() => {
         toast.success("Observation created successfully");
@@ -64,7 +74,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
     name: z.string().optional(),
     observatory: z.number().transform(Number),
     priority: z.number().transform(Number),
-    targets: z.array(z.number()),
+    targets: z.array(z.number()).min(1, { message: "Please select targets" }),
     start_date: z.date(),
     end_date: z.date(),
     tags: z.array(

@@ -5,6 +5,7 @@ import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
 import { ColumnDef } from "@tanstack/react-table";
+import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 
 export const columns: ColumnDef<Observation>[] = [
@@ -104,8 +105,11 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Start Date",
     cell(props) {
       const startDate: string = props.row.getValue("start_date");
-      const date = new Date(startDate).toISOString().split("T")[0];
-      return <div className="text-primary-foreground font-medium">{date}</div>;
+      const date = new Date(startDate);
+      const local_date = formatInTimeZone(date, "Asia/Taipei", "yyyy-MM-dd");
+      return (
+        <div className="text-primary-foreground font-medium">{local_date}</div>
+      );
     },
   },
   {

@@ -59,12 +59,13 @@ class Visibility:
                              time_resolution, time_resolution)
 
         # Convert the Julian Date range to an array of Time objects
-        observation_times = Time(jd_range, format='jd')
-        obs_time_offset = observation_times - self.time_offset
+        observation_times = Time(jd_range, format='jd', scale='utc')
+        obs_time_offset = observation_times
         moon_altaz = get_body('moon', obs_time_offset, location=self.observatory_location).transform_to(
             AltAz(obstime=obs_time_offset, location=self.observatory_location))
 
         altaz_data = AltAzData()
+        observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = moon_altaz.alt.deg.tolist()
         altaz_data.az = moon_altaz.az.deg.tolist()
@@ -76,12 +77,13 @@ class Visibility:
         time_resolution = TimeDelta(self.time_resolution).to(u.day).value
         jd_range = np.arange(start_time.jd, end_time.jd +
                              time_resolution, time_resolution)
-        observation_times = Time(jd_range, format='jd')
-        obs_time_offset = observation_times - self.time_offset
+        observation_times = Time(jd_range, format='jd', scale='utc')
+        obs_time_offset = observation_times
         altaz = target.transform_to(
             AltAz(obstime=obs_time_offset, location=self.observatory_location))
 
         altaz_data = AltAzData()
+        observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = altaz.alt.deg.tolist()
         altaz_data.az = altaz.az.deg.tolist()
