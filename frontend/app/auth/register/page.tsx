@@ -24,6 +24,8 @@ interface ErrorResponse {
   [key: string]: string[];
 }
 
+const validDomains = ["gmail.com", "astro.ncu.edu.tw", "edu.tw", "edu"];
+
 export default function SignUp() {
   const router = useRouter();
   const mutation = useMutation({
@@ -49,18 +51,35 @@ export default function SignUp() {
     },
   });
 
-  const formSchema = z.object({
-    first_name: z.string(),
-    last_name: z.string(),
-    institute: z.string(),
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
-    }),
-    password: z.string(),
-    re_password: z.string(),
-    email: z.string().email(),
-    use_demo_targets: z.boolean().default(true),
-  });
+  const formSchema = z
+    .object({
+      first_name: z.string(),
+      last_name: z.string(),
+      institute: z.string(),
+      username: z.string().min(2, {
+        message: "Username must be at least 2 characters.",
+      }),
+      password: z.string().min(8, {
+        message: "Password must be at least 8 characters.",
+      }),
+      re_password: z.string(),
+      email: z.string().email({ message: "Invalid email address" }),
+      use_demo_targets: z.boolean().default(true),
+    })
+    .refine((data) => data.password === data.re_password, {
+      message: "Passwords do not match",
+      path: ["re_password"],
+    })
+    .refine(
+      (data) => {
+        const emailDomain = data.email.split("@").pop() || "";
+        return validDomains.some((domain) => emailDomain.endsWith(domain));
+      },
+      {
+        message: "Invalid email domain",
+        path: ["email"],
+      }
+    );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

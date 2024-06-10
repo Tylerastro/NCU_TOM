@@ -1,11 +1,4 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,7 +8,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { AuthError } from "next-auth";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { z } from "zod";
 
 export default function SignInPage({
   params,
@@ -47,17 +49,25 @@ export default function SignInPage({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    signIn("credentials", {
-      username: values.username,
-      password: values.password,
-      callbackUrl: "/",
-    })
-      .then(() => {
-        router.push("/");
-      })
-      .catch((error) => {
-        console.log(error);
+    try {
+      signIn("credentials", {
+        username: values.username,
+        password: values.password,
+        callbackUrl: "/",
       });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error("Unknown error, please try again");
+      }
+      if (error instanceof AuthError)
+        switch (error.type) {
+          case "CredentialsSignin":
+            toast.error("Invalid username or password");
+        }
+      else {
+        toast.error("Error signing in");
+      }
+    }
   }
 
   return (
