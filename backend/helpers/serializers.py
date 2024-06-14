@@ -61,7 +61,7 @@ class AnnouncementsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Announcements
-        fields = 'user', 'title', 'context', 'type', 'created_at'
+        fields = 'id', 'user', 'title', 'context', 'type', 'created_at'
 
 
 class AnnouncementsPostSerializer(serializers.ModelSerializer):

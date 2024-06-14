@@ -20,8 +20,8 @@ export function AccordionAnnoucemnets() {
 
   return (
     <Accordion type="single" collapsible className="w-full">
-      {announcements.map((item, index) => (
-        <AccordionItem key={item.id} value={`item-${index}`}>
+      {announcements.map((item) => (
+        <AccordionItem key={item.id} value={`item-${item.id}`}>
           <AccordionTrigger>{item.title}</AccordionTrigger>
           <AccordionDate>
             {item.created_at

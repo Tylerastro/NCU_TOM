@@ -8,12 +8,24 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use(async (config) => {
-  const session = await getSession();
-  if (session?.user.accessToken) {
-    config.headers.Authorization = `JWT ${session.user.accessToken}`;
+api.interceptors.request.use(
+  async (config) => {
+    const session = await getSession();
+
+    if (session?.user?.accessToken) {
+      config.headers.Authorization = `JWT ${session.user.accessToken}`;
+    } else {
+      // Prevent the request from being sent by throwing an error
+      const error = new Error("No access token found");
+      error.message = "Please sign in to continue";
+      throw error;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default api;

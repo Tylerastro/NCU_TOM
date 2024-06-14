@@ -124,6 +124,8 @@ class AnnouncementsView(APIView):
         return Response(serializer.data, status=200)
 
     def post(self, request):
+        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+            return Response({"detail": "You're not authorized to perform this action"}, status=403)
         serializer = AnnouncementsPostSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():

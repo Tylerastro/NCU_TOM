@@ -30,51 +30,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-function isHourAngleFormat(input: string) {
-  const hourAnglePattern = /^\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?$/;
-  return hourAnglePattern.test(input);
-}
-function convertHourAngleToDegrees(hourAngle: unknown) {
-  if (typeof hourAngle !== "string") {
-    return 0;
-  }
-  if (!isHourAngleFormat(hourAngle)) {
-    return parseFloat(hourAngle);
-  }
-
-  const parts = hourAngle.split(":");
-  if (parts.length !== 3) {
-    return 0;
-  }
-
-  const hours = parseFloat(parts[0]);
-  const minutes = parseFloat(parts[1]);
-  const seconds = parseFloat(parts[2]);
-
-  const degrees = (hours + minutes / 60 + seconds / 3600) * 15;
-  return degrees;
-}
-
-function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
-  if (typeof sexagesimal !== "string") {
-    return 0;
-  }
-  if (!isHourAngleFormat(sexagesimal)) {
-    return parseFloat(sexagesimal);
-  }
-
-  const parts = sexagesimal.split(":");
-  if (parts.length !== 3) {
-    return 0;
-  }
-
-  const degrees = parseFloat(parts[0]);
-  const minutes = parseFloat(parts[1]);
-  const seconds = parseFloat(parts[2]);
-  const decimalDegrees = degrees + minutes / 60 + seconds / 3600;
-  return decimalDegrees;
-}
-
 export function NewAnnouncementForm() {
   const [open, setOpen] = React.useState(false);
 
@@ -85,6 +40,11 @@ export function NewAnnouncementForm() {
         setOpen(false);
       })
       .catch((error) => {
+        if (error.response) {
+          toast.error(error.response.data.detail);
+        } else {
+          toast.error(error.message);
+        }
         for (const key in error.data) {
           toast.error(`${key}: ${error.data[key][0]}`);
         }
