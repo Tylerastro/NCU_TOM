@@ -1,5 +1,5 @@
 "use client";
-
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,22 +8,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Target } from "@/models/targets";
 import {
   ColumnDef,
-  flexRender,
   ColumnFiltersState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
-  getCoreRowModel,
-  getFacetedUniqueValues,
-  VisibilityState,
-  getFacetedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
 import { DataTableToolbar } from "./tooltip";
-import { Button } from "@/components/ui/button";
-import { Target } from "@/models/targets";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

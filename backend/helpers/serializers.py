@@ -20,7 +20,7 @@ class FullUserSerializer(serializers.ModelSerializer):
 class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
-        fields = ('name',)
+        fields = ('name', 'id')
 
 
 class TagsGetSerializer(serializers.ModelSerializer):
