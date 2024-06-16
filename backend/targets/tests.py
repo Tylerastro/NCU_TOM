@@ -12,12 +12,14 @@ class TargetModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        test_student_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER,
+        test_user_use_demo = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER, use_demo_targets=True,
+                                                  institute='testinstitute', first_name='testfirst', last_name='testlast')
+        test_user_no_demo = Users.objects.create(username='userNoDemo', password='12345', email='b@b.com', role=Users.roles.USER, use_demo_targets=False,
                                                  institute='testinstitute', first_name='testfirst', last_name='testlast')
 
-        test_tag = Tags.objects.create(name='testtag', user=test_student_user)
+        test_tag = Tags.objects.create(name='testtag', user=test_user_use_demo)
         target = Target.objects.create(
-            user=test_student_user,
+            user=test_user_use_demo,
             name='NGC 3824',
             ra=123.456,
             dec=78.90,
@@ -41,6 +43,13 @@ class TargetModelTest(TestCase):
     def test_target_string_representation(self):
         target = Target.objects.first()
         self.assertEqual(str(target), target.name)
+
+    def test_user_has_targets(self):
+        user = Users.objects.get(username='testuser')
+        self.assertTrue(user.targets.exists())
+
+        user_no_demo = Users.objects.get(username='userNoDemo')
+        self.assertFalse(user_no_demo.targets.exists())
 
 
 class TargetApiTest(TestCase):

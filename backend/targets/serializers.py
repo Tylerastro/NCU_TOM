@@ -170,23 +170,22 @@ class TargetSimbadDataSerializer(serializers.Serializer):
 
 
 class TargetSEDSerializer(serializers.Serializer):
-    filter = serializers.ListField(child=serializers.CharField())
+    filter = serializers.CharField()
     flux = serializers.ListField(child=serializers.FloatField())
     fluxe = serializers.ListField(child=serializers.FloatField())
     fluxv = serializers.ListField(child=serializers.FloatField())
-    frequency = serializers.ListField(child=serializers.FloatField())
-    fluxMin = serializers.ListField(child=serializers.FloatField())
-    fluxMax = serializers.ListField(child=serializers.FloatField())
+    frequency = serializers.FloatField()
 
     def to_internal_value(self, data):
+        """
+        Converts incoming JSON data to a dictionary.
+        """
         return {
-            'filter': data.get('filter', None),
-            'flux': data.get('flux', None),
-            'fluxe': data.get('fluxe', None),
-            'frequency': data.get('frequency', None),
-            'fluxv': data.get('fluxv', None),
-            'fluxMin': data.get('fluxMin', None),
-            'fluxMax': data.get('fluxMax', None)
+            'filter': data.get('filter'),
+            'flux': data.get('flux'),
+            'fluxe': data.get('fluxe'),
+            'frequency': data.get('frequency'),
+            'fluxv': data.get('fluxv'),
         }
 
     def to_representation(self, instance):
@@ -195,7 +194,7 @@ class TargetSEDSerializer(serializers.Serializer):
         """
         ret = super().to_representation(instance)
         # Iterate over float fields and replace non-compliant values
-        for field in ['flux', 'fluxe', 'frequency', 'fluxv']:
+        for field in ['flux', 'fluxe', 'fluxv']:
             if field in ret:
                 ret[field] = [self.handle_non_compliant_float(
                     value) for value in ret[field]]
@@ -207,6 +206,4 @@ class TargetSEDSerializer(serializers.Serializer):
         """
         if value is not None and (math.isinf(value) or math.isnan(value)):
             return None
-        return value
-        return value
         return value

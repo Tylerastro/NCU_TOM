@@ -18,7 +18,7 @@ from .serializers import (TargetAltAzSerializer, TargetGetSerializer,
                           TargetPostSerializer, TargetSEDSerializer,
                           TargetSimbadDataSerializer)
 from .simbad import SimbadService
-from .vizier import SedData, VizierService
+from .vizier import VizierService
 
 
 class TargetsView(APIView):
@@ -179,7 +179,7 @@ def GetTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
 @permission_classes((IsAuthenticated, ))
 def GetTargetSimbad(request, pk: int):
     service = SimbadService()
-    target = Target.objects.get(id=pk, user=request.user)
+    target = Target.objects.get(id=pk)
     if target is None:
         return {"error": "Target not found."}
 
@@ -198,12 +198,13 @@ def GetTargetSimbad(request, pk: int):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 def GetTargetSED(request, pk: int):
+    # TODO: Implement Cache for SED data
     service = VizierService()
-    target = Target.objects.get(id=pk, user=request.user)
+    target = Target.objects.get(id=pk)
     if target is None:
         return {"error": "Target not found."}
-    sed: SedData = service.get_sed(target)
-    serializer = TargetSEDSerializer(data=sed.to_dict())
+    sed = service.get_sed(target)
+    serializer = TargetSEDSerializer(data=sed, many=True)
     if serializer.is_valid():
         return Response(serializer.data, status=200)
     else:

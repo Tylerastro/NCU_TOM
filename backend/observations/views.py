@@ -169,11 +169,6 @@ def GetCodes(request):
     if all([not start_date, not end_date]):
         return Response({"detail": "start_date and end_date are required"}, status=400)
 
-    # if start_date:
-    #     start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    # if end_date:
-    #     end_date = datetime.strptime(end_date, '%Y-%m-%d')
-
     return HttpResponse(service.get_codes(
         start_date, end_date), content_type='text/plain')
 

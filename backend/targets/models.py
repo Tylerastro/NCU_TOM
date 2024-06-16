@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 
 from astropy import units as u
@@ -8,7 +9,7 @@ from django.db import models
 
 class Target(models.Model):
     user = models.ForeignKey('helpers.Users',
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)
     ra = models.FloatField(null=False, validators=[
                            MinValueValidator(0), MaxValueValidator(360)])
@@ -18,6 +19,10 @@ class Target(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
+    sed = models.JSONField(null=True, blank=True)
+    hashed_sed = models.CharField(max_length=64, null=True, blank=True)
+    simbad = models.JSONField(null=True, blank=True)
+    hashed_simbad = models.CharField(max_length=64, null=True, blank=True)
     tags = models.ManyToManyField('helpers.Tags', related_name='targets')
     notes = models.TextField(max_length=100, null=True, blank=True)
 
