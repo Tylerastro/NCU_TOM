@@ -48,6 +48,11 @@ export const columns: ColumnDef<Observation>[] = [
         </div>
       );
     },
+    filterFn: (row, id, value) => {
+      const rowUser: User = row.getValue(id);
+      const rowValue: number = rowUser.id;
+      return value.some((filter: string) => rowValue === parseInt(filter, 10));
+    },
   },
   {
     accessorKey: "name",
@@ -152,9 +157,7 @@ export const columns: ColumnDef<Observation>[] = [
     },
     filterFn: (row, id, value) => {
       const rowValue: number = row.getValue(id);
-      return value.some(
-        (filterValue: string) => rowValue === parseInt(filterValue, 10)
-      );
+      return value.some((filter: string) => rowValue === parseInt(filter, 10));
     },
   },
 ];

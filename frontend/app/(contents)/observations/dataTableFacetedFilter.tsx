@@ -1,7 +1,6 @@
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { Column } from "@tanstack/react-table";
-import * as React from "react";
-
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,11 +40,11 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as number[]);
-  const [occurrences, setOccurrences] = React.useState<Map<number, number>>(
+  const [occurrences, setOccurrences] = useState<Map<number, number>>(
     new Map()
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (facets && !autoCounter) {
       const counts = new Map<number, number>();
       facets.forEach((value, key: Tag[]) => {

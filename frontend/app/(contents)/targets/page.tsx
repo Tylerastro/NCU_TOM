@@ -28,6 +28,7 @@ export default function TargetsTable() {
   } = useQuery({
     queryKey: ["targets"],
     queryFn: () => getTargets(),
+    refetchOnWindowFocus: false,
     initialData: () => [] as Target[],
   });
 

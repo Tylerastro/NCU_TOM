@@ -39,10 +39,6 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
-  const hanldeDelete = async (ids: number[]) => {
-    table.resetRowSelection();
-  };
-
   const table = useReactTable({
     data,
     columns,

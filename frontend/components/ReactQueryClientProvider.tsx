@@ -27,6 +27,7 @@ export const ReactQueryClientProvider = ({
     defaultOptions: {
       queries: {
         retry: shouldRetry,
+        refetchOnWindowFocus: false,
       },
     },
   });

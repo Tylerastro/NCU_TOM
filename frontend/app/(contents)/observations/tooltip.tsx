@@ -8,13 +8,19 @@ import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./viewOptions";
 
 import { getTags } from "@/apis/tags/getTags";
-import { Tag } from "@/models/helpers";
+import { Tag, User } from "@/models/helpers";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import * as React from "react";
 import { DataTableFacetedFilter } from "./dataTableFacetedFilter";
-
+import { getUserList } from "@/apis/system/getUserList";
+import { useQuery } from "@tanstack/react-query";
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+}
+
+interface TransformedUser {
+  label: string;
+  value: number;
 }
 
 const statuses = [
@@ -35,11 +41,11 @@ const statuses = [
     value: 4,
   },
   {
-    label: "EXPIRED",
+    label: "Expired",
     value: 5,
   },
   {
-    label: "DENIED",
+    label: "Denied",
     value: 6,
   },
   {
@@ -75,6 +81,19 @@ export function DataTableToolbar<TData>({
     setTagOptions(tags.map(transformTagToOption));
   }, [tags]);
 
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => getUserList(),
+    initialData: [] as User[],
+  });
+
+  const transformUsersData = (users: User[]): TransformedUser[] => {
+    return users.map((user) => ({
+      label: user.username,
+      value: user.id,
+    }));
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -92,6 +111,14 @@ export function DataTableToolbar<TData>({
             title="Tags"
             options={tagOptions}
             autoCounter={false}
+          />
+        )}
+        {table.getColumn("user") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("user")}
+            title="User"
+            options={transformUsersData(users)}
+            autoCounter={true}
           />
         )}
         {table.getColumn("status") && (
