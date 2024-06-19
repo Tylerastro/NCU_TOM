@@ -46,24 +46,24 @@ function AuthTooltip(session: any) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {settings.map((setting) => (
-            <DropdownMenuItem key={setting.name} disabled={setting.disabled}>
-              <Link href={setting.url} passHref>
+            <Link href={setting.url} passHref>
+              <DropdownMenuItem key={setting.name} disabled={setting.disabled}>
                 {setting.name}
-              </Link>
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            </Link>
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <form
-            action={async (formData) => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button type="submit">logout</button>
-          </form>
-        </DropdownMenuItem>
+        <form
+          action={async (formData) => {
+            "use server";
+            await signOut({ redirectTo: "/" });
+          }}
+        >
+          <button className="w-full" type="submit">
+            <DropdownMenuItem>logout</DropdownMenuItem>
+          </button>
+        </form>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -3,6 +3,7 @@ from typing import List
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
 from djoser.social.views import ProviderAuthView
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -130,6 +131,24 @@ class AnnouncementsView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+    def put(self, request, pk):
+        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+            return Response({"detail": "You're not authorized to perform this action"}, status=403)
+        announcement_instance = get_object_or_404(Announcements, pk=pk)
+        serializer = AnnouncementsPostSerializer(
+            announcement_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+            return Response({"detail": "You're not authorized to perform this action"}, status=403)
+        announcement_instance = get_object_or_404(Announcements, pk=pk)
+        announcement_instance.delete()
+        return Response(status=204)
+
 
 def send_observation_mail(request: HttpRequest):
     try:
@@ -145,6 +164,7 @@ def send_observation_mail(request: HttpRequest):
         return Response(status=400)
 
 
+@permission_classes((IsAuthenticated, ))
 class UserView(APIView):
     def get(self, request) -> Users:
         if request.user.role != Users.roles.ADMIN:

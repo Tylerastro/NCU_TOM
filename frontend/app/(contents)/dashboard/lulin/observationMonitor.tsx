@@ -27,6 +27,7 @@ export default function ObservationMonitor() {
   } = useQuery({
     queryKey: ["observations"],
     queryFn: () => getObservations(),
+    refetchOnWindowFocus: true,
     initialData: () => [] as Observation[],
   });
 
