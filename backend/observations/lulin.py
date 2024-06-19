@@ -1,5 +1,5 @@
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List
 
 import astropy.units as u

@@ -2,11 +2,8 @@ from typing import List
 
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpRequest
 from djoser.social.views import ProviderAuthView
-from helpers.models import Users
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -144,7 +141,7 @@ def send_observation_mail(request: HttpRequest):
             fail_silently=True if settings.DEBUG else False
         )
         return Response(status=200)
-    except:
+    except Exception:
         return Response(status=400)
 
 

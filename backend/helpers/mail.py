@@ -1,5 +1,4 @@
 
-from typing import List
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -25,7 +24,7 @@ class MailService:
                 fail_silently=True if settings.DEBUG else False
             )
             return Response(status=200)
-        except:
+        except Exception:
             return Response(status=400)
 
     def send_announcement_mail(self, level: str, title: str, announcement: str):
@@ -40,5 +39,5 @@ class MailService:
                 fail_silently=True if settings.DEBUG else False
             )
             return Response(status=200)
-        except:
+        except Exception:
             return Response(status=400)

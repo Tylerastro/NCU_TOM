@@ -14,8 +14,8 @@ class TargetModelTest(TestCase):
     def setUpTestData(cls):
         test_user_use_demo = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER, use_demo_targets=True,
                                                   institute='testinstitute', first_name='testfirst', last_name='testlast')
-        test_user_no_demo = Users.objects.create(username='userNoDemo', password='12345', email='b@b.com', role=Users.roles.USER, use_demo_targets=False,
-                                                 institute='testinstitute', first_name='testfirst', last_name='testlast')
+        Users.objects.create(username='userNoDemo', password='12345', email='b@b.com', role=Users.roles.USER, use_demo_targets=False,
+                             institute='testinstitute', first_name='testfirst', last_name='testlast')
 
         test_tag = Tags.objects.create(name='testtag', user=test_user_use_demo)
         target = Target.objects.create(

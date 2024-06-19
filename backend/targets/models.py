@@ -1,4 +1,3 @@
-import hashlib
 from datetime import datetime
 
 from astropy import units as u
