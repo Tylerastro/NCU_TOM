@@ -1,6 +1,9 @@
 import { AccordionAnnoucemnets } from "./accor";
+import { UserRole } from "@/models/enums";
 import { NewAnnouncementForm } from "./createAnnouncement";
-export default function Announcements() {
+import { auth } from "@/auth";
+export default async function Announcements() {
+  const session = await auth();
   return (
     <>
       <div className="flex space-between justify-between pb-2">
@@ -9,10 +12,12 @@ export default function Announcements() {
             Annoucements
           </h1>
         </div>
-
-        <div className="flex gap-2">
-          <NewAnnouncementForm />
-        </div>
+        {session &&
+          [UserRole.Admin, UserRole.Faculty].includes(session.user.role) && (
+            <div className="flex gap-2">
+              <NewAnnouncementForm />
+            </div>
+          )}
       </div>
 
       <AccordionAnnoucemnets />
