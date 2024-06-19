@@ -46,7 +46,7 @@ function AuthTooltip(session: any) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {settings.map((setting) => (
-            <Link href={setting.url} passHref>
+            <Link key={setting.name} href={setting.url} passHref>
               <DropdownMenuItem key={setting.name} disabled={setting.disabled}>
                 {setting.name}
               </DropdownMenuItem>
