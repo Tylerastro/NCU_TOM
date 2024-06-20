@@ -182,6 +182,8 @@ def EditUserRole(request, pk):
         return Response({"detail": "Forbidden"}, status=403)
 
     user = Users.objects.get(id=pk)
+    if user == request.user:
+        return Response({"detail": "You can't edit your own role"}, status=403)
     user.role = request.data['role']
     user.save()
 
