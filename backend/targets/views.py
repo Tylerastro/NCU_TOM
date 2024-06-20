@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 from astropy.time import Time
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -39,11 +40,24 @@ class TargetsView(APIView):
             serializer = TargetGetSerializer(target)
             return Response(serializer.data, status=200)
         else:
-            targets_filter = Target.objects.filter(
-                deleted_at__isnull=True
-            ) if is_admin_or_faculty else Target.objects.filter(
-                user=request.user, deleted_at__isnull=True
-            )
+            conditions = []
+            conditions.append(Q(deleted_at__isnull=True))
+
+            name = request.query_params.get('name')
+            if name:
+                conditions.append(Q(name__icontains=name))
+
+            combined_conditions = Q()
+            for condition in conditions:
+                combined_conditions &= condition
+
+            if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+                targets_filter = Target.objects.filter(combined_conditions)
+            else:
+                targets_filter = Target.objects.filter(
+                    Q(user=request.user) & combined_conditions
+                )
+
             results = self.paginator.paginate_queryset(targets_filter, request)
             serializer = TargetGetSerializer(results, many=True)
             return self.paginator.get_paginated_response(serializer.data)

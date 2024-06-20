@@ -21,8 +21,8 @@ import { Target } from "@/models/targets";
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { z } from "zod";
-
 import { getTargets } from "@/apis/targets/getTargets";
+
 const formSchema = z.object({
   name: z.string().optional(),
   observatory: z.string().transform(Number),
@@ -51,12 +51,11 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
     const [search, setSearch] = React.useState("");
     const [selectedTargets, setSelectedTargets] = React.useState<number[]>([]);
     const { data: session } = useSession();
-    const { data: targets, refetch } = useQuery({
-      queryKey: ["targets"],
-      queryFn: () => getTargets(),
-      initialData: () => [] as Target[],
+    const { data, refetch } = useQuery({
+      queryKey: ["targets", 1, search],
+      queryFn: () => getTargets(1, search),
       select: (data) =>
-        data
+        data.results
           .filter((target) => target.user?.username === session?.user.username)
           .map((target) => target),
       refetchOnWindowFocus: false,
@@ -79,7 +78,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
               ? selectedTargets
                   .map(
                     (targetId) =>
-                      targets.find((target) => target.id === targetId)?.name
+                      data?.find((target) => target.id === targetId)?.name
                   )
                   .filter(Boolean)
                   .join(", ")
@@ -98,7 +97,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
               <p>No targets found.</p>
             </CommandEmpty>
             <CommandGroup>
-              {targets.map((target) => (
+              {data?.map((target) => (
                 <CommandItem
                   key={target.id ?? "unique-key"} // Use a fallback value for the key if id is undefined or null
                   value={target.name}
