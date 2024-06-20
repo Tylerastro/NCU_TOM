@@ -99,7 +99,7 @@ class TargetApiTest(TestCase):
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_data = response.data[0]
+        response_data = response.data
         self.assertEqual(response_data['name'], self.student_target.name)
         self.assertEqual(response_data['notes'], self.student_target.notes)
         self.assertEqual(response_data['notes'],
@@ -136,7 +136,7 @@ class TargetApiTest(TestCase):
         request = self.factory.get('/api/targets/')
         force_authenticate(request, user=self.user)
         response = view(request)
-        target_id = response.data[0]['id']
+        target_id = response.data['results'][0]['id']
 
         view = TargetsView.as_view()
         request = self.factory.get(f'/api/targets/?target_id={target_id}')
