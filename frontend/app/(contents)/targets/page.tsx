@@ -5,8 +5,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
 import { columns } from "./columns";
+import { Paginator } from "@/models/helpers";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
+import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import { useState } from "react";
 
 function LoadingSkeleton() {
   return (
@@ -21,15 +34,11 @@ function LoadingSkeleton() {
 }
 
 export default function TargetsTable() {
-  const {
-    data: targets,
-    refetch,
-    isFetching,
-  } = useQuery({
-    queryKey: ["targets"],
-    queryFn: () => getTargets(),
+  const [page, setPage] = useState(1);
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ["targets", page],
+    queryFn: () => getTargets(page),
     refetchOnWindowFocus: false,
-    initialData: () => [] as Target[],
   });
 
   const handleDelete = async (ids: number[]) => {
@@ -39,6 +48,31 @@ export default function TargetsTable() {
     } catch (error) {
       console.error("Error deleting data:", error);
     }
+  };
+  const targets = data?.results as Target[];
+
+  const getPaginationItems = () => {
+    const currentPage = page;
+    const totalPages = data?.total || 1;
+
+    const startPage = Math.max(currentPage - 1, 1);
+    const endPage = Math.min(currentPage + 1, totalPages);
+
+    const paginationItems = [];
+    for (let i = startPage; i <= endPage; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <Button
+            variant={i === currentPage ? "outline" : "ghost"}
+            onClick={() => setPage(i)}
+          >
+            {i}
+          </Button>
+        </PaginationItem>
+      );
+    }
+
+    return paginationItems;
   };
 
   return (
@@ -56,11 +90,38 @@ export default function TargetsTable() {
       </div>
 
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        {isFetching ? (
+        {isFetching || !targets ? (
           <LoadingSkeleton />
         ) : (
           <DataTable columns={columns} data={targets} onDelete={handleDelete} />
         )}
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <Button
+                  variant={"ghost"}
+                  onClick={() => setPage(page - 1)}
+                  disabled={!data?.previous}
+                >
+                  Previous
+                </Button>
+              </PaginationItem>
+
+              {getPaginationItems()}
+
+              <PaginationItem>
+                <Button
+                  variant={"ghost"}
+                  onClick={() => setPage(page + 1)}
+                  disabled={!data?.next}
+                >
+                  Next
+                </Button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </>
   );

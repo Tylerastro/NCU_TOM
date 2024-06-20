@@ -1,5 +1,5 @@
 "use client";
-import { getTargets } from "@/apis/targets/getTargets";
+import { getTarget } from "@/apis/targets/getTarget";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,12 +9,10 @@ import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
 export default function DashboardPage(params: { params: { id: number } }) {
-  const { data: targets } = useQuery({
+  const { data: target } = useQuery({
     queryKey: ["targets"],
-    queryFn: () => getTargets(params.params.id),
+    queryFn: () => getTarget(params.params.id),
   });
-
-  const target = targets?.[0];
 
   return (
     <>

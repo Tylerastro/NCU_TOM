@@ -7,6 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from helpers.models import Users
+from helpers.paginator import Pagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,6 +24,7 @@ from .vizier import VizierService
 
 class TargetsView(APIView):
     serializer_class = TargetPostSerializer
+    paginator = Pagination()
 
     def get(self, request):
         target_id = request.query_params.get('target_id')
@@ -34,16 +36,17 @@ class TargetsView(APIView):
             target_filter = {} if is_admin_or_faculty else {'user': request.user}
             target_filter['deleted_at__isnull'] = True
             target = get_object_or_404(Target, id=target_id, **target_filter)
-            serializer = TargetGetSerializer([target], many=True)
+            serializer = TargetGetSerializer(target)
+            return Response(serializer.data, status=200)
         else:
             targets_filter = Target.objects.filter(
                 deleted_at__isnull=True
             ) if is_admin_or_faculty else Target.objects.filter(
                 user=request.user, deleted_at__isnull=True
             )
-            serializer = TargetGetSerializer(targets_filter, many=True)
-
-        return Response(serializer.data, status=200)
+            results = self.paginator.paginate_queryset(targets_filter, request)
+            serializer = TargetGetSerializer(results, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = TargetPostSerializer(

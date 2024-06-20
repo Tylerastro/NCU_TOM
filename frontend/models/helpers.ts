@@ -48,3 +48,12 @@ export interface PersonalInfo {
   website?: string;
   facebook?: string;
 }
+
+export interface Paginator {
+  count: number;
+  next: number;
+  previous: number;
+  current: number;
+  total: number;
+  results: any[];
+}
