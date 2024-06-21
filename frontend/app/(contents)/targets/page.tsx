@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/pagination";
 
 import { useState } from "react";
+import SearchBar from "@/components/SearchBar";
 
 function LoadingSkeleton() {
   return (
@@ -88,7 +89,6 @@ export default function TargetsTable() {
           <NewTargetFrom refetch={refetch} />
         </div>
       </div>
-
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
         {isFetching || !targets ? (
           <LoadingSkeleton />
