@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'observations',
     'social_django',
     'helpers',
+    'drf_spectacular',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
@@ -193,7 +194,15 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'helpers.paginator.Pagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'NCU TOM API',
+    'DESCRIPTION': '',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True
 }
 
 
