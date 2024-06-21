@@ -1,3 +1,4 @@
+import { BugForm } from "./bugForm";
 import PersonCard from "./personCard";
 
 const contributors = [
@@ -23,7 +24,7 @@ const contributors = [
 export default function page() {
   return (
     <>
-      <section>
+      <section className="h-screen" id="Developers">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
           <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
@@ -58,7 +59,7 @@ export default function page() {
           </div>
         </div>
       </section>
-      <section>
+      <section className="h-screen" id="Contributors">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
           <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
@@ -70,6 +71,21 @@ export default function page() {
             </p>
           </div>
           <div className="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+        </div>
+      </section>
+      <section className="h-screen" id="Bugs">
+        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
+          <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
+            <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
+              Found a bug? Report it!
+            </h2>
+            <p className="font-light text-gray-500 sm:text-xl dark:text-gray-400">
+              Great job! We're happy to receive bug reports and fix them.
+            </p>
+            <div className="text-left py-4">
+              <BugForm />
+            </div>
+          </div>
         </div>
       </section>
     </>
