@@ -80,7 +80,7 @@ export default function page() {
               Found a bug? Report it!
             </h2>
             <p className="font-light text-gray-500 sm:text-xl dark:text-gray-400">
-              Great job! We're happy to receive bug reports and fix them.
+              {`Great job! We're happy to receive bug reports and fix them.`}
             </p>
             <div className="text-left py-4">
               <BugForm />
