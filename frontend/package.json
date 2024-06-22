@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,6 +12,8 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@hookform/resolvers": "^3.3.4",
+    "@octokit/core": "^6.1.2",
+    "@octokit/types": "^13.5.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",

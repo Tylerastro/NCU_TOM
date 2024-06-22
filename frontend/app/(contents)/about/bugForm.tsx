@@ -1,14 +1,9 @@
 "use client";
+import { createIssue } from "@/apis/github/createIssue";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-toastify";
 
 const FormSchema = z.object({
   title: z
@@ -38,9 +34,26 @@ const FormSchema = z.object({
 export function BugForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+    },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {}
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      const response = await createIssue(
+        form.getValues().title,
+        form.getValues().content
+      );
+      if (response.status === 201) {
+        form.reset();
+        toast.success("Issue created successfully");
+      }
+    } catch (error) {
+      toast.error("Error creating issue, please try again");
+    }
+  }
 
   return (
     <Form {...form}>
@@ -81,18 +94,8 @@ export function BugForm() {
             </FormItem>
           )}
         />
-        <TooltipProvider>
-          <Tooltip delayDuration={200}>
-            <TooltipTrigger disabled={false}>
-              <Button disabled type="submit">
-                Submit
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent sticky="always" sideOffset={40}>
-              <p>Feature coming soon</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   );
