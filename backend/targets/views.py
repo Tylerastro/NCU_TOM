@@ -29,7 +29,6 @@ class TargetsView(APIView):
 
     def get(self, request):
         target_id = request.query_params.get('target_id')
-
         is_admin_or_faculty = request.user.role in (
             Users.roles.ADMIN, Users.roles.FACULTY
         )
@@ -42,17 +41,24 @@ class TargetsView(APIView):
         else:
             conditions = []
             conditions.append(Q(deleted_at__isnull=True))
-
             name = request.query_params.get('name')
+            target_tags = request.query_params.get('tags')
             if name:
                 conditions.append(Q(name__icontains=name))
+            if target_tags:
+                tags = target_tags.split(',')
+                tags = [int(tag) for tag in tags if tag.isdigit()]
+
+                if tags:
+                    conditions.append(Q(tags__in=tags))
 
             combined_conditions = Q()
             for condition in conditions:
                 combined_conditions &= condition
 
-            if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
-                targets_filter = Target.objects.filter(combined_conditions)
+            if is_admin_or_faculty:
+                targets_filter = Target.objects.filter(
+                    combined_conditions).distinct()
             else:
                 targets_filter = Target.objects.filter(
                     Q(user=request.user) & combined_conditions
