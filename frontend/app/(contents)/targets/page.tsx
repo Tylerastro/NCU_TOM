@@ -81,16 +81,19 @@ export default function TargetsTable() {
         </div>
       </div>
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
-        <Input
-          placeholder="Filter targets..."
-          className="text-primary-foreground h-8 w-[150px] lg:w-[250px]"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <SearchFilter
-          title="Tags"
-          data={TagFilterData}
-          setData={setSearchTags}
-        />
+        <div className="flex space-between py-2 px-2 gap-2">
+          <Input
+            placeholder="Filter targets..."
+            className="text-primary-foreground h-8 w-[150px] lg:w-[250px]"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <SearchFilter
+            title="Tags"
+            data={TagFilterData}
+            setData={setSearchTags}
+          />
+        </div>
+
         {isFetching || !targets ? (
           <LoadingSkeleton />
         ) : (

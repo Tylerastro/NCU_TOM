@@ -22,7 +22,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { DataTableToolbar } from "./tooltip";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -70,11 +69,10 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="pb-4 flex flex-col gap-4">
-        <DataTableToolbar table={table} />
         <Button
           variant="outline"
           disabled={!table.getIsSomeRowsSelected()}
-          className="w-[150px] dark:hover:bg-red-700/90"
+          className="w-[150px] dark:bg-red-700/90 dark:hover:bg-red-500/70"
           onClick={() =>
             hanldeDelete(
               table
