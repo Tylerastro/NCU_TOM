@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
       <div className="pb-4 flex flex-col gap-4">
         <Button
           variant="outline"
-          disabled={!table.getIsSomeRowsSelected()}
+          disabled={table.getSelectedRowModel().rows.length === 0}
           className="w-[150px] dark:bg-red-700/90 dark:hover:bg-red-500/70"
           onClick={() =>
             hanldeDelete(

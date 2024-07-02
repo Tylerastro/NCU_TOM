@@ -35,7 +35,7 @@ export default function Lulin(props: { observation_id: number }) {
       <div className="container mx-auto px-4 h-200 max-h-200 w-full">
         <div>
           <h1 className="my-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-            Edit your submission
+            Edit your observation
           </h1>
         </div>
         {isFetching ? (
