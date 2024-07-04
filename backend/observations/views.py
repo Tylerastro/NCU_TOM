@@ -5,9 +5,10 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from helpers.models import Comments, Users
+from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from targets.views import GetTargetsAltAz
@@ -16,24 +17,42 @@ from targets.visibility import TargetAltAz
 from .models import Lulin, Observation
 from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
                           LulinPutSerializer, ObservationGetSerializer,
-                          ObservationPostSerializer, ObservationPutSerializer)
+                          ObservationPostSerializer, ObservationPutSerializer,
+                          ObservationStatsSerializer)
 
 
 class ObservationsView(APIView):
     serializer_class = ObservationGetSerializer
+    paginator = Pagination()
 
     def get(self, request):
         conditions = []
+        conditions.append(Q(deleted_at__isnull=True))
         observation_id = request.query_params.get('observation_id')
         observatory = request.query_params.get('observatory')
         status = request.query_params.get('status')
+        name = request.query_params.get('name')
+        users = request.query_params.get('user')
+        tags = request.query_params.get('tags')
 
         if observation_id:
             conditions.append(Q(id=observation_id))
         if observatory:
             conditions.append(Q(observatory=observatory))
         if status:
-            conditions.append(Q(status=status))
+            status = status.split(',')
+            status = [int(status) for status in status if status.isdigit()]
+            conditions.append(Q(status__in=status))
+        if name:
+            conditions.append(Q(name__icontains=name))
+        if users:
+            conditions.append(Q(user=users))
+        if tags:
+            tags = tags.split(',')
+            tags = [int(tag) for tag in tags if tag.isdigit()]
+
+            if tags:
+                conditions.append(Q(tags__in=tags))
 
         combined_conditions = Q()
         for condition in conditions:
@@ -47,8 +66,10 @@ class ObservationsView(APIView):
             observations = Observation.objects.filter(
                 Q(user=request.user) & combined_conditions
             )
-        serializer = ObservationGetSerializer(observations, many=True)
-        return Response(serializer.data, status=200)
+        results = self.paginator.paginate_queryset(observations, request)
+        serializer = ObservationGetSerializer(results, many=True)
+
+        return self.paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = ObservationPostSerializer(
@@ -189,6 +210,15 @@ def GetCodes(request):
 
     return HttpResponse(service.get_codes(
         start_date, end_date), content_type='text/plain')
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getObservationStats(request):
+    observations = Observation.objects.first()
+    serializer = ObservationStatsSerializer(observations)
+
+    return Response(serializer.data, status=200)
 
 
 @api_view(['POST'])

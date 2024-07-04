@@ -1,15 +1,49 @@
 import api from "../axiosAuth";
-import { Observation } from "@/models/observations";
+import { Paginator } from "@/models/helpers";
 
-export const getObservations = async (
-  observationId?: number
-): Promise<Observation[]> => {
+interface GetObservationsOptions {
+  observationId?: number;
+  name?: string;
+  page?: number;
+  tags?: number[];
+  user?: number[];
+  status?: number[];
+}
+
+export const getObservations = async ({
+  observationId,
+  name,
+  page,
+  tags,
+  user,
+  status,
+}: GetObservationsOptions): Promise<Paginator> => {
   try {
-    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/observations/`;
-    if (observationId) {
-      url += `?observation_id=${observationId}`;
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/observations/`);
+    const params = new URLSearchParams();
+
+    if (observationId !== undefined) {
+      params.append("observation_id", observationId.toString());
     }
-    const response = await api.get(url);
+    if (name) {
+      params.append("name", name);
+    }
+    if (page !== undefined) {
+      params.append("page", page.toString());
+    }
+    if (tags && tags.length > 0) {
+      params.append("tags", tags.join(","));
+    }
+    if (user && user.length > 0) {
+      params.append("user", user.join(","));
+    }
+    if (status && status.length > 0) {
+      params.append("status", status.join(","));
+    }
+
+    url.search = params.toString();
+
+    const response = await api.get(url.toString());
     return response.data;
   } catch (error) {
     console.error(error);

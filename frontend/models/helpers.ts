@@ -7,6 +7,9 @@ export interface User {
   title: number;
   role: number;
   created_at?: Date;
+  targets?: number[];
+  observations?: number[];
+  tags?: number[];
 }
 
 export interface Tag {

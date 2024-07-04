@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from django.db import models
 from helpers.models import Comments
@@ -27,7 +28,7 @@ class Observation(models.Model):
 
     name = models.CharField(max_length=100, null=False, blank=True)
     user = models.ForeignKey('helpers.Users',
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE, related_name='observations')
     observatory = models.IntegerField(
         choices=observatories.choices, default=observatories.LULIN)
     start_date = models.DateTimeField(null=False)
@@ -39,6 +40,7 @@ class Observation(models.Model):
         choices=statuses.choices, default=statuses.PREP)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
     code = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField('helpers.Tags', related_name='observations')
     comments = models.ManyToManyField(
@@ -60,6 +62,10 @@ class Observation(models.Model):
                 self.comments.add(comment)
 
         super().save(*args, **kwargs)
+
+    def delete(self):
+        self.deleted_at = datetime.now()
+        self.save()
 
 
 def get_filters():

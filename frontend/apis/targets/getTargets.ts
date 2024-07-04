@@ -18,10 +18,8 @@ export const getTargets = async (
       url += `&tags=${tags.join(",")}`;
     }
     const response = await api.get(url);
-    console.log(response.data);
     return response.data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };

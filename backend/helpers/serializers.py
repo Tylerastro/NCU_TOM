@@ -11,10 +11,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FullUserSerializer(serializers.ModelSerializer):
+    targets = serializers.SerializerMethodField()
+    observations = serializers.SerializerMethodField()
+
     class Meta:
         model = Users
         fields = ('id', 'username', 'institute', 'email',
+                  'targets', 'observations',
                   'role', 'created_at', 'is_active', 'last_login')
+
+    def get_targets(self, user):
+        return [target.id for target in user.targets.all()]
+
+    def get_observations(self, user):
+        return [observation.id for observation in user.observations.all()]
 
 
 class TagsSerializer(serializers.ModelSerializer):

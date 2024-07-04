@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
@@ -69,6 +69,10 @@ export default function TargetsTable() {
         id: tag.id || 0,
       };
     }) || [];
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, searchTags]);
 
   return (
     <>

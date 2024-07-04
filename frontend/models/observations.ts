@@ -97,3 +97,17 @@ interface DataPoint {
   x: number; // Timestamp
   y: number; // Numerical value
 }
+
+export interface ObservationStats {
+  total_observations: number;
+  total_targets: number;
+  total_users: number;
+  observatory_counts: CountItem[];
+  priority_counts: CountItem[];
+  status_counts: CountItem[];
+}
+interface CountItem {
+  id: number;
+  name: string;
+  count: number;
+}

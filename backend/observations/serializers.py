@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Count
 from helpers.models import Comments, Tags
 from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
                                  UserSerializer)
@@ -129,3 +130,69 @@ class LulinPutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lulin
         fields = "__all__"
+
+
+class StatusSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class ObservationStatsSerializer(serializers.Serializer):
+    total_observations = serializers.IntegerField()
+    total_targets = serializers.IntegerField()
+    total_users = serializers.IntegerField()
+    observatory_counts = serializers.ListField(child=serializers.DictField())
+    priority_counts = serializers.ListField(child=serializers.DictField())
+    status_counts = serializers.ListField(child=serializers.DictField())
+
+    def get_total_observations(self):
+        return Observation.objects.count()
+
+    def get_total_targets(self):
+        return Observation.objects.values('targets').distinct().count()
+
+    def get_total_users(self):
+        return Observation.objects.values('user').distinct().count()
+
+    def get_observatory_counts(self):
+        counts = Observation.objects.values(
+            'observatory').annotate(count=Count('observatory'))
+        return [
+            {
+                'id': item['observatory'],
+                'name': dict(Observation.observatories.choices).get(item['observatory'], 'Unknown'),
+                'count': item['count']
+            } for item in counts
+        ]
+
+    def get_priority_counts(self):
+        counts = Observation.objects.values(
+            'priority').annotate(count=Count('priority'))
+        return [
+            {
+                'id': item['priority'],
+                'name': dict(Observation.priorities.choices).get(item['priority'], 'Unknown'),
+                'count': item['count']
+            } for item in counts
+        ]
+
+    def get_status_counts(self):
+        counts = Observation.objects.values(
+            'status').annotate(count=Count('status'))
+        return [
+            {
+                'id': item['status'],
+                'name': dict(Observation.statuses.choices).get(item['status'], 'Unknown'),
+                'count': item['count']
+            } for item in counts
+        ]
+
+    def to_representation(self, instance):
+        return {
+            'total_observations': self.get_total_observations(),
+            'total_targets': self.get_total_targets(),
+            'total_users': self.get_total_users(),
+            'observatory_counts': self.get_observatory_counts(),
+            'priority_counts': self.get_priority_counts(),
+            'status_counts': self.get_status_counts()
+        }

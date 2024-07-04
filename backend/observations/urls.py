@@ -20,6 +20,7 @@ urlpatterns = [
     path('observations/lulin/<int:id>/code/', views.CodeView.as_view()),
     path('observations/lulin/code/', views.GetCodes),
     path('observations/<int:pk>/lulin/', views.LulinView.as_view()),
+    path('observations/stats/', views.getObservationStats),
     path('observations/lulin/', views.LulinView.as_view()),
     path('observations/submit/lulin/', send_observation_mail),
 ]

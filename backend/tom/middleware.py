@@ -20,7 +20,7 @@ class RequestLogMiddleware:
             'body': request.body.decode('utf-8') if request.body else None,
             'headers': dict(request.headers),
             'ip_address': request.META.get('REMOTE_ADDR'),
-            'user': None,  # Initialize user to None
+            'user': None,
         }
 
         if hasattr(request, 'user') and request.user.is_authenticated:
