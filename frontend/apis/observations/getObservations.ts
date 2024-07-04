@@ -5,6 +5,7 @@ interface GetObservationsOptions {
   observationId?: number;
   name?: string;
   page?: number;
+  pageSize?: number;
   tags?: number[];
   user?: number[];
   status?: number[];
@@ -14,6 +15,7 @@ export const getObservations = async ({
   observationId,
   name,
   page,
+  pageSize,
   tags,
   user,
   status,
@@ -30,6 +32,9 @@ export const getObservations = async ({
     }
     if (page !== undefined) {
       params.append("page", page.toString());
+    }
+    if (pageSize !== undefined) {
+      params.append("page_size", pageSize.toString());
     }
     if (tags && tags.length > 0) {
       params.append("tags", tags.join(","));

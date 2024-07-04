@@ -4,7 +4,6 @@ import { deleteTarget } from "@/apis/targets/deleteTarget";
 import { getTargets } from "@/apis/targets/getTargets";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
-import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
@@ -40,7 +40,7 @@ export default function TargetsTable() {
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ["targets", page, search, searchTags],
-    queryFn: () => getTargets(page, search, searchTags),
+    queryFn: () => getTargets({ page, name: search, tags: searchTags }),
     refetchOnWindowFocus: false,
   });
 

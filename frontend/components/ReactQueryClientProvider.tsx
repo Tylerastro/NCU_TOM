@@ -8,7 +8,11 @@ import {
 import { toast } from "react-toastify";
 
 const shouldRetry = (failureCount: number, error: any) => {
-  if (error.message === "Please sign in to continue") {
+  console.log(error);
+  if (
+    error.message === "Please sign in to continue" ||
+    error.response.status === 403
+  ) {
     // Don't retry if the error message indicates a missing token
     return false;
   }

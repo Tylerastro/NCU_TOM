@@ -1,26 +1,26 @@
 "use client";
+import { deleteObservation } from "@/apis/observations/deleteObservation";
 import { getObservationStats } from "@/apis/observations/getObservationStats";
 import { getObservations } from "@/apis/observations/getObservations";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Observation } from "@/models/observations";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import { deleteObservation } from "@/apis/observations/deleteObservation";
-import { columns } from "./columns";
-import { NewObservationFrom } from "./createObservation";
-import { Button } from "@/components/ui/button";
-import { DataTable } from "./dataTable";
-import { useEffect, useState } from "react";
+import { getUserList } from "@/apis/system/getUserList";
+import { getTags } from "@/apis/tags/getTags";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
-import { getTags } from "@/apis/tags/getTags";
-import { getUserList } from "@/apis/system/getUserList";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Observation } from "@/models/observations";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { columns } from "./columns";
+import { NewObservationFrom } from "./createObservation";
+import { DataTable } from "./dataTable";
 
 function LoadingSkeleton() {
   return (
@@ -48,7 +48,14 @@ export default function ObservationsTable() {
     refetch,
     isFetching: isFetchingData,
   } = useQuery({
-    queryKey: ["observations", search, searchTags, searchUsers, searchStatus],
+    queryKey: [
+      "observations",
+      page,
+      search,
+      searchTags,
+      searchUsers,
+      searchStatus,
+    ],
     queryFn: () =>
       getObservations({
         name: search,

@@ -2,7 +2,7 @@
 import { getObservations } from "@/apis/observations/getObservations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Observation } from "@/models/observations";
+import { Status } from "@/models/enums";
 import { useQuery } from "@tanstack/react-query";
 import ObservationTable from "./observationTable";
 
@@ -20,16 +20,17 @@ function LoadingSkeleton() {
 }
 
 export default function ObservationMonitor() {
-  const {
-    data: observations,
-    refetch,
-    isFetching,
-  } = useQuery({
+  const { data, refetch, isFetching } = useQuery({
     queryKey: ["observations"],
-    queryFn: () => getObservations(),
+    queryFn: () =>
+      getObservations({
+        pageSize: 50,
+        status: [Status.Pending, Status.In_progress, Status.Done],
+      }),
     refetchOnWindowFocus: true,
-    initialData: () => [] as Observation[],
   });
+
+  const observations = data?.results || [];
 
   return (
     <>
@@ -145,7 +146,9 @@ export default function ObservationMonitor() {
             <LoadingSkeleton />
           ) : (
             <ObservationTable
-              observationData={observations.filter((o) => o.status === 2)}
+              observationData={observations.filter(
+                (o) => o.status === Status.Pending
+              )}
             />
           )}
         </div>
@@ -155,7 +158,9 @@ export default function ObservationMonitor() {
             <LoadingSkeleton />
           ) : (
             <ObservationTable
-              observationData={observations.filter((o) => o.status === 3)}
+              observationData={observations.filter(
+                (o) => o.status === Status.In_progress
+              )}
             />
           )}
         </div>
@@ -165,7 +170,9 @@ export default function ObservationMonitor() {
             <LoadingSkeleton />
           ) : (
             <ObservationTable
-              observationData={observations.filter((o) => o.status === 4)}
+              observationData={observations.filter(
+                (o) => o.status === Status.Done
+              )}
             />
           )}
         </div>
