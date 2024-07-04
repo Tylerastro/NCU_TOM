@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";

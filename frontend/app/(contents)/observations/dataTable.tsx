@@ -22,15 +22,19 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { DataTableToolbar } from "./tooltip";
+import { useEffect } from "react";
+import { Observation } from "@/models/observations";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  setSelectedIds: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  setSelectedIds,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -57,6 +61,14 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  useEffect(() => {
+    const selectIds = table
+      .getSelectedRowModel()
+      .flatRows.map((row) => (row.original as Observation).id)
+      .filter((id): id is number => id !== undefined);
+    setSelectedIds(selectIds);
+  }, [table, table.getSelectedRowModel()]);
 
   return (
     <div>

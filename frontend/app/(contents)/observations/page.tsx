@@ -7,7 +7,9 @@ import { toast } from "react-toastify";
 import { deleteObservation } from "@/apis/observations/deleteObservation";
 import { columns } from "./columns";
 import { NewObservationFrom } from "./createObservation";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "./dataTable";
+import { useState } from "react";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -31,6 +33,8 @@ export default function ObservationsTable() {
     initialData: () => [] as Observation[],
   });
 
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
   const handleDelete = async (ids: number[]) => {
     try {
       const response = await deleteObservation(ids);
@@ -52,6 +56,15 @@ export default function ObservationsTable() {
 
         <div className="flex gap-2">
           <NewObservationFrom refetch={refetch} />
+          <Button
+            variant="outline"
+            size={"lg"}
+            disabled={selectedIds.length === 0}
+            className=" dark:bg-red-800/100 dark:hover:bg-red-500/70"
+            onClick={() => handleDelete(selectedIds.map((id) => id))}
+          >
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -59,7 +72,11 @@ export default function ObservationsTable() {
         {isFetching ? (
           <LoadingSkeleton />
         ) : (
-          <DataTable columns={columns} data={observations} />
+          <DataTable
+            columns={columns}
+            data={observations}
+            setSelectedIds={setSelectedIds}
+          />
         )}
       </div>
     </>
