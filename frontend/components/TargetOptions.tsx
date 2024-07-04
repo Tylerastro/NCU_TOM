@@ -1,8 +1,7 @@
 "use client";
 
+import { getTargets } from "@/apis/targets/getTargets";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 import {
   Command,
   CommandEmpty,
@@ -17,11 +16,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/components/utils";
-import { Target } from "@/models/targets";
+import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { useSession } from "next-auth/react";
 import * as React from "react";
 import { z } from "zod";
-import { getTargets } from "@/apis/targets/getTargets";
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -53,7 +52,8 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
     const { data: session } = useSession();
     const { data, refetch } = useQuery({
       queryKey: ["targets", 1, search],
-      queryFn: () => getTargets(1, search),
+      queryFn: () =>
+        getTargets({ page: 1, name: search, tags: [], pageSize: 100 }),
       select: (data) =>
         data.results
           .filter((target) => target.user?.username === session?.user.username)

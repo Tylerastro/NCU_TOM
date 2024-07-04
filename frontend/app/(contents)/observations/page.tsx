@@ -119,7 +119,7 @@ export default function ObservationsTable() {
     userData?.map((user) => {
       return {
         label: user.username,
-        value: user.observations?.length || 0,
+        value: user.observations || 0,
         id: user.id || 0,
       };
     }) || [];

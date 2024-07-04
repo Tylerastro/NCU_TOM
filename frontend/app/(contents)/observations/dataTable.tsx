@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Observation } from "@/models/observations";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -20,9 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { DataTableToolbar } from "./tooltip";
 import { useEffect } from "react";
-import { Observation } from "@/models/observations";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

@@ -8,8 +8,8 @@ export default function Feeds(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["observations", props.observation_id],
     queryFn: () =>
-      getObservations(props.observation_id).then((data) => {
-        return data[0];
+      getObservations({ observationId: props.observation_id }).then((data) => {
+        return data.results[0];
       }),
   });
   const sortedComments = React.useMemo(() => {

@@ -7,6 +7,8 @@ export interface UserProfile {
   created_at?: Date;
   is_active?: boolean;
   last_login?: Date;
+  targets?: number;
+  observations?: number;
 }
 
 export interface NewUser {

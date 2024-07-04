@@ -28,11 +28,12 @@ function LoadingSkeleton() {
 }
 
 export default function Page({ params }: { params: { id: number } }) {
-  const { data: observation, isFetching } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["observations"],
-    queryFn: () => getObservations(params.id),
-    initialData: () => [] as Observation[],
+    queryFn: () => getObservations({ observationId: params.id }),
   });
+
+  const observation = data?.results[0] as Observation;
 
   const mutation = useMutation({
     mutationFn: (values: { status: number }) => {
@@ -48,11 +49,7 @@ export default function Page({ params }: { params: { id: number } }) {
       <div className="flex space-between justify-between pb-10">
         <div>
           <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
-            {isFetching ? (
-              <span className="loader"></span>
-            ) : (
-              observation[0].name
-            )}
+            {isFetching ? <span className="loader"></span> : observation.name}
           </h1>
         </div>
         <div className="flex gap-2">
@@ -65,7 +62,7 @@ export default function Page({ params }: { params: { id: number } }) {
               }
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={Status[observation[0].status]} />
+                <SelectValue placeholder={Status[observation.status]} />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(Status)
@@ -83,7 +80,7 @@ export default function Page({ params }: { params: { id: number } }) {
       {isFetching ? (
         <LoadingSkeleton />
       ) : (
-        <PageContent observation={observation[0]} />
+        <PageContent observation={observation} />
       )}
     </>
   );

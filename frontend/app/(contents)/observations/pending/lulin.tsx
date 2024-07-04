@@ -38,9 +38,9 @@ export default function Lulin(props: { observation_id: number }) {
 
   const { data: observations } = useQuery({
     queryKey: ["getObservation"],
-    queryFn: () => getObservations(props.observation_id),
+    queryFn: () => getObservations({ observationId: props.observation_id }),
   });
-  const observation = observations?.[0];
+  const observation = observations?.results[0];
 
   return (
     <>

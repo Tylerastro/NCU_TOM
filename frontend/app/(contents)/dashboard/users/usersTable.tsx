@@ -1,4 +1,12 @@
 "use client";
+import { editUserRole } from "@/apis/system/editUserRole";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -7,23 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { editUserRole } from "@/apis/system/editUserRole";
 
-import { useMutation } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
-import { UserRole } from "@/models/enums";
 import { getUserList } from "@/apis/system/getUserList";
-import { UserProfile } from "@/models/users";
-import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
-import Error from "next/error";
+import { UserRole } from "@/models/enums";
+import { UserProfile } from "@/models/users";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 function LoadingSkeleton() {
   return (
@@ -58,8 +56,6 @@ export default function UserTable() {
   } = useQuery({
     queryKey: ["users"],
     queryFn: () => getUserList(),
-    select: (data) =>
-      data.sort((a: UserProfile, b: UserProfile) => a.id - b.id),
     initialData: () => [],
   });
 

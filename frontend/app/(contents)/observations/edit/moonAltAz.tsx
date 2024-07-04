@@ -31,8 +31,8 @@ export default function MoonAltAz(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["observation", props.observation_id],
     queryFn: async () =>
-      getObservations(props.observation_id).then((data) => {
-        return data[0];
+      getObservations({ observationId: props.observation_id }).then((data) => {
+        return data.results[0];
       }),
     initialData: {} as Observation,
   });
