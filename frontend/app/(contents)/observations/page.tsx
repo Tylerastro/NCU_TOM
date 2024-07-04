@@ -3,6 +3,8 @@ import { getObservations } from "@/apis/observations/getObservations";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { deleteObservation } from "@/apis/observations/deleteObservation";
 import { columns } from "./columns";
 import { NewObservationFrom } from "./createObservation";
 import { DataTable } from "./dataTable";
@@ -28,6 +30,16 @@ export default function ObservationsTable() {
     queryFn: () => getObservations(),
     initialData: () => [] as Observation[],
   });
+
+  const handleDelete = async (ids: number[]) => {
+    try {
+      const response = await deleteObservation(ids);
+      await refetch();
+      toast.success(response.message || "Observations deleted successfully");
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
 
   return (
     <>

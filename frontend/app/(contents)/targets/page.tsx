@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
@@ -36,6 +36,7 @@ export default function TargetsTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchTags, setSearchTags] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ["targets", page, search, searchTags],
@@ -80,6 +81,15 @@ export default function TargetsTable() {
 
         <div className="flex gap-2">
           <NewTargetFrom refetch={refetch} />
+          <Button
+            variant="outline"
+            size={"lg"}
+            disabled={selectedIds.length === 0}
+            className=" dark:bg-red-800/100 dark:hover:bg-red-500/70"
+            onClick={() => handleDelete(selectedIds.map((id) => id))}
+          >
+            Delete
+          </Button>
         </div>
       </div>
       <div className="container px-0 sm:max-w-[825px] lg:max-w-full  py-10">
@@ -99,7 +109,11 @@ export default function TargetsTable() {
         {isFetching || !targets ? (
           <LoadingSkeleton />
         ) : (
-          <DataTable columns={columns} data={targets} onDelete={handleDelete} />
+          <DataTable
+            columns={columns}
+            data={targets}
+            setSelectedIds={setSelectedIds}
+          />
         )}
         <div className="flex items-center justify-end space-x-2 py-4">
           <Pagination>

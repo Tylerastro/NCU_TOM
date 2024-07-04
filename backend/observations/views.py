@@ -14,9 +14,9 @@ from targets.views import GetTargetsAltAz
 from targets.visibility import TargetAltAz
 
 from .models import Lulin, Observation
-from .serializers import (LulinGetSerializer, LulinPutSerializer,
-                          ObservationGetSerializer, ObservationPostSerializer,
-                          ObservationPutSerializer)
+from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
+                          LulinPutSerializer, ObservationGetSerializer,
+                          ObservationPostSerializer, ObservationPutSerializer)
 
 
 class ObservationsView(APIView):
@@ -70,6 +70,26 @@ class ObservationsView(APIView):
             serializer.save()
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
+
+    def delete(self, request):
+        serializer = DeleteObservationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        try:
+            observation_ids = serializer.validated_data['observation_ids']
+
+            if request.user.role == Users.roles.ADMIN:
+                observations = Observation.objects.filter(
+                    id__in=observation_ids)
+            else:
+                observations = Observation.objects.filter(
+                    id__in=observation_ids, user=request.user)
+
+            deleted_count = observations.delete()[0]
+
+            return Response({'message': f'{deleted_count} observations deleted successfully'}, status=200)
+        except Exception as e:
+            return Response({'error': f'Error deleting observations: {str(e)}'}, status=500)
 
 
 @csrf_exempt

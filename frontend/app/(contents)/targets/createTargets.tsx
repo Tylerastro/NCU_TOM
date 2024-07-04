@@ -19,8 +19,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -40,6 +46,7 @@ function isHourAngleFormat(input: string) {
 }
 
 function convertHourAngleToDegrees(hourAngle: unknown) {
+  console.log(hourAngle);
   if (typeof hourAngle !== "string") {
     return Error("Invalid hour angle format");
   }
@@ -55,6 +62,7 @@ function convertHourAngleToDegrees(hourAngle: unknown) {
   const hours = parseFloat(parts[0]);
   const minutes = parseFloat(parts[1]);
   const seconds = parseFloat(parts[2]);
+  console.log(hours, minutes, seconds);
 
   const degrees = (hours + minutes / 60 + seconds / 3600) * 15;
   return degrees;
@@ -80,12 +88,14 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
   const minutes = parseFloat(parts[1]);
   const seconds = parseFloat(parts[2]);
   const decimalDegrees = degrees + minutes / 60 + seconds / 3600;
+  console.log(degrees, minutes, seconds);
   return decimalDegrees;
 }
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
-  const [open, setOpen] = React.useState(false);
-  const [selectedTags, setSelectedTags] = React.useState<
+  const [open, setOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<
     z.infer<typeof formSchema>["tags"]
   >([]);
 
@@ -134,12 +144,15 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      ra: 0,
+      dec: 0,
       tags: selectedTags,
     },
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} modal={false}>
+    <Dialog open={open} onOpenChange={setOpen} modal={true}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
           Create target
@@ -184,9 +197,35 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                 name="ra"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      RA
-                    </FormLabel>
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <FormLabel className="text-primary-foreground flex items-center gap-2">
+                            RA{" "}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1}
+                              stroke="currentColor"
+                              className="size-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                              />
+                            </svg>
+                          </FormLabel>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                          Support formats: degrees <br />
+                          12h34m56.78s <br />
+                          12 30 49.42338414
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <FormControl>
                       <Input
                         className="text-primary-foreground w-full"
@@ -202,9 +241,35 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                 name="dec"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">
-                      Dec
-                    </FormLabel>
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <FormLabel className="text-primary-foreground flex items-center gap-2">
+                            Dec{" "}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1}
+                              stroke="currentColor"
+                              className="size-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                              />
+                            </svg>
+                          </FormLabel>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                          Support formats: degrees <br />
+                          12h34m56.78s <br />
+                          +12 23 28.0436859
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <FormControl>
                       <Input
                         className="text-primary-foreground w-full"

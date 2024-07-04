@@ -21,30 +21,22 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import * as React from "react";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onDelete: (ids: number[]) => void; // New prop for the delete function
+  setSelectedIds: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onDelete,
+  setSelectedIds,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-
-  const hanldeDelete = async (ids: number[]) => {
-    onDelete(ids);
-    table.resetRowSelection();
-  };
+  const [rowSelection, setRowSelection] = useState({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const table = useReactTable({
     data,
@@ -66,25 +58,17 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  useEffect(() => {
+    const selectIds = table
+      .getSelectedRowModel()
+      .flatRows.map((row) => (row.original as Target).id)
+      .filter((id): id is number => id !== undefined);
+    setSelectedIds(selectIds);
+  }, [table, table.getSelectedRowModel()]);
+
   return (
     <div>
-      <div className="pb-4 flex flex-col gap-4">
-        <Button
-          variant="outline"
-          disabled={table.getSelectedRowModel().rows.length === 0}
-          className="w-[150px] dark:bg-red-700/90 dark:hover:bg-red-500/70"
-          onClick={() =>
-            hanldeDelete(
-              table
-                .getSelectedRowModel()
-                .flatRows.map((row) => (row.original as Target).id)
-                .filter((id): id is number => id !== undefined)
-            )
-          }
-        >
-          Delete
-        </Button>
-      </div>
+      <div className="pb-4 flex flex-col gap-4"></div>
       <div className="rounded-md border ">
         <Table>
           <TableHeader>
