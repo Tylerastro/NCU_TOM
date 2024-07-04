@@ -1,11 +1,13 @@
 import api from "../axiosAuth";
 
-export const deleteTarget = async (id: number) => {
+export const deleteTarget = async (targetIds: number[]) => {
   try {
-    const response = await api.post(`/api/targets/${id}/delete/`, {});
+    const response = await api.delete("/api/targets/delete/", {
+      data: { target_ids: targetIds },
+    });
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error deleting targets:", error);
     throw error;
   }
 };

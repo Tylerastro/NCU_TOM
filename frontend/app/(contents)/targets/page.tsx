@@ -1,9 +1,10 @@
 "use client";
 import { getTags } from "@/apis/tags/getTags";
-import { deleteBulkTarget } from "@/apis/targets/bulkTargetDelete";
+import { deleteTarget } from "@/apis/targets/deleteTarget";
 import { getTargets } from "@/apis/targets/getTargets";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -50,8 +51,9 @@ export default function TargetsTable() {
 
   const handleDelete = async (ids: number[]) => {
     try {
-      await deleteBulkTarget(ids);
+      const response = await deleteTarget(ids);
       await refetch();
+      toast.success(response.message || "Targets deleted successfully");
     } catch (error) {
       console.error("Error deleting data:", error);
     }

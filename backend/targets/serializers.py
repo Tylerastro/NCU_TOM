@@ -98,6 +98,13 @@ class TargetPostSerializer(serializers.ModelSerializer):
                 target.tags.remove(tag)
 
 
+class DeleteTargetSerializer(serializers.Serializer):
+    target_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False
+    )
+
+
 class NestedAltAzDataSerializer(serializers.Serializer):
     time = serializers.DateTimeField()
     alt = serializers.FloatField()

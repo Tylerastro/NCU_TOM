@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import extend_schema
 from helpers.models import Users
 from helpers.paginator import Pagination
 from rest_framework.decorators import api_view, permission_classes
@@ -16,9 +17,9 @@ from rest_framework.views import APIView
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
-from .serializers import (TargetAltAzSerializer, TargetGetSerializer,
-                          TargetPostSerializer, TargetSEDSerializer,
-                          TargetSimbadDataSerializer)
+from .serializers import (DeleteTargetSerializer, TargetAltAzSerializer,
+                          TargetGetSerializer, TargetPostSerializer,
+                          TargetSEDSerializer, TargetSimbadDataSerializer)
 from .simbad import SimbadService
 from .vizier import VizierService
 
@@ -87,6 +88,26 @@ class TargetsView(APIView):
             serializer.save()
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
+
+    @extend_schema(request=DeleteTargetSerializer)
+    def delete(self, request):
+        serializer = DeleteTargetSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        try:
+            target_ids = serializer.validated_data['target_ids']
+
+            if request.user.role == Users.roles.ADMIN:
+                targets = Target.objects.filter(id__in=target_ids)
+            else:
+                targets = Target.objects.filter(
+                    id__in=target_ids, user=request.user)
+
+            deleted_count = targets.delete()[0]
+
+            return Response({'message': f'{deleted_count} targets deleted successfully'}, status=200)
+        except Exception as e:
+            return Response({'error': f'Error deleting targets: {str(e)}'}, status=500)
 
 
 @api_view(['POST'])
