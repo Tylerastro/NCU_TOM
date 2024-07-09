@@ -32,7 +32,7 @@ class ObservationsView(APIView):
         observatory = request.query_params.get('observatory')
         status = request.query_params.get('status')
         name = request.query_params.get('name')
-        users = request.query_params.get('user')
+        users = request.query_params.get('users')
         tags = request.query_params.get('tags')
 
         if observation_id:
@@ -46,11 +46,13 @@ class ObservationsView(APIView):
         if name:
             conditions.append(Q(name__icontains=name))
         if users:
-            conditions.append(Q(user=users))
+            users = users.split(',')
+            users = [int(user) for user in users if user.isdigit()]
+            if users:
+                conditions.append(Q(user__in=users))
         if tags:
             tags = tags.split(',')
             tags = [int(tag) for tag in tags if tag.isdigit()]
-
             if tags:
                 conditions.append(Q(tags__in=tags))
 

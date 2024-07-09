@@ -66,7 +66,10 @@ export const columns: ColumnDef<Target>[] = [
     header: "RA",
     cell(props) {
       const ra: number = props.row.getValue("ra");
-      return <div className="text-primary-foreground font-medium">{ra}</div>;
+      const roundedRa = parseFloat(ra.toFixed(4));
+      return (
+        <div className="text-primary-foreground font-medium">{roundedRa}</div>
+      );
     },
   },
   {
@@ -74,7 +77,10 @@ export const columns: ColumnDef<Target>[] = [
     header: "Dec",
     cell(props) {
       const dec: number = props.row.getValue("dec");
-      return <div className="text-primary-foreground font-medium">{dec}</div>;
+      const roundedDec = parseFloat(dec.toFixed(4));
+      return (
+        <div className="text-primary-foreground font-medium">{roundedDec}</div>
+      );
     },
   },
   {

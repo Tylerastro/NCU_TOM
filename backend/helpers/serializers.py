@@ -36,6 +36,7 @@ class TagsSerializer(serializers.ModelSerializer):
 class TagsGetSerializer(serializers.ModelSerializer):
     targets = serializers.SerializerMethodField()
     observations = serializers.SerializerMethodField()
+    user = UserSerializer()
 
     class Meta:
         model = Tags

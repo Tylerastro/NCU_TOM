@@ -20,6 +20,7 @@ import { TargetLulinForm } from "./lulinForm";
 interface LulinDataProps {
   data: LulinObservations[];
   setCodeUpdate: React.Dispatch<boolean>;
+  refetch: () => void;
 }
 
 export default function LulinData(props: LulinDataProps) {
@@ -67,7 +68,7 @@ export default function LulinData(props: LulinDataProps) {
                       Lorem ipsum dolor sit amet.
                     </SheetDescription>
                   </SheetHeader>
-                  <TargetLulinForm observation={data} />
+                  <TargetLulinForm observation={data} refetch={props.refetch} />
                 </SheetContent>
               </Sheet>
             </TableCell>

@@ -21,7 +21,11 @@ function LoadingSkeleton() {
 export default function Lulin(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
 
-  const { data: lulinObservations, isFetching } = useQuery({
+  const {
+    data: lulinObservations,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["getLulin"],
     queryFn: () =>
       getLulin(props.observation_id).then((data) => {
@@ -45,7 +49,11 @@ export default function Lulin(props: { observation_id: number }) {
         )}
 
         <div className="flex justify-center">
-          <LulinData data={lulinObservations} setCodeUpdate={setCodeUpdate} />
+          <LulinData
+            data={lulinObservations}
+            setCodeUpdate={setCodeUpdate}
+            refetch={refetch}
+          />
         </div>
 
         <CodeBlock

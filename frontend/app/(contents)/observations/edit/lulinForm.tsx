@@ -84,8 +84,10 @@ const formSchema = z.object({
 
 export function TargetLulinForm({
   observation,
+  refetch,
 }: {
   observation: LulinObservations;
+  refetch: () => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -105,7 +107,7 @@ export function TargetLulinForm({
     putLulin(observation.id, values)
       .then(() => {
         toast.success("Observation updated successfully");
-        Object.assign(observation, values);
+        refetch();
       })
       .catch((error) => {
         for (const key in error.data) {

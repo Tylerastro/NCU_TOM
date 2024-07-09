@@ -11,7 +11,7 @@ const shouldRetry = (failureCount: number, error: any) => {
   console.log(error);
   if (
     error.message === "Please sign in to continue" ||
-    error.response.status === 403
+    [403, 401].includes(error.response.status)
   ) {
     // Don't retry if the error message indicates a missing token
     return false;

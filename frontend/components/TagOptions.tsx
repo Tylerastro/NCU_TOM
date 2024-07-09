@@ -56,7 +56,7 @@ export const TagOptions: React.FC<TagOptionsProps> = React.forwardRef(
       initialData: () => [] as Tag[],
       select: (data) =>
         data
-          .filter((tag) => tag.user?.username === session?.user.username)
+          .filter((tag) => tag.user?.id == session?.user.id)
           .map((target) => target),
     });
 

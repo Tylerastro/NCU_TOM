@@ -5,6 +5,7 @@ import { getTargets } from "@/apis/targets/getTargets";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
 import { Button } from "@/components/ui/button";
+import useDebounce from "@/components/Debounce";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -35,12 +36,28 @@ function LoadingSkeleton() {
 export default function TargetsTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const debounceSearch = useDebounce(search, 300);
   const [searchTags, setSearchTags] = useState<number[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ["targets", page, search, searchTags],
-    queryFn: () => getTargets({ page, name: search, tags: searchTags }),
+    queryKey: ["targets", page, debounceSearch, searchTags],
+    queryFn: async () => {
+      try {
+        const response = await getTargets({
+          page,
+          name: search,
+          tags: searchTags,
+        });
+        return response;
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          toast.error("Please sign in to continue");
+          return { results: [], count: 0, next: 0, previous: 0, total: 0 };
+        }
+        throw error;
+      }
+    },
     refetchOnWindowFocus: false,
   });
 
