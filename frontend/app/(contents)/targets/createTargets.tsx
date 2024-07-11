@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -145,8 +145,6 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      ra: 0,
-      dec: 0,
       tags: selectedTags,
     },
   });
@@ -305,9 +303,18 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
             </div>
           </form>
         </Form>
-        <div className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[720px]">
-          <FileUpload setOpen={setOpen} />
-        </div>
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[720px]">
+                <FileUpload setOpen={setOpen} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={-50}>
+              <p>Must contain columns: name, ra, dec</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );

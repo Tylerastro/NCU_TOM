@@ -78,17 +78,21 @@ export default function DashboardPage(params: { params: { id: number } }) {
                     </svg>
                   </CardHeader>
                   <CardContent className="grid grid-rows-2 gap-2">
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-around">
                       <span className="text-sm font-medium text-muted-foreground mr-2">
                         RA:
                       </span>
-                      <span className="text-lg font-bold">{target?.ra}</span>
+                      <span className="text-lg font-bold">
+                        {target?.coordinates?.split(" ")[0]}
+                      </span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-around">
                       <span className="text-sm font-medium text-muted-foreground mr-2">
                         Dec:
                       </span>
-                      <span className="text-lg font-bold">{target?.dec}</span>
+                      <span className="text-lg font-bold">
+                        {target?.coordinates?.split(" ")[1]}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>

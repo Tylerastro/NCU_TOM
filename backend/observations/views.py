@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from targets.views import GetTargetsAltAz
+from targets.views import getTargetsAltAz
 from targets.visibility import TargetAltAz
 
 from .models import Lulin, Observation
@@ -237,7 +237,7 @@ def GetObservationAltAz(request, pk):
 
     targets = [x.target for x in observations]
 
-    data: List[TargetAltAz] = GetTargetsAltAz(
+    data: List[TargetAltAz] = getTargetsAltAz(
         targets, observation.start_date, observation.end_date)
 
     return JsonResponse(data, safe=False)

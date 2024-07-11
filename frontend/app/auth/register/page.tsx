@@ -21,7 +21,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import SubmitLoader from "./submitLoader";
-
+import Image from "next/image";
 interface ErrorResponse {
   [key: string]: string[];
 }
@@ -105,20 +105,14 @@ export default function SignUp() {
     <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
       {isSubmitting && <SubmitLoader isSubmitting={isSubmitting} />}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="gray"
-          className="mx-auto h-16 w-auto"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
-          />
-        </svg>
+        <Image
+          src="/main-logo-transparent.svg"
+          alt="logo"
+          width={200}
+          height={200}
+          priority
+          className="mx-auto"
+        />
 
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-foreground">
           Register an account
@@ -247,7 +241,6 @@ export default function SignUp() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="use_demo_targets"
@@ -277,15 +270,6 @@ export default function SignUp() {
             </div>
           </form>
         </Form>
-        <p className="mt-10 text-center text-sm text-primary-foreground">
-          Not a member?{" "}
-          <a
-            href="/auth/register"
-            className="font-semibold leading-6 text-primary-foreground hover:text-popover-foreground"
-          >
-            Sign up here!
-          </a>
-        </p>
       </div>
     </div>
   );

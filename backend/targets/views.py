@@ -112,7 +112,7 @@ class TargetsView(APIView):
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
-def BulkTargetCreation(request):
+def bulkTargetCreation(request):
     def handle_uploads(file):
         file_extension = file.name.split('.')[-1]
         if file_extension == 'csv':
@@ -146,45 +146,8 @@ def BulkTargetCreation(request):
     return HttpResponse("Invalid request method", status=400)
 
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
-def DeleteTarget(request, target_id):
-    try:
-        target = Target.objects.get(id=target_id, user=request.user)
-        target.delete()
-        return JsonResponse({'message': 'Target deleted successfully'})
-    except Target.DoesNotExist:
-        return JsonResponse({'error': 'Target not found'}, status=404)
-    except Exception:
-        return JsonResponse({'error': 'Error deleting target'}, status=500)
-
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
-def DeleteBulkTargets(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-            target_ids = data.get('target_ids', [])
-            target_ids = [int(target_id) for target_id in target_ids]
-            if request.user.role == Users.roles.ADMIN:
-                targets = Target.objects.filter(id__in=target_ids)
-            else:
-                targets = Target.objects.filter(
-                    id__in=target_ids, user=request.user)
-            for target in targets:
-                target.delete()
-            return JsonResponse({'message': 'Targets deleted successfully'})
-        except Exception as e:
-            return JsonResponse({'error': f'Error deleting targets: {str(e)}'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-
-@api_view(['POST'])
-def GetMoonAltAz(request):
+def getMoonAltAz(request):
     service = Visibility(lat=23.469444, lon=120.872639)
 
     moon_altaz: TargetAltAz = service.get_moon_altaz(
@@ -200,7 +163,7 @@ def GetMoonAltAz(request):
         return Response(serializer.errors, status=400)
 
 
-def GetTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
+def getTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
     service = Visibility(lat=23.469444, lon=120.872639)
 
     targets_altaz: List[TargetAltAz] = service.get_targets_altaz(
@@ -221,7 +184,7 @@ def GetTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def GetTargetSimbad(request, pk: int):
+def getTargetSimbad(request, pk: int):
     service = SimbadService()
     target = Target.objects.get(id=pk)
     if target is None:
@@ -241,7 +204,7 @@ def GetTargetSimbad(request, pk: int):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def GetTargetSED(request, pk: int):
+def getTargetSED(request, pk: int):
     # TODO: Implement Cache for SED data
     service = VizierService()
     target = Target.objects.get(id=pk)

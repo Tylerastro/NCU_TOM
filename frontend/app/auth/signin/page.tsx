@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -71,20 +72,14 @@ export default function SignInPage({
   return (
     <div className="flex min-h-full flex-col justify-center px-12 py-12 lg:px-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="gray"
-          className="mx-auto h-16 w-auto"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
-          />
-        </svg>
+        <Image
+          width={250}
+          height={250}
+          src="/main-logo-white-transparent.png"
+          alt="NCU Tom Logo"
+          // className="w-full h-8 object-cover mb-4 rounded-lg" // Adjust width, height, and margins as needed
+          className="object-contain h-48 w-96"
+        />
 
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-foreground">
           Sign in to your account

@@ -79,13 +79,13 @@ export default function TargetsTable() {
   const targets = data?.results as Target[];
 
   const TagFilterData =
-    tagData?.map((tag) => {
-      return {
+    tagData
+      ?.filter((tag) => tag.targets.length > 0)
+      .map((tag) => ({
         label: tag.name,
         value: tag.targets.length,
         id: tag.id || 0,
-      };
-    }) || [];
+      })) || [];
 
   useEffect(() => {
     setPage(1);

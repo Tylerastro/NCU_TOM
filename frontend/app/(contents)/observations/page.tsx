@@ -110,13 +110,15 @@ export default function ObservationsTable() {
   const observations = data?.results as Observation[];
 
   const TagFilterData =
-    tagData?.map((tag) => {
-      return {
-        label: tag.name,
-        value: tag.observations.length,
-        id: tag.id || 0,
-      };
-    }) || [];
+    tagData
+      ?.filter((tag) => tag.observations.length > 0)
+      ?.map((tag) => {
+        return {
+          label: tag.name,
+          value: tag.observations.length,
+          id: tag.id || 0,
+        };
+      }) || [];
 
   const StatusFilterData =
     observationStats?.status_counts.map((status) => {

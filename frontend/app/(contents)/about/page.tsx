@@ -24,7 +24,7 @@ const contributors = [
 export default function page() {
   return (
     <>
-      <section className="h-screen" id="Developers">
+      <section className="h-90vh" id="Developers">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
           <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
@@ -59,7 +59,7 @@ export default function page() {
           </div>
         </div>
       </section>
-      <section className="h-screen" id="Contributors">
+      <section className="h-90vh" id="Contributors">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
           <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
