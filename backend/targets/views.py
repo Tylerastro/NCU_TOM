@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 import pandas as pd
@@ -6,7 +5,6 @@ from astropy.time import Time
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema
 from helpers.models import Users
 from helpers.paginator import Pagination
