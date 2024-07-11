@@ -88,10 +88,17 @@ def get_instruments():
 
 class Lulin(models.Model):
 
+    class priorities(models.IntegerChoices):
+        HIGH = 1
+        MEDIUM = 2
+        LOW = 3
+        Too = 4
+
     observation = models.ForeignKey(Observation, on_delete=models.CASCADE)
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     priority = models.IntegerField(
-        default=5, choices=[(i, i) for i in range(1, 11)])
+        choices=priorities.choices, default=priorities.LOW
+    )
     filters = models.JSONField(default=get_filters)
     binning = models.IntegerField(default=1)
     frames = models.IntegerField(default=1)

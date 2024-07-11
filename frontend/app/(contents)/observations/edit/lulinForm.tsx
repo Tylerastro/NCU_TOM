@@ -72,7 +72,7 @@ const instruments = [
 ];
 
 const formSchema = z.object({
-  priority: z.number().int().min(1).max(10).default(5),
+  priority: z.number().transform(Number),
   filters: z.record(z.boolean()).default({}),
   binning: z.coerce.number().int().min(1).default(1),
   frames: z.coerce.number().int().min(1).default(1),
@@ -116,9 +116,6 @@ export function TargetLulinForm({
       });
   }
 
-  console.log(observation.start_date);
-  console.log(new Date(observation.start_date));
-
   return (
     <Form {...form}>
       <form
@@ -132,27 +129,19 @@ export function TargetLulinForm({
             <FormItem>
               <FormLabel>Priority</FormLabel>
               <Select
-                onValueChange={(value) => {
-                  field.onChange(parseInt(value));
-                }}
+                onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value.toString()}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a priority" />
+                    <SelectValue />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value={"1"}>1</SelectItem>
-                  <SelectItem value={"2"}>2</SelectItem>
-                  <SelectItem value={"3"}>3</SelectItem>
-                  <SelectItem value={"4"}>4</SelectItem>
-                  <SelectItem value={"5"}>5</SelectItem>
-                  <SelectItem value={"6"}>6</SelectItem>
-                  <SelectItem value={"7"}>7</SelectItem>
-                  <SelectItem value={"8"}>8</SelectItem>
-                  <SelectItem value={"9"}>9</SelectItem>
-                  <SelectItem value={"10"}>10</SelectItem>
+                  <SelectItem value={"1"}>High</SelectItem>
+                  <SelectItem value={"2"}>Medium</SelectItem>
+                  <SelectItem value={"3"}>Low</SelectItem>
+                  <SelectItem value={"4"}>Too</SelectItem>
                 </SelectContent>
               </Select>
             </FormItem>
