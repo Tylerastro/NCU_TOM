@@ -253,7 +253,11 @@ class ObservationMessagesView(APIView):
         return Response(serializer.data, status=200)
 
     def post(self, request, pk):
-        observation = get_object_or_404(Observation, pk=pk, user=request.user)
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observation = get_object_or_404(Observation, pk=pk)
+        else:
+            observation = get_object_or_404(
+                Observation, pk=pk, user=request.user)
         if observation:
             comment = Comments.objects.create(
                 user=request.user,
