@@ -120,10 +120,14 @@ class ObservationPutSerializer(serializers.ModelSerializer):
 
 class LulinGetSerializer(serializers.ModelSerializer):
     target = TargetGetSerializer()
+    observation = serializers.SerializerMethodField()
 
     class Meta:
         model = Lulin
         fields = "__all__"
+
+    def get_observation(self, obj):
+        return obj.observation.name if obj.observation else None
 
 
 class LulinPutSerializer(serializers.ModelSerializer):

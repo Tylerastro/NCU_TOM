@@ -113,7 +113,7 @@ export default function ObservationsTable() {
     tagData?.map((tag) => {
       return {
         label: tag.name,
-        value: tag.targets.length,
+        value: tag.observations.length,
         id: tag.id || 0,
       };
     }) || [];

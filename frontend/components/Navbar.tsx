@@ -1,6 +1,7 @@
 import NavTooltip from "./NavTooltip";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Logo from "./Logo";
 
 const pages = [
   {
@@ -33,11 +34,7 @@ const pages = [
 function NavBar() {
   return (
     <div className="w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
-      <div>
-        <h2 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl text-primary-foreground">
-          <a href="/">NCU TOM</a>
-        </h2>
-      </div>
+      <Logo />
       <div>
         <nav className="flex">
           {pages.map((page) => (

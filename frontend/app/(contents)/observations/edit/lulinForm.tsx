@@ -77,7 +77,7 @@ const formSchema = z.object({
   binning: z.coerce.number().int().min(1).default(1),
   frames: z.coerce.number().int().min(1).default(1),
   instruments: z.record(z.boolean()).default({}),
-  exposure_time: z.number().int().default(10),
+  exposure_time: z.coerce.number().int().default(10),
   start_date: z.date(),
   end_date: z.date(),
 });
@@ -115,6 +115,9 @@ export function TargetLulinForm({
         }
       });
   }
+
+  console.log(observation.start_date);
+  console.log(new Date(observation.start_date));
 
   return (
     <Form {...form}>
@@ -198,7 +201,7 @@ export function TargetLulinForm({
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="binning"
@@ -215,7 +218,6 @@ export function TargetLulinForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="frames"
@@ -233,47 +235,65 @@ export function TargetLulinForm({
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="instruments"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Instruments</FormLabel>
-              </div>
-              {instruments.map((item) => (
-                <FormField
-                  key={item.id}
-                  control={form.control}
-                  name="instruments"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={item.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.[item.id] ?? false}
-                            onCheckedChange={(checked) => {
-                              field.onChange({
-                                ...field.value,
-                                [item.id]: checked,
-                              });
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {item.label}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <FormField
+            control={form.control}
+            name="exposure_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Exposure time</FormLabel>
+                <FormControl>
+                  <Input
+                    className="text-primary-foreground"
+                    placeholder="Exposure time"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="instruments"
+            render={() => (
+              <FormItem>
+                <div className="mb-4">
+                  <FormLabel className="text-base">Instruments</FormLabel>
+                </div>
+                {instruments.map((item) => (
+                  <FormField
+                    key={item.id}
+                    control={form.control}
+                    name="instruments"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={item.id}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.[item.id] ?? false}
+                              onCheckedChange={(checked) => {
+                                field.onChange({
+                                  ...field.value,
+                                  [item.id]: checked,
+                                });
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            {item.label}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
           name="start_date"
@@ -284,6 +304,7 @@ export function TargetLulinForm({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      disabled
                       type="button"
                       variant={"outline"}
                       className={cn(
@@ -304,7 +325,10 @@ export function TargetLulinForm({
                   <Calendar
                     mode="single"
                     onSelect={field.onChange}
-                    disabled={(date) => date <= new Date()}
+                    disabled={(date) =>
+                      date < new Date(observation.start_date) ||
+                      new Date(observation.end_date) < date
+                    }
                     initialFocus
                   />
                 </PopoverContent>
@@ -322,6 +346,7 @@ export function TargetLulinForm({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      disabled
                       type="button"
                       variant={"outline"}
                       className={cn(
