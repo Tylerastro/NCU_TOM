@@ -9,6 +9,7 @@ import CodeBlock from "./codeblock";
 import Feeds from "./feeds";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
+import { Badge } from "@/components/ui/badge";
 
 function LoadingSkeleton() {
   return (
@@ -72,6 +73,15 @@ export default function Lulin(props: { observation_id: number }) {
             <div className="flex justify-between">
               <div className="text-xl font-bold">
                 <span className="text-base">{observation?.name}</span>
+
+                <div className="flex items-center space-x-2">
+                  <Badge key={`${observation?.id}-start`} className="">
+                    {observation?.start_date.split(" ")[0]}
+                  </Badge>
+                  <Badge key={`${observation?.id}-end`} className="">
+                    {observation?.end_date.split(" ")[0]}
+                  </Badge>
+                </div>
               </div>
             </div>
           </CardContent>

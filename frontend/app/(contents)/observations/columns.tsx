@@ -154,7 +154,7 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Status",
     cell(props) {
       const status: number = props.row.getValue("status");
-      return <div>{Status[status]}</div>;
+      return <div>{Status[status].replace("_", " ")}</div>;
     },
     filterFn: (row, id, value) => {
       const rowValue: number = row.getValue(id);

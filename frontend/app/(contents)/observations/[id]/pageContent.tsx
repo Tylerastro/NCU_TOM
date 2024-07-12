@@ -180,7 +180,9 @@ export default function PageContent({
           <CardContent>
             <div className="flex justify-between">
               <div className="text-xl font-bold">
-                <span className="text-base">{Status[observation?.status]}</span>
+                <span className="text-base">
+                  {Status[observation?.status].replace("_", " ")}
+                </span>
               </div>
             </div>
           </CardContent>

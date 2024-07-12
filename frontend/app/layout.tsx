@@ -11,9 +11,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "NCU Tom",
   description: "Targets and Obersvation Manager developed by NCU",
-  icons: {
-    icon: "/icon.ico",
-  },
 };
 
 export default function RootLayout({

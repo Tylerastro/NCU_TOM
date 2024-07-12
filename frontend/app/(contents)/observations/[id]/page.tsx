@@ -62,14 +62,16 @@ export default function Page({ params }: { params: { id: number } }) {
               }
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={Status[observation.status]} />
+                <SelectValue
+                  placeholder={Status[observation.status].replace("_", " ")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(Status)
                   .filter((value) => typeof value === "number")
                   .map((stat) => (
                     <SelectItem key={stat} value={String(stat)}>
-                      {Status[stat as number]}
+                      {Status[stat as number].replace("_", " ")}
                     </SelectItem>
                   ))}
               </SelectContent>

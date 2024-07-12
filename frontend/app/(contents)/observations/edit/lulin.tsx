@@ -1,11 +1,13 @@
 import { getLulin } from "@/apis/observations/getLulin";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LulinObservations } from "@/models/observations";
+import { LulinObservations, Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import CodeBlock from "./codeblock";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
+import { getObservations } from "@/apis/observations/getObservations";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -20,6 +22,14 @@ function LoadingSkeleton() {
 
 export default function Lulin(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
+
+  const { data: observation } = useQuery({
+    queryKey: ["getObservation", props.observation_id],
+    queryFn: () =>
+      getObservations({ observationId: props.observation_id }).then((data) => {
+        return data.results[0] as Observation;
+      }),
+  });
 
   const {
     data: lulinObservations,
@@ -37,14 +47,23 @@ export default function Lulin(props: { observation_id: number }) {
   return (
     <>
       <div className="container mx-auto px-4 h-200 max-h-200 w-full">
-        <div>
+        <div className="py-6">
           <h1 className="my-10 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
             Edit your observation
           </h1>
-          <h2 className="my-10 text-2xl font-extrabold tracking-tight lg:text-2xl text-primary-foreground">
-            {lulinObservations[0]?.observation}
-          </h2>
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
+              {observation?.name}
+            </span>
+            <Badge key={`${observation?.id}-start`} className="mr-1">
+              {observation?.start_date.split(" ")[0]}
+            </Badge>
+            <Badge key={`${observation?.id}-end`} className="mr-1">
+              {observation?.end_date.split(" ")[0]}
+            </Badge>
+          </div>
         </div>
+
         {isFetching ? (
           <LoadingSkeleton />
         ) : (
