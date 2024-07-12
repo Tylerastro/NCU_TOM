@@ -113,7 +113,7 @@ const config = {
       };
     },
     async session({ session, token }) {
-      if (!token?.accessToken) return session;
+      if (!token?.accessToken) return { expires: session.expires };
       session.user = token as any;
 
       return session;
