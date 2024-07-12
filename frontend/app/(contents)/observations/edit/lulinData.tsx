@@ -23,6 +23,8 @@ interface LulinDataProps {
   refetch: () => void;
 }
 
+const filterOrder = ["u", "g", "r", "i", "z"];
+
 export default function LulinData(props: LulinDataProps) {
   const { setCodeUpdate, ...otherProps } = props;
 
@@ -86,6 +88,9 @@ export default function LulinData(props: LulinDataProps) {
             <TableCell className="text-right">
               {Object.entries(data.filters)
                 .filter(([_, value]) => value)
+                .sort(
+                  ([a], [b]) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
+                )
                 .map(([key]) => key)
                 .join(", ")}
             </TableCell>

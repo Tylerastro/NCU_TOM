@@ -29,19 +29,7 @@ interface LulinDataProps {
   setCodeUpdate: React.Dispatch<boolean>;
 }
 
-const filterOptions: Option[] = [
-  { id: 1, label: "u" },
-  { id: 2, label: "g" },
-  { id: 3, label: "r" },
-  { id: 4, label: "i" },
-  { id: 5, label: "z" },
-];
-
-const instrumentOptions: Option[] = [
-  { id: 1, label: "LOT" },
-  { id: 2, label: "SLT" },
-  { id: 3, label: "TRIPOL" },
-];
+const filterOrder = ["u", "g", "r", "i", "z"];
 
 export default function LulinData(props: LulinDataProps) {
   const { setCodeUpdate, ...otherProps } = props;
@@ -107,6 +95,9 @@ export default function LulinData(props: LulinDataProps) {
             <TableCell className="text-right">
               {Object.entries(data.filters)
                 .filter(([_, value]) => value)
+                .sort(
+                  ([a], [b]) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
+                )
                 .map(([key]) => key)
                 .join(", ")}
             </TableCell>
