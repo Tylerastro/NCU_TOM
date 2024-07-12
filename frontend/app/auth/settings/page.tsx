@@ -34,7 +34,7 @@ export default async function Component() {
               Change Password
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 p-4 CollapsibleContent">
+            <CollapsibleContent className="space-y-4  CollapsibleContent">
               <div className="grid gap-2">
                 <Label htmlFor="current-password">Current Password</Label>
                 <Input id="current-password" type="password" />
@@ -55,7 +55,7 @@ export default async function Component() {
               Update Profile
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 p-4 CollapsibleContent">
+            <CollapsibleContent className="space-y-4 CollapsibleContent">
               <div className="grid gap-2">
                 <Label htmlFor="name">Username</Label>
                 <Input id="name" defaultValue={session?.user.username} />
@@ -85,7 +85,7 @@ export default async function Component() {
               Notification Preferences
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 p-4 CollapsibleContent">
+            <CollapsibleContent className="space-y-4 CollapsibleContent">
               <div className="flex items-center space-x-2">
                 <Switch id="email-notifications" />
                 <Label htmlFor="email-notifications">Email Notifications</Label>
@@ -105,7 +105,7 @@ export default async function Component() {
               Delete Account
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
-            <CollapsibleContent className=" space-y-4 p-4 CollapsibleContent">
+            <CollapsibleContent className=" space-y-4  CollapsibleContent">
               <p>
                 Deleting your account will permanently remove your data from our
                 servers. This action cannot be undone.
