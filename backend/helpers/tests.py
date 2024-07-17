@@ -1,6 +1,11 @@
+from unittest.mock import MagicMock, patch
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
-# Create your tests here.
+from django.http import HttpRequest
 from django.test import TestCase
+from helpers.authentication import TomJWTAuthentication
+from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import Announcements, Comments, Tags, Users
 
@@ -217,3 +222,67 @@ class AnnouncementsModelTest(TestCase):
         announcement.title = ''  # setting an invalid (blank) title
         with self.assertRaises(ValidationError):
             announcement.full_clean()  # This should raise a ValidationError
+
+
+class TestTomJWTAuthentication(TestCase):
+    def setUp(self):
+        self.auth = TomJWTAuthentication()
+        self.request = HttpRequest()
+
+    def test_successful_authentication_from_header(self):
+        token = str(AccessToken())
+        self.request.META['HTTP_AUTHORIZATION'] = f'JWT {token}'
+
+        with patch.object(TomJWTAuthentication, 'get_user') as mock_get_user:
+            mock_get_user.return_value = MagicMock()
+            user, auth_token = self.auth.authenticate(self.request)
+
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(auth_token)
+
+    def test_successful_authentication_from_cookie(self):
+        token = str(AccessToken())
+        self.request.COOKIES[settings.AUTH_COOKIE] = token
+
+        with patch.object(TomJWTAuthentication, 'get_user') as mock_get_user:
+            mock_get_user.return_value = MagicMock()
+            user, auth_token = self.auth.authenticate(self.request)
+
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(auth_token)
+
+    def test_no_token_provided(self):
+        self.assertIsNone(self.auth.authenticate(self.request))
+
+    def test_invalid_token(self):
+        self.request.META['HTTP_AUTHORIZATION'] = 'JWT invalid_token'
+
+        with patch.object(TomJWTAuthentication, 'get_validated_token') as mock_get_validated_token:
+            mock_get_validated_token.side_effect = Exception('Invalid token')
+
+        self.assertIsNone(self.auth.authenticate(self.request))
+
+    def test_exception_handling(self):
+        self.request.META['HTTP_AUTHORIZATION'] = 'JWT valid_token'
+
+        with patch.object(TomJWTAuthentication, 'get_validated_token') as mock_get_validated_token:
+            mock_get_validated_token.side_effect = Exception(
+                'Unexpected error')
+
+        self.assertIsNone(self.auth.authenticate(self.request))
+
+    def test_header_priority_over_cookie(self):
+        header_token = str(AccessToken())
+        cookie_token = str(AccessToken())
+
+        self.request.META['HTTP_AUTHORIZATION'] = f'JWT {header_token}'
+        self.request.COOKIES[settings.AUTH_COOKIE] = cookie_token
+
+        with patch.object(TomJWTAuthentication, 'get_user') as mock_get_user, \
+                patch.object(TomJWTAuthentication, 'get_validated_token') as mock_get_validated_token:
+            mock_get_user.return_value = MagicMock()
+            mock_get_validated_token.return_value = header_token
+            user, auth_token = self.auth.authenticate(self.request)
+
+        self.assertIsNotNone(user)
+        self.assertEqual(auth_token, header_token)
