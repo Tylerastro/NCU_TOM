@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 import pandas as pd
@@ -101,7 +102,7 @@ class TargetsView(APIView):
                 targets = Target.objects.filter(
                     id__in=target_ids, user=request.user)
 
-            deleted_count = targets.delete()[0]
+            deleted_count = targets.update(deleted_at=datetime.now())
 
             return Response({'message': f'{deleted_count} targets deleted successfully'}, status=200)
         except Exception as e:
