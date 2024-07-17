@@ -6,6 +6,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import UpdateProfile from "./profile";
 import { Switch } from "@/components/ui/switch";
 import { auth } from "@/auth";
 
@@ -56,28 +57,13 @@ export default async function Component() {
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 CollapsibleContent">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Username</Label>
-                <Input id="name" defaultValue={session?.user.username} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="name">First Name</Label>
-                <Input id="name" defaultValue={session?.user.first_name} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="name">Last Name</Label>
-                <Input id="name" defaultValue={session?.user.last_name} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  defaultValue={session?.user.email}
-                />
-              </div>
-
-              <Button>Update Profile</Button>
+              <UpdateProfile
+                userId={session?.user.id || 0}
+                username={session?.user.username || ""}
+                first_name={session?.user.first_name || ""}
+                last_name={session?.user.last_name || ""}
+                institute={session?.user.institute || ""}
+              />
             </CollapsibleContent>
           </Collapsible>
           <Collapsible className="rounded-lg border">

@@ -10,6 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
                   'role', 'created_at', 'is_active')
 
 
+class UserPutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ('username', 'institute', 'first_name', 'last_name')
+
+
 class FullUserSerializer(serializers.ModelSerializer):
     targets = serializers.SerializerMethodField()
     observations = serializers.SerializerMethodField()

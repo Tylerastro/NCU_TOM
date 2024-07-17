@@ -94,7 +94,7 @@ const config = {
         return "/auth/error?error=CredentialsSignin";
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (token.accessToken) {
         const jwt = await parseJwt(token.accessToken);
         if (jwt && jwt.exp < Date.now() / 1000 && token.refreshToken) {
@@ -103,6 +103,16 @@ const config = {
             token.accessToken = newToken.access;
           } else {
             return null;
+          }
+        }
+      }
+
+      if (trigger === "update" && token.accessToken) {
+        const jwt = await parseJwt(token.accessToken);
+        if (jwt) {
+          const updatedUser = await getUser(token.accessToken);
+          if (updatedUser) {
+            return { ...token, ...updatedUser };
           }
         }
       }

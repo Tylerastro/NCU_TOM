@@ -1,12 +1,12 @@
+from django.urls import path, re_path
 from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
-from django.urls import path, re_path
 from rest_framework import routers
 
 from .views import (AnnouncementsView, EditUserRole, LogoutView,
                     TagsDetailView, TagsView, TomProviderAuthView,
                     TomTokenObtainPairView, TomTokenRefreshView,
-                    TomTokenVerifyView, UserView)
+                    TomTokenVerifyView, UserDetailView, UserView)
 
 router = routers.DefaultRouter()
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path("tags/<int:pk>/", TagsDetailView.as_view(),),
     path("list/users/", UserView.as_view()),
     path("user/<int:pk>/", EditUserRole),
+    path("user/<int:pk>/edit/", UserDetailView.as_view()),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('schema/swagger-ui/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

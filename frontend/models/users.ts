@@ -13,6 +13,13 @@ export interface UserProfile {
   observations?: number[];
 }
 
+export interface UserUpdate {
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  institute?: string;
+}
+
 export interface NewUser {
   first_name: string;
   last_name: string;

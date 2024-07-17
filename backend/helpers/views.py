@@ -16,7 +16,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 from .models import Announcements, Tags, Users
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
                           FullUserSerializer, TagsGetSerializer,
-                          TagsSerializer)
+                          TagsSerializer, UserPutSerializer)
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -173,6 +173,20 @@ class UserView(APIView):
         users = Users.objects.all()
         serializer = FullUserSerializer(users, many=True)
         return Response(serializer.data, status=200)
+
+
+@permission_classes((IsAuthenticated, ))
+class UserDetailView(APIView):
+    def put(self, request, pk) -> Users:
+        if request.user != Users.objects.get(id=pk):
+            return Response({"detail": "Forbidden"}, status=403)
+
+        user = Users.objects.get(id=pk)
+        serializer = UserPutSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
 
 
 @api_view(['PUT'])
