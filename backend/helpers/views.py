@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from django.conf import settings
@@ -146,7 +147,7 @@ class AnnouncementsView(APIView):
         if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
         announcement_instance = get_object_or_404(Announcements, pk=pk)
-        announcement_instance.delete()
+        announcement_instance.deleted_at = datetime.now()
         return Response(status=204)
 
 

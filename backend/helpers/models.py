@@ -38,6 +38,7 @@ class Announcements(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)
     context = models.TextField(max_length=1000, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True)
     type = models.IntegerField(
         choices=types.choices, null=False, blank=False, default=types.INFO)
 

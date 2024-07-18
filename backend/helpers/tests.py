@@ -1,10 +1,13 @@
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
 from helpers.authentication import TomJWTAuthentication
+from rest_framework import status
+from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import Announcements, Comments, Tags, Users
@@ -286,3 +289,145 @@ class TestTomJWTAuthentication(TestCase):
 
         self.assertIsNotNone(user)
         self.assertEqual(auth_token, header_token)
+
+
+User = get_user_model()
+
+
+class ViewsTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin_user = User.objects.create_user(
+            username='admin', email='admin@example.com', password='adminpass', role=Users.roles.ADMIN, is_active=True)
+        self.faculty_user = User.objects.create_user(
+            username='faculty', email='faculty@example.com', password='facultypass', role=Users.roles.FACULTY, is_active=True)
+        self.regular_user = User.objects.create_user(
+            username='regular', email='regular@example.com', password='regularpass', role=Users.roles.VISITOR, is_active=True)
+
+    def test_tom_token_obtain_pair_view(self):
+        data = {'username': 'regular', 'password': 'regularpass'}
+        response = self.client.post('/api/jwt/create/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.cookies)
+        self.assertIn('refresh', response.cookies)
+
+    def test_tom_token_refresh_view(self):
+        # First login
+        data = {'username': 'regular', 'password': 'regularpass'}
+        response = self.client.post('/api/jwt/create/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.cookies)
+        self.assertIn('refresh', response.cookies)
+
+        access = response.data.get('access')
+        refresh = response.data.get('refresh')
+
+        data = {'refresh': refresh}
+        response = self.client.post('/api/jwt/refresh/', data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+
+        new_access = response.data.get('access')
+        self.assertNotEqual(access, new_access)
+
+    def test_tags_view(self):
+        self.client.force_authenticate(user=self.regular_user)
+
+        # Test GET
+        response = self.client.get('/api/tags/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test POST
+        data = {'name': 'Test Tag'}
+        response = self.client.post('/api/tags/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_tags_detail_view(self):
+        tag = Tags.objects.create(user=self.regular_user, name='Test Tag')
+        self.client.force_authenticate(user=self.regular_user)
+
+        response = self.client.get(f'/api/tags/{tag.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'Test Tag')
+
+    def test_announcements_view(self):
+
+        # Test GET (no authentication required)
+        response = self.client.get('/api/announcements/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test POST (faculty user)
+        self.client.force_authenticate(user=self.faculty_user)
+        data = {'title': 'Test Announcement',
+                'context': 'This is a test.', 'type': Announcements.types.INFO}
+        response = self.client.post('/api/announcements/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Test POST (regular user - should fail)
+        self.client.force_authenticate(user=self.regular_user)
+        response = self.client.post('/api/announcements/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_announcements_detail_view(self):
+        announcement = Announcements.objects.create(
+            title='Test', context='Content', type=Announcements.types.INFO, user=self.admin_user)
+
+        # Test PUT (faculty user)
+        self.client.force_authenticate(user=self.faculty_user)
+        data = {'title': 'Updated Test', 'context': 'Updated Content'}
+        response = self.client.put(
+            f'/api/announcements/{announcement.id}/edit/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test DELETE (admin user)
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.delete(
+            f'/api/announcements/{announcement.id}/delete/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_user_view(self):
+
+        # Test GET (admin user)
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.get('/api/list/users/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test GET (regular user - should fail)
+        self.client.force_authenticate(user=self.regular_user)
+        response = self.client.get('/api/list/users/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_detail_view(self):
+        # Test PUT (user updating their own details)
+        self.client.force_authenticate(user=self.regular_user)
+        data = {'first_name': 'Updated', 'last_name': 'User'}
+        response = self.client.put(
+            f'/api/user/{self.regular_user.id}/edit/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test PUT (user trying to update someone else's details - should fail)
+        response = self.client.put(
+            f'/api/user/{self.faculty_user.id}/edit/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_edit_user_role(self):
+
+        # Test PUT (admin user)
+        self.client.force_authenticate(user=self.admin_user)
+        data = {'role': Users.roles.FACULTY}
+        response = self.client.put(
+            f'/api/user/{self.regular_user.id}/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test PUT (regular user - should fail)
+        self.client.force_authenticate(user=self.regular_user)
+        response = self.client.put(
+            f'/api/user/{self.regular_user.id}/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Test admin trying to change their own role (should fail)
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.put(
+            f'/api/user/{self.admin_user.id}/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
