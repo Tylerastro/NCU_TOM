@@ -1,11 +1,16 @@
-import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from helpers.models import Comments, Tags, Users
+from helpers.models import Tags, Users
 from observations.models import Lulin, Observation, Target
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from .lulin import LulinScheduler
+from .serializers import ObservationGetSerializer
 
 
 class TestObservationModel(TestCase):
@@ -184,3 +189,179 @@ class TestLulinModel(TestCase):
                 priority=10  # Invalid priority
             )
             observation.full_clean()
+
+
+class ObservationsViewTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        # Create a test user
+        self.user = Users.objects.create_user(
+            username='testuser', password='testpass', email='test@example.com', use_demo_targets=False)
+        self.client.force_authenticate(user=self.user)
+
+        self.target = Target.objects.create(
+            name="Test Target", user=self.user, ra=12, dec=34)
+
+        # Create some test observations
+        self.observation1 = Observation.objects.create(
+            user=self.user,
+            name='Test Observation 1',
+            observatory=Observation.observatories.LULIN,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+            status=1
+        )
+        self.observation2 = Observation.objects.create(
+            user=self.user,
+            name='Test Observation 2',
+            observatory=Observation.observatories.LULIN,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+            status=2
+        )
+
+    def test_get_observations(self):
+        response = self.client.get('/api/observations/')
+        observations = Observation.objects.filter(user=self.user)
+        serializer = ObservationGetSerializer(observations, many=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_create_observation(self):
+        data = {
+            'name': 'New Observation',
+            'observatory': Observation.observatories.LULIN,
+            'user': self.user.id,
+            'targets': [self.target.id],
+            'priority': Observation.priorities.MEDIUM,
+            'start_date': timezone.now() + timedelta(days=1),
+            'end_date': timezone.now() + timedelta(days=2),
+            'status': Observation.statuses.PREP
+        }
+        response = self.client.post('/api/observations/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Observation.objects.count(), 3)
+        self.assertEqual(Observation.objects.latest(
+            'id').name, 'New Observation')
+        self.assertEqual(Observation.objects.latest('id').user, self.user)
+        self.assertEqual(Observation.objects.latest('id').status, 1)
+        self.assertEqual(Observation.objects.latest(
+            'id').targets.first(), self.target)
+
+    def test_update_observation(self):
+        data = {'name': 'Updated Observation'}
+        response = self.client.put(
+            f'/api/observations/{self.observation1.id}/edit/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.observation1.refresh_from_db()
+        self.assertEqual(self.observation1.name, 'Updated Observation')
+
+    def test_delete_observations(self):
+        data = {'observation_ids': [
+            self.observation1.id, self.observation2.id]}
+        response = self.client.delete('/api/observations/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Observation.objects.count(), 0)
+
+    def test_filter_observations(self):
+        response = self.client.get('/api/observations/?status=1')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results']
+                         [0]['name'], 'Test Observation 1')
+
+    def test_unauthorized_access(self):
+        self.client.force_authenticate(user=None)
+        response = self.client.get('/api/observations/')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class LulinSchedulerTestCase(TestCase):
+    def setUp(self):
+        self.scheduler = LulinScheduler()
+
+        self.user = Users.objects.create_user(
+            username='testuser', password='testpass', email='test@example.com', use_demo_targets=False)
+        # Create test data
+        self.target = Target.objects.create(
+            name="Test Target",
+            user=self.user,
+            ra=15.0,
+            dec=45.0
+        )
+        self.observation = Observation.objects.create(
+            user=self.user,
+            name='Test Observation 1',
+            observatory=Observation.observatories.LULIN,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+            status=1
+        )
+        self.lulin = Lulin.objects.create(
+            observation=self.observation,
+            target=self.target,
+            priority=Lulin.priorities.HIGH,
+            filters={'u': True, 'g': False, 'r': True, 'i': False, 'z': False},
+            binning=2,
+            frames=10,
+            exposure_time=300
+        )
+
+    def test_convert_ra(self):
+        ra_deg = 15.0
+        ra_str = LulinScheduler.convert_ra(ra_deg)
+        self.assertEqual(ra_str, '01:00:00.000')
+
+    def test_convert_dec(self):
+        dec_deg = 45.0
+        dec_str = LulinScheduler.convert_dec(dec_deg)
+        self.assertEqual(dec_str, '45:00:00')
+
+    def test_get_filter_full_name(self):
+        self.assertEqual(self.scheduler.get_filter_full_name(
+            'u'), 'up_Astrodon_2019')
+        self.assertEqual(self.scheduler.get_filter_full_name(
+            'g'), 'gp_Astrodon_2019')
+
+    def test_gen_code(self):
+        code = self.scheduler.gen_code(self.observation.id)
+        expected_code = f"""
+#REPEAT 1
+#BINNING 2,2,
+#COUNT 10,10,
+#INTERVAL 300,300,
+#FILTER up_Astrodon_2019,rp_Astrodon_2019,
+
+{self.target.name}    01:00:00.000    45:00:00
+#WAITFOR 1
+            """
+
+        self.assertEqual(code.strip(), expected_code.strip())
+
+    @patch('observations.models.Observation.objects.filter')
+    def test_get_codes(self, mock_filter):
+        start_date = '2023-07-18T00:00:00.000Z'
+        end_date = '2023-07-19T00:00:00.000Z'
+
+        # Mock the queryset returned by Observation.objects.filter
+        mock_observation = MagicMock()
+        mock_observation.code = "Test Observation Code"
+        mock_filter.return_value = [mock_observation]
+
+        codes = self.scheduler.get_codes(start_date, end_date)
+        self.assertEqual(codes, "Test Observation Code")
+
+        # Check that filter was called with correct arguments
+        mock_filter.assert_called_once()
+        call_kwargs = mock_filter.call_args[1]
+        self.assertEqual(call_kwargs['status'],
+                         Observation.statuses.IN_PROGRESS)
+        self.assertIsInstance(call_kwargs['start_date__lte'], datetime)
+        self.assertIsInstance(call_kwargs['end_date__gte'], datetime)

@@ -38,9 +38,10 @@ class LulinScheduler:
     @staticmethod
     def convert_ra(degrees: float) -> str:
         angle_in_degrees = Angle(degrees, u.deg)
-        right_ascension = angle_in_degrees.to_string(unit=u.hour, sep=':')
-
-        return right_ascension
+        hours = angle_in_degrees.hms.h
+        minutes = angle_in_degrees.hms.m
+        seconds = angle_in_degrees.hms.s
+        return f"{hours:02.0f}:{minutes:02.0f}:{seconds:06.3f}"
 
     @staticmethod
     def convert_dec(degrees: float) -> str:
@@ -51,7 +52,7 @@ class LulinScheduler:
 
     def schedule(self, targets: List[Target], start_time: Time, end_time: Time):
         sorted_targets: List[Target] = sorted(
-            targets, key=lambda target: target.priority, reverse=True)
+            targets, key=lambda target: target.name, reverse=True)
 
         schedule = {}
 
@@ -84,7 +85,8 @@ class LulinScheduler:
             exposure = ""
             filters = ""
 
-            for key, val in obs.filters.items():
+            for key in ['u', 'g', 'r', 'i', 'z']:
+                val = obs.filters.get(key, False)
                 if val:
                     filters += self.get_filter_full_name(key) + ","
                     binning += str(obs.binning) + ","
@@ -93,7 +95,7 @@ class LulinScheduler:
 
             tmp = f"""
 #REPEAT 1
-#BINNING {binning} 
+#BINNING {binning}
 #COUNT {frames}
 #INTERVAL {exposure}
 #FILTER {filters}

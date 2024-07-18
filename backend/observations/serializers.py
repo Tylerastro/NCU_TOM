@@ -49,8 +49,6 @@ class ObservationPostSerializer(serializers.ModelSerializer):
             'id': {'read_only': True, 'required': False},
             'name': {'required': False},
             'user': {'read_only': True},
-            'binning': {'required': False},
-            'frames': {'required': False}
         }
 
     def validate(self, data):

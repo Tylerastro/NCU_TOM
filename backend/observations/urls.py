@@ -12,7 +12,6 @@ router.register(r'observations', views.ObservationsView,
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
-    path('observations/delete/', views.ObservationsView.as_view()),
     path('observations/<int:pk>/messages/',
          views.ObservationMessagesView.as_view()),
     path('observations/<int:pk>/edit/', views.ObservationsView.as_view()),
