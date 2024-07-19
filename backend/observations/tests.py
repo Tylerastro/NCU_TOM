@@ -10,7 +10,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from .lulin import LulinScheduler
-from .models import Lulin, Observation
 from .serializers import ObservationGetSerializer
 
 
@@ -30,8 +29,8 @@ class TestObservationModel(TestCase):
         self.user = Users.objects.create(**user_profile)
         self.target = Target.objects.create(
             name="Test Target", user=self.user, ra=12, dec=34)
-        self.start_date = timezone.now()
-        self.end_date = self.start_date + timedelta(hours=1)
+        self.start_date = timezone.now() + timedelta(hours=+1)
+        self.end_date = self.start_date + timedelta(hours=+2)
 
     def test_observation_creation(self):
         observation = Observation.objects.create(
@@ -40,8 +39,47 @@ class TestObservationModel(TestCase):
             end_date=self.end_date
         )
         self.assertIsNotNone(observation.pk)
-        self.assertTrue(observation.name)  # Auto-generated name
+        self.assertTrue(observation.name)
         self.assertEqual(observation.status, Observation.statuses.PREP)
+
+    def test_observation_creation_with_valid_dates(self):
+        start_date = timezone.now() + timedelta(hours=1)
+        end_date = start_date + timedelta(hours=5)
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.assertEqual(Observation.objects.count(), 1)
+        self.assertEqual(observation.user, self.user)
+
+    def test_observation_creation_with_invalid_dates(self):
+        start_date = timezone.now() + timedelta(hours=1)
+        end_date = start_date - timedelta(hours=5)
+
+        with self.assertRaises(ValidationError) as context:
+            Observation.objects.create(
+                user=self.user,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        self.assertTrue(
+            'Start date must be before end date.' in str(context.exception))
+
+    def test_observation_creation_with_start_date_in_past(self):
+        start_date = timezone.now() - timedelta(hours=1)
+        end_date = start_date + timedelta(hours=5)
+
+        with self.assertRaises(ValidationError) as context:
+            Observation.objects.create(
+                user=self.user,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        self.assertTrue(
+            'Start date cannot be in the past.' in str(context.exception))
 
     def test_observation_str_method(self):
         observation = Observation.objects.create(
@@ -124,8 +162,8 @@ class TestLulinModel(TestCase):
             name="Test Target", user=self.user, ra=12, dec=34)
         self.observation = Observation.objects.create(
             user=self.user,
-            start_date=timezone.now(),
-            end_date=timezone.now() + timedelta(hours=1)
+            start_date=timezone.now() + timedelta(hours=1),
+            end_date=timezone.now() + timedelta(hours=2)
         )
 
     def test_lulin_creation(self):

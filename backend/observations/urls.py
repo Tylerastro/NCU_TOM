@@ -8,18 +8,16 @@ router.register(r'observations', views.ObservationsView,
                 basename='observations')
 
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
+    path('observations/<int:pk>/edit/', views.ObservationsView.as_view()),
     path('observations/<int:pk>/messages/',
          views.ObservationMessagesView.as_view()),
-    path('observations/<int:pk>/edit/', views.ObservationsView.as_view()),
     path('observations/<int:pk>/altaz/', views.GetObservationAltAz),
+    path('observations/lulin/', views.LulinView.as_view()),
     path('observations/lulin/<int:id>/code/', views.CodeView.as_view()),
     path('observations/lulin/code/', views.GetCodes),
     path('observations/<int:pk>/lulin/', views.LulinView.as_view()),
     path('observations/stats/', views.getObservationStats),
-    path('observations/lulin/', views.LulinView.as_view()),
     path('observations/submit/lulin/', send_observation_mail),
 ]

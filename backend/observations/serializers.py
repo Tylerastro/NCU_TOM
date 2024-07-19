@@ -58,6 +58,13 @@ class ObservationPostSerializer(serializers.ModelSerializer):
             if target.user != request_user:
                 raise serializers.ValidationError(
                     "You do not have permission to perform this action for this target.")
+
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        if start_date and end_date and start_date > end_date:
+            raise serializers.ValidationError(
+                "Start date cannot be after end date.")
+
         return data
 
     def create(self, validated_data):

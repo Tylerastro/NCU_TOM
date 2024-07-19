@@ -1,13 +1,14 @@
 import uuid
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from helpers.models import Comments
 from targets.models import Target
 
 
 class Observation(models.Model):
-
     class observatories(models.IntegerChoices):
         LULIN = 1
 
@@ -25,7 +26,6 @@ class Observation(models.Model):
         EXPIRED = 5
         DENIED = 6
         POSTPONED = 7
-
     name = models.CharField(max_length=100, null=False, blank=True)
     user = models.ForeignKey('helpers.Users',
                              on_delete=models.CASCADE, related_name='observations')
@@ -40,7 +40,7 @@ class Observation(models.Model):
         choices=statuses.choices, default=statuses.PREP)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     code = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField('helpers.Tags', related_name='observations')
     comments = models.ManyToManyField(
@@ -49,10 +49,18 @@ class Observation(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        super().clean()
+        if self.start_date and self.end_date:
+            if self.start_date >= self.end_date:
+                raise ValidationError("Start date must be before end date.")
+
+        if self.start_date and self.start_date < timezone.now():
+            raise ValidationError("Start date cannot be in the past.")
+
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = str(uuid.uuid4())[:8]
-
         if self.pk and self.status == self.statuses.PENDING:
             old_observation = Observation.objects.get(pk=self.pk)
             if old_observation.status == old_observation.statuses.PREP:
@@ -60,7 +68,7 @@ class Observation(models.Model):
                     context=f"Observation {self.name} is now Pending.",
                 )
                 self.comments.add(comment)
-
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def delete(self):

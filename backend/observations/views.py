@@ -3,7 +3,6 @@ from typing import List
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from helpers.models import Comments, Users
 from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
@@ -113,25 +112,6 @@ class ObservationsView(APIView):
             return Response({'message': f'{deleted_count} observations deleted successfully'}, status=200)
         except Exception as e:
             return Response({'error': f'Error deleting observations: {str(e)}'}, status=500)
-
-
-@csrf_exempt
-@api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
-def DeleteObservation(request, pk):
-    if request.method == 'POST':
-        try:
-            observation = Observation.objects.get(id=pk)
-            if observation.user != request.user:
-                return JsonResponse({'error': 'Unauthorized'}, status=401)
-            observation.delete()
-            return JsonResponse({'message': 'Observation deleted successfully'})
-        except Observation.DoesNotExist:
-            return JsonResponse({'error': 'Observation not found'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': f'Error deleting Observation: {str(e)}'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 class LulinView(APIView):
