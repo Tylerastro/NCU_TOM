@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from .lulin import LulinScheduler
+from .models import Lulin, Observation
 from .serializers import ObservationGetSerializer
 
 
@@ -365,3 +366,124 @@ class LulinSchedulerTestCase(TestCase):
                          Observation.statuses.IN_PROGRESS)
         self.assertIsInstance(call_kwargs['start_date__lte'], datetime)
         self.assertIsInstance(call_kwargs['end_date__gte'], datetime)
+
+
+class LulinViewTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        user_profile = {
+            'username': 'admin',
+            'password': 'password',
+            'email': 'admin@ncu.edu.com',
+            'role': Users.roles.ADMIN,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin',
+            'use_demo_targets': False,
+            'is_superuser': True
+        }
+        self.user = Users.objects.create(**user_profile)
+        target_profile = {
+            'user': self.user,
+            'name': 'Test Target',
+            'ra': 15.0,
+            'dec': 45.0
+        }
+        self.target = Target.objects.create(**target_profile)
+        self.client.force_authenticate(user=self.user)
+        self.observation = Observation.objects.create(
+            name='Test Observation',
+            user=self.user,
+            observatory=Observation.observatories.LULIN,
+            status=1,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2)
+        )
+        self.lulin = Lulin.objects.create(
+            observation=self.observation,
+            target=self.target,
+        )
+
+    def test_get_lulin(self):
+        response = self.client.get('/api/observations/lulin/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_update_lulin(self):
+        data = {'some_field': 'Updated Value'}
+        response = self.client.put(
+            f'/api/observations/{self.lulin.id}/lulin/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lulin.refresh_from_db()
+
+
+class CodeViewTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        user_profile = {
+            'username': 'admin',
+            'password': 'password',
+            'email': 'admin@ncu.edu.com',
+            'role': Users.roles.ADMIN,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin',
+            'use_demo_targets': False,
+            'is_superuser': True
+        }
+        self.user = Users.objects.create(**user_profile)
+        self.client.force_authenticate(user=self.user)
+        self.observation = Observation.objects.create(
+            name='Test Observation',
+            user=self.user,
+            observatory=Observation.observatories.LULIN,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+            status=1
+        )
+
+    def test_get_code(self):
+        url = f'/api/observations/lulin/{self.observation.id}/code/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(response.content)
+
+
+class ObservationMessagesViewTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        user_profile = {
+            'username': 'admin',
+            'password': 'password',
+            'email': 'admin@ncu.edu.com',
+            'role': Users.roles.ADMIN,
+            'institute': 'NCU',
+            'first_name': 'Tyler',
+            'last_name': 'Lin',
+            'use_demo_targets': False,
+            'is_superuser': True
+        }
+        self.user = Users.objects.create(**user_profile)
+        self.client.force_authenticate(user=self.user)
+        self.observation = Observation.objects.create(
+            name='Test Observation',
+            user=self.user,
+            observatory=Observation.observatories.LULIN,
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+            status=1
+        )
+
+    def test_get_observation_messages(self):
+        response = self.client.get(
+            f'/api/observations/{self.observation.id}/messages/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.observation.id)
+
+    def test_post_observation_message(self):
+        data = {'message': 'Test message'}
+        response = self.client.post(
+            f'/api/observations/{self.observation.id}/messages/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.observation.refresh_from_db()
+        self.assertEqual(self.observation.comments.count(), 1)
