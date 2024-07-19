@@ -11,8 +11,6 @@ from .views import (AnnouncementsView, EditUserRole, LogoutView,
 router = routers.DefaultRouter()
 
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     re_path(r'^o/(?P<provider>\S+)/$',
             TomProviderAuthView.as_view(), name="o_auth"),

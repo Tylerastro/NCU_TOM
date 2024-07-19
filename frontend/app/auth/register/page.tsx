@@ -106,12 +106,12 @@ export default function SignUp() {
       {isSubmitting && <SubmitLoader isSubmitting={isSubmitting} />}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center align-center">
         <Image
-          src="/main-logo-transparent.svg"
+          src="/main-logo-white-transparent.png"
           alt="logo"
-          width={200}
-          height={200}
+          width={250}
+          height={250}
           priority
-          className="mx-auto"
+          className="object-contain h-48 w-96"
         />
 
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-foreground">

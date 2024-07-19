@@ -71,6 +71,9 @@ class UserManager(BaseUserManager):
 class Users(AbstractUser, PermissionsMixin):
     objects = UserManager()
 
+    class Meta:
+        ordering = ['id']
+
     class roles(models.IntegerChoices):
         ADMIN = 1
         FACULTY = 2
@@ -87,6 +90,7 @@ class Users(AbstractUser, PermissionsMixin):
     last_login = models.DateTimeField(auto_now=True)
     use_demo_targets = models.BooleanField(default=True)
     is_active = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True)
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'

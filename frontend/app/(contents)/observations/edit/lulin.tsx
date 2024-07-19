@@ -8,6 +8,7 @@ import CodeBlock from "./codeblock";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
 import { getObservations } from "@/apis/observations/getObservations";
+import { Button } from "@/components/ui/button";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -70,12 +71,16 @@ export default function Lulin(props: { observation_id: number }) {
           <MoonAltAz observation_id={props.observation_id} />
         )}
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center py-4">
           <LulinData
             data={lulinObservations}
             setCodeUpdate={setCodeUpdate}
             refetch={refetch}
           />
+          <Button disabled className="w-full">
+            {" "}
+            +{" "}
+          </Button>
         </div>
 
         <CodeBlock

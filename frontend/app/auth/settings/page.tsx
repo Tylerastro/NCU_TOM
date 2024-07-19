@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import UpdateProfile from "./profile";
 import { Switch } from "@/components/ui/switch";
 import { auth } from "@/auth";
+import DeleteAccount from "./deleteAccount";
 
 export default async function Component() {
   const session = await auth();
@@ -31,7 +32,10 @@ export default async function Component() {
       <main className="flex-1 px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-5xl space-y-8">
           <Collapsible>
-            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium  hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
+            <CollapsibleTrigger
+              disabled
+              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium  hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
+            >
               Change Password
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
@@ -67,7 +71,10 @@ export default async function Component() {
             </CollapsibleContent>
           </Collapsible>
           <Collapsible className="rounded-lg border">
-            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
+            <CollapsibleTrigger
+              disabled
+              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
+            >
               Notification Preferences
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
@@ -92,11 +99,7 @@ export default async function Component() {
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
             <CollapsibleContent className=" space-y-4  CollapsibleContent">
-              <p>
-                Deleting your account will permanently remove your data from our
-                servers. This action cannot be undone.
-              </p>
-              <Button variant="destructive">Delete Account</Button>
+              <DeleteAccount />
             </CollapsibleContent>
           </Collapsible>
         </div>

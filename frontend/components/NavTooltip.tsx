@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const settings = [
   { name: "Dashboard", url: "/dashboard/", disabled: false },
-  { name: "Settings", url: "/settings", disabled: true },
+  { name: "Settings", url: "/auth/settings", disabled: true },
 ];
 
 import { Button as ButtonUI } from "@/components/ui/button";
