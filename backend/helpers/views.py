@@ -189,6 +189,16 @@ class UserDetailView(APIView):
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
+    def delete(self, request, pk) -> Users:
+        if request.user != Users.objects.get(id=pk):
+            return Response({"detail": "Forbidden"}, status=403)
+
+        user = Users.objects.get(id=pk)
+        user.deleted_at = datetime.now()
+        user.is_active = False
+        user.save()
+        return Response(status=204)
+
 
 @api_view(['PUT'])
 @permission_classes((IsAuthenticated, ))

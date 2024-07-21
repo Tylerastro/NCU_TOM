@@ -62,6 +62,10 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  if (!data) {
+    return <div>No data available</div>;
+  }
+
   useEffect(() => {
     const selectIds = table
       .getSelectedRowModel()

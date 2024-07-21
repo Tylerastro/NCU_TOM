@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { UserRole } from "./models/enums";
 
-const protectedRoutes = ["/dashboard", "/dashboard/lulin", "/settings"];
+const protectedRoutes = ["/dashboard", "/dashboard/lulin", "/auth/settings"];
 
 export default auth((req) => {
   if (

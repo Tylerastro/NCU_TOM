@@ -1,10 +1,10 @@
 "use client";
-import useDebounce from "@/components/Debounce";
 import { deleteObservation } from "@/apis/observations/deleteObservation";
 import { getObservationStats } from "@/apis/observations/getObservationStats";
 import { getObservations } from "@/apis/observations/getObservations";
 import { getUserList } from "@/apis/system/getUserList";
 import { getTags } from "@/apis/tags/getTags";
+import useDebounce from "@/components/Debounce";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,10 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserRole } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { columns } from "./columns";
@@ -44,6 +46,9 @@ export default function ObservationsTable() {
   const [searchStatus, setSearchStatus] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const session = useSession();
+  const isAdmin = session?.data?.user?.role === UserRole.Admin;
 
   const {
     data,
@@ -76,18 +81,21 @@ export default function ObservationsTable() {
         throw error;
       }
     },
+    enabled: !!session && !!session.data,
   });
 
   const { data: tagData, isFetching: tagIsFetching } = useQuery({
     queryKey: ["tags"],
     queryFn: () => getTags(),
     refetchOnWindowFocus: false,
+    enabled: !!session && !!session.data,
   });
 
   const { data: userData, isFetching: userIsFetching } = useQuery({
     queryKey: ["users"],
     queryFn: () => getUserList(),
     refetchOnWindowFocus: false,
+    enabled: isAdmin,
   });
 
   const { data: observationStats, isFetching: observationStatIsFetching } =
@@ -95,6 +103,7 @@ export default function ObservationsTable() {
       queryKey: ["observationStats"],
       queryFn: () => getObservationStats(),
       refetchOnWindowFocus: false,
+      enabled: !!session && !!session.data,
     });
 
   const handleDelete = async (ids: number[]) => {
@@ -129,14 +138,13 @@ export default function ObservationsTable() {
       };
     }) || [];
 
-  const UserFilterData =
-    userData?.map((user) => {
-      return {
+  const UserFilterData = isAdmin
+    ? userData?.map((user) => ({
         label: user.username,
         value: user.observations?.length || 0,
         id: user.id || 0,
-      };
-    }) || [];
+      })) || []
+    : [];
 
   useEffect(() => {
     setIsLoading(
@@ -155,6 +163,10 @@ export default function ObservationsTable() {
   useEffect(() => {
     setPage(1);
   }, [search, searchTags, searchUsers, searchStatus]);
+
+  if (!session || !session.data) {
+    return null;
+  }
 
   return (
     <>
@@ -191,11 +203,13 @@ export default function ObservationsTable() {
             data={TagFilterData}
             setData={setSearchTags}
           />
-          <SearchFilter
-            title="Users"
-            data={UserFilterData}
-            setData={setSearchUsers}
-          />
+          {isAdmin && (
+            <SearchFilter
+              title="Users"
+              data={UserFilterData}
+              setData={setSearchUsers}
+            />
+          )}
           <SearchFilter
             title="Status"
             data={StatusFilterData}

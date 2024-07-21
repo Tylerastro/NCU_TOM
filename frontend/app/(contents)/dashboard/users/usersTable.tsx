@@ -48,6 +48,26 @@ const inactiveLight = (
   </div>
 );
 
+const deletedLight = (
+  <div className="flex items-center justify-center">
+    <span className="relative flex h-6 w-6 ">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+        />
+      </svg>
+    </span>
+  </div>
+);
+
 export default function UserTable() {
   const {
     data: users,
@@ -126,7 +146,11 @@ export default function UserTable() {
             <TableCell className="text-center">{user.institute}</TableCell>
             <TableCell className="text-center">{user.email}</TableCell>
             <TableCell className="text-center">
-              {user.is_active ? activeLight : inactiveLight}
+              {user.deleted_at
+                ? deletedLight
+                : user.is_active
+                ? activeLight
+                : inactiveLight}
             </TableCell>
           </TableRow>
         ))}

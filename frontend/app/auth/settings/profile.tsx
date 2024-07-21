@@ -1,4 +1,5 @@
 "use client";
+import { updateUser } from "@/apis/auth/updateUser";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,15 +9,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useSession } from "next-auth/react";
-import { UpdateSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { updateUser } from "@/apis/auth/updateUser";
 import { toast } from "react-toastify";
+import { z } from "zod";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -148,7 +146,7 @@ export default function UpdateProfile({
             className="w-full text-primary-foreground bg-primary"
             type="submit"
           >
-            Submit
+            Save
           </Button>
         </div>
       </form>

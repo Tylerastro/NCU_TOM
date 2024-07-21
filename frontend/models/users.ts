@@ -7,6 +7,7 @@ export interface UserProfile {
   role: number;
   email: string;
   created_at?: Date;
+  deleted_at?: Date;
   is_active?: boolean;
   last_login?: Date;
   targets?: number[];

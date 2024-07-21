@@ -28,6 +28,7 @@ urlpatterns = [
     path("list/users/", UserView.as_view()),
     path("user/<int:pk>/", EditUserRole),
     path("user/<int:pk>/edit/", UserDetailView.as_view()),
+    path("user/<int:pk>/delete/", UserDetailView.as_view()),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('schema/swagger-ui/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

@@ -23,7 +23,7 @@ class FullUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ('id', 'username', 'institute', 'email',
-                  'targets', 'observations',
+                  'targets', 'observations', 'deleted_at',
                   'role', 'created_at', 'is_active', 'last_login')
 
     def get_targets(self, user):
