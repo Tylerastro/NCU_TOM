@@ -198,7 +198,8 @@ def GetCodes(request):
 @permission_classes((AllowAny, ))
 def getObservationStats(request):
     observations = Observation.objects.first()
-    serializer = ObservationStatsSerializer(observations)
+    serializer = ObservationStatsSerializer(
+        observations, context={'request': request})
 
     return Response(serializer.data, status=200)
 

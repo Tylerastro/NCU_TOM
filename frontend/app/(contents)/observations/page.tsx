@@ -216,7 +216,7 @@ export default function ObservationsTable() {
             setData={setSearchStatus}
           />
         </div>
-        {isLoading ? (
+        {isLoading || !observations ? (
           <LoadingSkeleton />
         ) : (
           <DataTable
