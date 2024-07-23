@@ -180,7 +180,7 @@ class TargetApiTest(TestCase):
         self.assertEqual(len(response.data['results']), 1)
 
     def test_get_target_detail(self):
-        response = self.client.get(f'/api/targets/?target_id={self.target.id}')
+        response = self.client.get(f'/api/targets/{self.target.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'M 87')
         self.assertEqual(response.data['tags'][0]['name'], 'TestTag')
@@ -254,7 +254,7 @@ class TargetApiTest(TestCase):
             'dec': 55.0
         }
         response = self.client.put(
-            f'/api/targets/{self.target.id}/edit/', data)
+            f'/api/targets/{self.target.id}/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.target.refresh_from_db()
         self.assertEqual(self.target.name, 'Updated Target')
@@ -266,7 +266,7 @@ class TargetApiTest(TestCase):
             'dec': 55.0
         }
         response = self.client.put(
-            f'/api/targets/{self.target.id}/edit/', data)
+            f'/api/targets/{self.target.id}/', data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.target.refresh_from_db()
         self.assertNotEqual(self.target.name, 'Updated Target')
@@ -283,7 +283,7 @@ class TargetApiTest(TestCase):
             'tags': [{'name': 'New Tag'}]
         }
         response = self.client.put(
-            f'/api/targets/{self.target.id}/edit/', data, format='json')
+            f'/api/targets/{self.target.id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.target.refresh_from_db()
 

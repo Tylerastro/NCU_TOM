@@ -28,45 +28,37 @@ class TargetsView(APIView):
     paginator = Pagination()
 
     def get(self, request):
-        target_id = request.query_params.get('target_id')
         is_admin_or_faculty = request.user.role in (
             Users.roles.ADMIN, Users.roles.FACULTY
         )
-        if target_id:
-            target_filter = {} if is_admin_or_faculty else {'user': request.user}
-            target_filter['deleted_at__isnull'] = True
-            target = get_object_or_404(Target, id=target_id, **target_filter)
-            serializer = TargetGetSerializer(target)
-            return Response(serializer.data, status=200)
+        conditions = []
+        conditions.append(Q(deleted_at__isnull=True))
+        name = request.query_params.get('name')
+        target_tags = request.query_params.get('tags')
+        if name:
+            conditions.append(Q(name__icontains=name))
+        if target_tags:
+            tags = target_tags.split(',')
+            tags = [int(tag) for tag in tags if tag.isdigit()]
+
+            if tags:
+                conditions.append(Q(tags__in=tags))
+
+        combined_conditions = Q()
+        for condition in conditions:
+            combined_conditions &= condition
+
+        if is_admin_or_faculty:
+            targets_filter = Target.objects.filter(
+                combined_conditions).distinct()
         else:
-            conditions = []
-            conditions.append(Q(deleted_at__isnull=True))
-            name = request.query_params.get('name')
-            target_tags = request.query_params.get('tags')
-            if name:
-                conditions.append(Q(name__icontains=name))
-            if target_tags:
-                tags = target_tags.split(',')
-                tags = [int(tag) for tag in tags if tag.isdigit()]
+            targets_filter = Target.objects.filter(
+                Q(user=request.user) & combined_conditions
+            )
 
-                if tags:
-                    conditions.append(Q(tags__in=tags))
-
-            combined_conditions = Q()
-            for condition in conditions:
-                combined_conditions &= condition
-
-            if is_admin_or_faculty:
-                targets_filter = Target.objects.filter(
-                    combined_conditions).distinct()
-            else:
-                targets_filter = Target.objects.filter(
-                    Q(user=request.user) & combined_conditions
-                )
-
-            results = self.paginator.paginate_queryset(targets_filter, request)
-            serializer = TargetGetSerializer(results, many=True)
-            return self.paginator.get_paginated_response(serializer.data)
+        results = self.paginator.paginate_queryset(targets_filter, request)
+        serializer = TargetGetSerializer(results, many=True)
+        return self.paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = TargetPostSerializer(
@@ -74,18 +66,6 @@ class TargetsView(APIView):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-    def put(self, request, pk):
-        if pk is None:
-            return Response(status=400)
-
-        target = get_object_or_404(Target, pk=pk, user=request.user)
-        serializer = TargetPostSerializer(
-            target, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
     @extend_schema(request=DeleteTargetSerializer)
@@ -109,9 +89,41 @@ class TargetsView(APIView):
             return Response({'error': f'Error deleting targets: {str(e)}'}, status=500)
 
 
+class TargetDetailView(APIView):
+    def get(self, request, pk):
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)
+        else:
+            target = get_object_or_404(
+                Target, pk=pk, user=request.user, deleted_at__isnull=True)
+        serializer = TargetGetSerializer(target)
+        return Response(serializer.data, status=200)
+
+    def delete(self, request, pk):
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)
+        else:
+            target = get_object_or_404(
+                Target, pk=pk, user=request.user, deleted_at__isnull=True)
+        target.deleted_at = datetime.now()
+        target.save()
+        return Response({'message': f'{target.name} deleted successfully'}, status=200)
+
+    def put(self, request, pk):
+        if pk is None:
+            return Response(status=400)
+        target = get_object_or_404(Target, pk=pk, user=request.user)
+        serializer = TargetPostSerializer(
+            target, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
+
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
-def bulkTargetCreation(request):
+def targets_creation(request):
     def handle_uploads(file):
         file_extension = file.name.split('.')[-1]
         if file_extension == 'csv':
@@ -146,7 +158,7 @@ def bulkTargetCreation(request):
 
 
 @api_view(['POST'])
-def getMoonAltAz(request):
+def get_moon_altaz(request):
     service = Visibility(lat=23.469444, lon=120.872639)
 
     moon_altaz: TargetAltAz = service.get_moon_altaz(
@@ -162,7 +174,7 @@ def getMoonAltAz(request):
         return Response(serializer.errors, status=400)
 
 
-def getTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
+def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
     service = Visibility(lat=23.469444, lon=120.872639)
 
     targets_altaz: List[TargetAltAz] = service.get_targets_altaz(
@@ -183,7 +195,7 @@ def getTargetsAltAz(targets: List[Target], start_time: str, end_time: str):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def getTargetSimbad(request, pk: int):
+def get_target_simbad(request, pk: int):
     service = SimbadService()
     target = Target.objects.get(id=pk)
     if target is None:
@@ -203,7 +215,7 @@ def getTargetSimbad(request, pk: int):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def getTargetSED(request, pk: int):
+def get_target_SED(request, pk: int):
     # TODO: Implement Cache for SED data
     service = VizierService()
     target = Target.objects.get(id=pk)
