@@ -1,6 +1,6 @@
 import api from "../axiosAuth";
 
-export const deleteTarget = async (targetIds: number[]) => {
+export const deleteTargets = async (targetIds: number[]) => {
   try {
     const response = await api.delete("/api/targets/", {
       data: { target_ids: targetIds },

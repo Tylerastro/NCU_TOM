@@ -10,7 +10,7 @@ router.register(r'observations', views.ObservationsView,
 
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
-    path('observations/<int:pk>/edit/', views.ObservationsView.as_view()),
+    path('observations/<int:pk>/', views.ObservationDetailView.as_view()),
     path('observations/<int:pk>/messages/',
          views.ObservationMessagesView.as_view()),
     path('observations/<int:pk>/altaz/', views.GetObservationAltAz),

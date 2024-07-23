@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from django.db.models import Q
@@ -27,15 +28,12 @@ class ObservationsView(APIView):
     def get(self, request):
         conditions = []
         conditions.append(Q(deleted_at__isnull=True))
-        observation_id = request.query_params.get('observation_id')
         observatory = request.query_params.get('observatory')
         status = request.query_params.get('status')
         name = request.query_params.get('name')
         users = request.query_params.get('users')
         tags = request.query_params.get('tags')
 
-        if observation_id:
-            conditions.append(Q(id=observation_id))
         if observatory:
             conditions.append(Q(observatory=observatory))
         if status:
@@ -80,19 +78,6 @@ class ObservationsView(APIView):
             return JsonResponse(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-    def put(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
-            observation = get_object_or_404(Observation, pk=pk)
-        else:
-            observation = get_object_or_404(
-                Observation, pk=pk, user=request.user)
-        serializer = ObservationPutSerializer(
-            observation, data=request.data, partial=True, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
-
     def delete(self, request):
         serializer = DeleteObservationSerializer(data=request.data)
         if not serializer.is_valid():
@@ -107,11 +92,45 @@ class ObservationsView(APIView):
                 observations = Observation.objects.filter(
                     id__in=observation_ids, user=request.user)
 
-            deleted_count = observations.delete()[0]
+            deleted_count = observations.update(deleted_at=datetime.now())
 
             return Response({'message': f'{deleted_count} observations deleted successfully'}, status=200)
         except Exception as e:
             return Response({'error': f'Error deleting observations: {str(e)}'}, status=500)
+
+
+class ObservationDetailView(APIView):
+    serializer_class = ObservationGetSerializer
+
+    def get(self, request, pk):
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observation = get_object_or_404(Observation, pk=pk)
+        else:
+            observation = get_object_or_404(
+                Observation, pk=pk, user=request.user)
+        serializer = ObservationGetSerializer(observation)
+        return Response(serializer.data, status=200)
+
+    def delete(self, request, pk):
+        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            observation = get_object_or_404(Observation, pk=pk)
+        else:
+            observation = get_object_or_404(
+                Observation, pk=pk, user=request.user)
+        observation.deleted_at = datetime.now()
+        observation.save()
+        return Response({'message': f'{observation.name} deleted successfully'}, status=200)
+
+    def put(self, request, pk):
+        if pk is None:
+            return Response(status=400)
+        observation = get_object_or_404(Observation, pk=pk, user=request.user)
+        serializer = ObservationPutSerializer(
+            observation, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
 
 
 class LulinView(APIView):

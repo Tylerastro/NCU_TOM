@@ -2,7 +2,6 @@ import api from "../axiosAuth";
 import { Paginator } from "@/models/helpers";
 
 interface GetObservationsOptions {
-  observationId?: number;
   name?: string;
   page?: number;
   pageSize?: number;
@@ -12,7 +11,6 @@ interface GetObservationsOptions {
 }
 
 export const getObservations = async ({
-  observationId,
   name,
   page,
   pageSize,
@@ -24,9 +22,6 @@ export const getObservations = async ({
     const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/observations/`);
     const params = new URLSearchParams();
 
-    if (observationId !== undefined) {
-      params.append("observation_id", observationId.toString());
-    }
     if (name) {
       params.append("name", name);
     }

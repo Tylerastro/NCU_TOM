@@ -293,7 +293,7 @@ class ObservationsViewTestCase(TestCase):
     def test_update_observation(self):
         data = {'name': 'Updated Observation'}
         response = self.client.put(
-            f'/api/observations/{self.observation1.id}/edit/', data)
+            f'/api/observations/{self.observation1.id}/', data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.observation1.refresh_from_db()
@@ -305,7 +305,16 @@ class ObservationsViewTestCase(TestCase):
         response = self.client.delete('/api/observations/', data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Observation.objects.count(), 0)
+        self.assertEqual(Observation.objects.count(), 2)
+        self.assertEqual(Observation.objects.filter(
+            deleted_at__isnull=False).count(), 2)
+
+        observation1 = Observation.objects.get(id=self.observation1.id)
+        observation2 = Observation.objects.get(id=self.observation2.id)
+        self.assertIsNotNone(observation1.deleted_at,
+                             'Test value is none.')
+        self.assertIsNotNone(observation2.deleted_at,
+                             'Test value is none.')
 
     def test_filter_observations(self):
         response = self.client.get('/api/observations/?status=1')
@@ -384,7 +393,7 @@ class LulinSchedulerTestCase(TestCase):
 
         self.assertEqual(code.strip(), expected_code.strip())
 
-    @patch('observations.models.Observation.objects.filter')
+    @ patch('observations.models.Observation.objects.filter')
     def test_get_codes(self, mock_filter):
         start_date = '2023-07-18T00:00:00.000Z'
         end_date = '2023-07-19T00:00:00.000Z'

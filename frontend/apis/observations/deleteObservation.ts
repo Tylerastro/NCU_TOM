@@ -2,7 +2,7 @@ import api from "../axiosAuth";
 
 export const deleteObservation = async (observationIds: number[]) => {
   try {
-    const response = await api.delete("/api/observations/delete/", {
+    const response = await api.delete("/api/observations/", {
       data: { observation_ids: observationIds },
     });
     return response.data;

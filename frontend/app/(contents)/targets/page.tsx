@@ -1,6 +1,5 @@
 "use client";
 import { getTags } from "@/apis/tags/getTags";
-import { deleteTarget } from "@/apis/targets/deleteTarget";
 import { getTargets } from "@/apis/targets/getTargets";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
@@ -20,6 +19,7 @@ import { toast } from "react-toastify";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
+import { deleteTargets } from "@/apis/targets/deleteTargets";
 
 function LoadingSkeleton() {
   return (
@@ -69,7 +69,7 @@ export default function TargetsTable() {
 
   const handleDelete = async (ids: number[]) => {
     try {
-      const response = await deleteTarget(ids);
+      const response = await deleteTargets(ids);
       await refetch();
       toast.success(response.message || "Targets deleted successfully");
     } catch (error) {
