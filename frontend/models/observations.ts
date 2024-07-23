@@ -44,6 +44,16 @@ export interface LulinObservations {
   target: Target;
 }
 
+export interface LulinObservationsCreate {
+  priority: number;
+  filters: { [key: string]: boolean };
+  binning: number;
+  frames: number;
+  instruments: { [key: string]: boolean };
+  exposure_time: number;
+  targets: number[];
+}
+
 export interface LulinObservationsUpdate {
   id?: number;
   observation?: string;

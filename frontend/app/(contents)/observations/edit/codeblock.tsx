@@ -44,7 +44,7 @@ export default function CodeBlock({
       router.push("/observations");
       router.refresh();
     } catch (error) {
-      console.log(error);
+      toast.error("Something went wrong");
     }
   };
 

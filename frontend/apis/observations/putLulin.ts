@@ -7,7 +7,7 @@ export const putLulin = async (
 ) => {
   try {
     const response = await api.put(
-      `/api/observations/${pk}/lulin/`,
+      `/api/observations/lulin/${pk}/`,
       updateData
     );
     return response.data;

@@ -17,9 +17,9 @@ from targets.visibility import TargetAltAz
 
 from .models import Lulin, Observation
 from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
-                          LulinPutSerializer, ObservationGetSerializer,
-                          ObservationPostSerializer, ObservationPutSerializer,
-                          ObservationStatsSerializer)
+                          LulinPostSerializer, LulinPutSerializer,
+                          ObservationGetSerializer, ObservationPostSerializer,
+                          ObservationPutSerializer, ObservationStatsSerializer)
 
 
 class ObservationsView(APIView):
@@ -172,6 +172,17 @@ class LulinView(APIView):
         serializer = LulinGetSerializer(observations, many=True)
         return Response(serializer.data, status=200)
 
+    @extend_schema(operation_id='Create Lulin')
+    def post(self, request, pk):
+        observation = get_object_or_404(
+            Observation, pk=pk, user=request.user)
+        serializer = LulinPostSerializer(
+            data=request.data, context={'request': request, 'observation': observation})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
 
 class LulinDetailView(APIView):
     def get_lulin_object(self, pk, user):
@@ -179,7 +190,7 @@ class LulinDetailView(APIView):
             return get_object_or_404(Lulin, pk=pk)
         return get_object_or_404(Lulin, pk=pk, observation__user=user)
 
-    @extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
+    @ extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
     def get(self, request, pk):
         lulin = self.get_lulin_object(pk, request.user)
         serializer = LulinGetSerializer(lulin)
@@ -194,9 +205,9 @@ class LulinDetailView(APIView):
         return Response(serializer.errors, status=400)
 
 
-@permission_classes((IsAuthenticated, ))
+@ permission_classes((IsAuthenticated, ))
 class LulinCodeView(APIView):
-    @extend_schema(operation_id='Get or gen code for Lulin observation')
+    @ extend_schema(operation_id='Get or gen code for Lulin observation')
     def get(self, request, pk):
         service = LulinScheduler()
         try:
@@ -215,7 +226,7 @@ class LulinCodeView(APIView):
             return HttpResponse(lulin.code, content_type='text/plain')
 
 
-@api_view(['GET'])
+@ api_view(['GET'])
 def get_lulin_compiled_codes(request):
     if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
         return Response({"detail": "Unauthorized"}, status=401)
@@ -230,8 +241,8 @@ def get_lulin_compiled_codes(request):
         start_date, end_date), content_type='text/plain')
 
 
-@api_view(['GET'])
-@permission_classes((AllowAny, ))
+@ api_view(['GET'])
+@ permission_classes((AllowAny, ))
 def get_observation_stats(request):
     observations = Observation.objects.first()
     serializer = ObservationStatsSerializer(
@@ -240,8 +251,8 @@ def get_observation_stats(request):
     return Response(serializer.data, status=200)
 
 
-@api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@ api_view(['POST'])
+@ permission_classes((IsAuthenticated, ))
 def get_observation_altaz(request, pk):
     if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
         observation = Observation.objects.get(id=pk, user=request.user)

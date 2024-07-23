@@ -66,9 +66,6 @@ export default function LulinData(props: LulinDataProps) {
                 <SheetContent className="w-[400px] sm:w-[540px]">
                   <SheetHeader>
                     <SheetTitle>Edit {data.target.name}</SheetTitle>
-                    <SheetDescription>
-                      Lorem ipsum dolor sit amet.
-                    </SheetDescription>
                   </SheetHeader>
                   <TargetLulinForm observation={data} refetch={props.refetch} />
                 </SheetContent>

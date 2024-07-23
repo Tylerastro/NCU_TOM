@@ -6,7 +6,7 @@ from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
 from rest_framework import serializers
 from targets.serializers import TargetGetSerializer
 
-from .models import Lulin, Observation
+from .models import Lulin, Observation, Target
 
 
 class ObservationGetSerializer(serializers.ModelSerializer):
@@ -139,6 +139,46 @@ class LulinPutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lulin
         fields = "__all__"
+
+
+class LulinPostSerializer(serializers.ModelSerializer):
+    targets = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Target.objects.all())
+
+    class Meta:
+        model = Lulin
+        fields = ('priority', 'filters', 'binning', 'frames',
+                  'instruments', 'exposure_time', 'targets')
+        extra_kwargs = {
+            'targets': {'required': False, 'read_only': True},
+        }
+
+    def validate(self, data):
+        request_user = self.context['request'].user
+        targets = data.get('targets', [])
+
+        for target in targets:
+            if target.user != request_user:
+                raise serializers.ValidationError(
+                    f"You do not have permission to perform this action for target {target.id}.")
+        return data
+
+    def create(self, validated_data):
+        targets_data = validated_data.pop('targets')
+        print(targets_data)
+        observation = self.context['observation']
+
+        lulin_instances = []
+        for target_instance in targets_data:
+            lulin = Lulin.objects.create(
+                observation=observation,
+                target=target_instance,
+                **validated_data
+            )
+            lulin_instances.append(lulin)
+            observation.targets.add(target_instance)
+
+        return observation
 
 
 class StatusSerializer(serializers.Serializer):
