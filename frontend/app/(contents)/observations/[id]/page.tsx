@@ -1,5 +1,4 @@
 "use client";
-import { getObservations } from "@/apis/observations/getObservations";
 import { putObservation } from "@/apis/observations/putObservation";
 import {
   Select,

@@ -81,7 +81,6 @@ export default function ObservationsTable() {
         throw error;
       }
     },
-    enabled: !!session && !!session.data,
   });
 
   const { data: tagData, isFetching: tagIsFetching } = useQuery({
@@ -147,6 +146,10 @@ export default function ObservationsTable() {
     : [];
 
   useEffect(() => {
+    console.log(isFetchingData);
+    console.log(tagIsFetching);
+    console.log(userIsFetching);
+    console.log(observationStatIsFetching);
     setIsLoading(
       isFetchingData ||
         tagIsFetching ||
@@ -163,10 +166,6 @@ export default function ObservationsTable() {
   useEffect(() => {
     setPage(1);
   }, [search, searchTags, searchUsers, searchStatus]);
-
-  if (!session || !session.data) {
-    return null;
-  }
 
   return (
     <>

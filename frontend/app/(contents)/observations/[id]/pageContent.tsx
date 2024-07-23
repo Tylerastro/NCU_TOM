@@ -1,5 +1,3 @@
-"use client";
-import { getLulin } from "@/apis/observations/getLulin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,16 +35,6 @@ export default function PageContent({
   observation: Observation;
 }) {
   const [dataReady, setDataReady] = useState(false);
-  const { data: lulinObservations } = useQuery({
-    queryKey: ["getLulin"],
-    queryFn: () =>
-      getLulin(observation.id).then((data) => {
-        setDataReady(true);
-        return data;
-      }),
-    initialData: [] as LulinObservations[],
-  });
-
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
