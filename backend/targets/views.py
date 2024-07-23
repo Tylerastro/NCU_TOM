@@ -68,7 +68,7 @@ class TargetsView(APIView):
             return JsonResponse(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-    @extend_schema(request=DeleteTargetSerializer)
+    @extend_schema(request=DeleteTargetSerializer,)
     def delete(self, request):
         serializer = DeleteTargetSerializer(data=request.data)
         if not serializer.is_valid():
@@ -195,6 +195,7 @@ def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
         return Response(serializer.errors, status=400)
 
 
+@extend_schema(request=None, responses=TargetSimbadDataSerializer)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 def get_target_simbad(request, pk: int):
@@ -215,6 +216,7 @@ def get_target_simbad(request, pk: int):
         return Response({"error": "Target not found."}, status=404)
 
 
+@extend_schema(request=None, responses=TargetSEDSerializer)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 def get_target_SED(request, pk: int):
