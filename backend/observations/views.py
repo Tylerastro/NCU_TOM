@@ -4,6 +4,7 @@ from typing import List
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from helpers.models import Comments, Users
 from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
@@ -102,6 +103,7 @@ class ObservationsView(APIView):
 class ObservationDetailView(APIView):
     serializer_class = ObservationGetSerializer
 
+    @extend_schema(responses=ObservationGetSerializer, operation_id='Get Single Observation')
     def get(self, request, pk):
         if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
             observation = get_object_or_404(Observation, pk=pk)
@@ -111,6 +113,7 @@ class ObservationDetailView(APIView):
         serializer = ObservationGetSerializer(observation)
         return Response(serializer.data, status=200)
 
+    @extend_schema(operation_id='Delete Single Observation')
     def delete(self, request, pk):
         if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
             observation = get_object_or_404(Observation, pk=pk)
@@ -136,6 +139,7 @@ class ObservationDetailView(APIView):
 class LulinView(APIView):
     serializer_class = LulinGetSerializer
 
+    @extend_schema(responses=LulinGetSerializer, operation_id='Get Lulin by observation')
     def get(self, request, pk=None):
         conditions = []
         start_date = request.query_params.get('start_date')
@@ -168,38 +172,51 @@ class LulinView(APIView):
         serializer = LulinGetSerializer(observations, many=True)
         return Response(serializer.data, status=200)
 
+
+class LulinDetailView(APIView):
+    def get_lulin_object(self, pk, user):
+        if user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            return get_object_or_404(Lulin, pk=pk)
+        return get_object_or_404(Lulin, pk=pk, observation__user=user)
+
+    @extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
+    def get(self, request, pk):
+        lulin = self.get_lulin_object(pk, request.user)
+        serializer = LulinGetSerializer(lulin)
+        return Response(serializer.data, status=200)
+
     def put(self, request, pk):
-        lulin_instance = get_object_or_404(Lulin, pk=pk)
-        serializer = LulinPutSerializer(
-            lulin_instance, data=request.data, partial=True)
+        lulin = self.get_lulin_object(pk, request.user)
+        serializer = LulinPutSerializer(lulin, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=200)
+            return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
 
 @permission_classes((IsAuthenticated, ))
-class CodeView(APIView):
-    def get(self, request, id):
+class LulinCodeView(APIView):
+    @extend_schema(operation_id='Get or gen code for Lulin observation')
+    def get(self, request, pk):
         service = LulinScheduler()
         try:
             if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
-                lulin = Observation.objects.get(id=id)
+                lulin = Observation.objects.get(pk=pk)
             else:
-                lulin = Observation.objects.get(id=id, user=request.user)
+                lulin = Observation.objects.get(pk=pk, user=request.user)
         except Observation.DoesNotExist:
             return Response({"detail": "Observation not found"}, status=404)
 
         refresh = request.query_params.get('refresh')
         if refresh == 'true' or not lulin.code:
-            code = service.gen_code(observation_id=id)
+            code = service.gen_code(observation_id=pk)
             return HttpResponse(code, content_type='text/plain')
         else:
             return HttpResponse(lulin.code, content_type='text/plain')
 
 
 @api_view(['GET'])
-def GetCodes(request):
+def get_lulin_compiled_codes(request):
     if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
         return Response({"detail": "Unauthorized"}, status=401)
 
@@ -215,7 +232,7 @@ def GetCodes(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-def getObservationStats(request):
+def get_observation_stats(request):
     observations = Observation.objects.first()
     serializer = ObservationStatsSerializer(
         observations, context={'request': request})
@@ -225,7 +242,7 @@ def getObservationStats(request):
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
-def GetObservationAltAz(request, pk):
+def get_observation_altaz(request, pk):
     if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
         observation = Observation.objects.get(id=pk, user=request.user)
         observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(

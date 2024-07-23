@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from djoser.social.views import ProviderAuthView
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -106,6 +107,7 @@ class TagsView(APIView):
 
 
 class TagsDetailView(APIView):
+    @extend_schema(operation_id='Get Single Tag')
     def get(self, request, pk) -> Tags:
         try:
             tag = Tags.objects.get(id=pk, user=request.user)
@@ -117,11 +119,13 @@ class TagsDetailView(APIView):
 
 @permission_classes((AllowAny,))
 class AnnouncementsView(APIView):
+    @extend_schema(request=None, responses=AnnouncementsSerializer)
     def get(self, request) -> List[Announcements]:
         announcements = Announcements.objects.all()
         serializer = AnnouncementsSerializer(announcements, many=True)
         return Response(serializer.data, status=200)
 
+    @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def post(self, request):
         if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
@@ -132,6 +136,9 @@ class AnnouncementsView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+
+class AnnouncementsDetailView(APIView):
+    @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def put(self, request, pk):
         if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)

@@ -90,6 +90,7 @@ class TargetsView(APIView):
 
 
 class TargetDetailView(APIView):
+    @extend_schema(operation_id='Get Single Target')
     def get(self, request, pk):
         if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
             target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)
@@ -99,6 +100,7 @@ class TargetDetailView(APIView):
         serializer = TargetGetSerializer(target)
         return Response(serializer.data, status=200)
 
+    @extend_schema(operation_id='Delete Single Target')
     def delete(self, request, pk):
         if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
             target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)

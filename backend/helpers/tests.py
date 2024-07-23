@@ -377,13 +377,13 @@ class ViewsTestCase(TestCase):
         self.client.force_authenticate(user=self.faculty_user)
         data = {'title': 'Updated Test', 'context': 'Updated Content'}
         response = self.client.put(
-            f'/api/announcements/{announcement.id}/edit/', data, format='json')
+            f'/api/announcements/{announcement.id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Test DELETE (admin user)
         self.client.force_authenticate(user=self.admin_user)
         response = self.client.delete(
-            f'/api/announcements/{announcement.id}/delete/')
+            f'/api/announcements/{announcement.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_user_view(self):

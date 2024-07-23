@@ -452,14 +452,15 @@ class LulinViewTestCase(TestCase):
         )
 
     def test_get_lulin(self):
-        response = self.client.get('/api/observations/lulin/')
+        response = self.client.get(
+            f'/api/observations/{self.observation.id}/lulin/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_update_lulin(self):
         data = {'some_field': 'Updated Value'}
         response = self.client.put(
-            f'/api/observations/{self.lulin.id}/lulin/', data)
+            f'/api/observations/lulin/{self.lulin.id}/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lulin.refresh_from_db()
 
@@ -490,7 +491,7 @@ class CodeViewTestCase(TestCase):
         )
 
     def test_get_code(self):
-        url = f'/api/observations/lulin/{self.observation.id}/code/'
+        url = f'/api/observations/{self.observation.id}/lulin/code/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(response.content)

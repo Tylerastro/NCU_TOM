@@ -3,8 +3,8 @@ from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
 from rest_framework import routers
 
-from .views import (AnnouncementsView, EditUserRole, LogoutView,
-                    TagsDetailView, TagsView, TomProviderAuthView,
+from .views import (AnnouncementsDetailView, AnnouncementsView, EditUserRole,
+                    LogoutView, TagsDetailView, TagsView, TomProviderAuthView,
                     TomTokenObtainPairView, TomTokenRefreshView,
                     TomTokenVerifyView, UserDetailView, UserView)
 
@@ -19,12 +19,10 @@ urlpatterns = [
     path("jwt/verify/", TomTokenVerifyView.as_view()),
     path("logout/", LogoutView.as_view(), name="Logout"),
     path("tags/", TagsView.as_view(), name="tags"),
-    path("announcements/", AnnouncementsView.as_view(), name="announcements"),
-    path("announcements/<int:pk>/edit/",
-         AnnouncementsView.as_view(), name="announcements"),
-    path("announcements/<int:pk>/delete/",
-         AnnouncementsView.as_view(), name="announcements"),
     path("tags/<int:pk>/", TagsDetailView.as_view(),),
+    path("announcements/", AnnouncementsView.as_view(), name="announcements"),
+    path("announcements/<int:pk>/",
+         AnnouncementsDetailView.as_view(), name="announcements"),
     path("list/users/", UserView.as_view()),
     path("user/<int:pk>/", EditUserRole),
     path("user/<int:pk>/edit/", UserDetailView.as_view()),
