@@ -9,6 +9,7 @@ import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
 import { getObservations } from "@/apis/observations/getObservations";
 import { Button } from "@/components/ui/button";
+import { getObservation } from "@/apis/observations/getObservation";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -27,8 +28,8 @@ export default function Lulin(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["getObservation", props.observation_id],
     queryFn: () =>
-      getObservations({ observationId: props.observation_id }).then((data) => {
-        return data.results[0] as Observation;
+      getObservation(props.observation_id).then((data) => {
+        return data;
       }),
   });
 

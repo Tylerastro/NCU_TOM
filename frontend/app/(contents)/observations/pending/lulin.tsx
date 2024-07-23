@@ -10,6 +10,7 @@ import Feeds from "./feeds";
 import LulinData from "./lulinData";
 import MoonAltAz from "./moonAltAz";
 import { Badge } from "@/components/ui/badge";
+import { getObservation } from "@/apis/observations/getObservation";
 
 function LoadingSkeleton() {
   return (
@@ -37,11 +38,10 @@ export default function Lulin(props: { observation_id: number }) {
     initialData: [] as LulinObservations[],
   });
 
-  const { data: observations } = useQuery({
+  const { data: observation } = useQuery({
     queryKey: ["getObservation"],
-    queryFn: () => getObservations({ observationId: props.observation_id }),
+    queryFn: () => getObservation(props.observation_id),
   });
-  const observation = observations?.results[0];
 
   return (
     <>

@@ -1,15 +1,15 @@
-import { getObservations } from "@/apis/observations/getObservations";
 import { Comments } from "@/models/helpers";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import React from "react";
 import { TextareaForm } from "./comments";
+import { getObservation } from "@/apis/observations/getObservation";
 export default function Feeds(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["observations", props.observation_id],
     queryFn: () =>
-      getObservations({ observationId: props.observation_id }).then((data) => {
-        return data.results[0];
+      getObservation(props.observation_id).then((data) => {
+        return data;
       }),
   });
   const sortedComments = React.useMemo(() => {

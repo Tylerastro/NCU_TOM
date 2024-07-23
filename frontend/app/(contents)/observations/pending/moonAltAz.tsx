@@ -1,5 +1,5 @@
 import { getObservationAltAz } from "@/apis/observations/getObservationAltAz";
-import { getObservations } from "@/apis/observations/getObservations";
+import { getObservation } from "@/apis/observations/getObservation";
 import { getMoonAltAz } from "@/apis/targets/getMoonAltAz";
 import { Observation } from "@/models/observations";
 import { TargetAltAz } from "@/models/targets";
@@ -31,8 +31,8 @@ export default function MoonAltAz(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["observation", props.observation_id],
     queryFn: async () =>
-      getObservations({ observationId: props.observation_id }).then((data) => {
-        return data.results[0];
+      getObservation(props.observation_id).then((data) => {
+        return data;
       }),
     initialData: {} as Observation,
   });

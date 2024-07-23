@@ -14,6 +14,7 @@ import { Observation } from "@/models/observations";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import PageContent from "./pageContent";
+import { getObservation } from "@/apis/observations/getObservation";
 
 function LoadingSkeleton() {
   return (
@@ -28,12 +29,14 @@ function LoadingSkeleton() {
 }
 
 export default function Page({ params }: { params: { id: number } }) {
-  const { data, isFetching } = useQuery({
+  const { data: observation, isFetching } = useQuery({
     queryKey: ["observations"],
-    queryFn: () => getObservations({ observationId: params.id }),
+    queryFn: () =>
+      getObservation(params.id).then((data) => {
+        return data;
+      }),
+    initialData: {} as Observation,
   });
-
-  const observation = data?.results[0] as Observation;
 
   const mutation = useMutation({
     mutationFn: (values: { status: number }) => {
