@@ -6,10 +6,7 @@ export const putObservation = async (
   observation: ObservationUpdate
 ) => {
   try {
-    const response = await api.put(
-      `/api/observations/${id}/edit/`,
-      observation
-    );
+    const response = await api.put(`/api/observations/${id}/`, observation);
     return response.data;
   } catch (error) {
     console.error(error);

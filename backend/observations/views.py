@@ -129,7 +129,7 @@ class ObservationDetailView(APIView):
             return Response(status=400)
         observation = get_object_or_404(Observation, pk=pk, user=request.user)
         serializer = ObservationPutSerializer(
-            observation, data=request.data, partial=True)
+            observation, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)

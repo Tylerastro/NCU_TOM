@@ -34,7 +34,6 @@ export default function PageContent({
 }: {
   observation: Observation;
 }) {
-  const [dataReady, setDataReady] = useState(false);
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -210,13 +209,9 @@ export default function PageContent({
         </Card>
       </div>
 
-      {dataReady ? (
-        <div className="flex justify-center w-full py-5">
-          <MoonAltAz observation_id={observation.id} />
-        </div>
-      ) : (
-        LoadingSkeleton()
-      )}
+      <div className="flex justify-center w-full py-5">
+        <MoonAltAz observation_id={observation.id} />
+      </div>
 
       <div className="grid grid-cols-2 gap-12 sm:grid-cols-2 py-6">
         <Feeds observation_id={observation.id} />
