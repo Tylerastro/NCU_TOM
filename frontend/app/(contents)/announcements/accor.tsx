@@ -22,7 +22,9 @@ export function AccordionAnnoucemnets() {
     <Accordion type="single" collapsible className="w-full">
       {announcements.map((item) => (
         <AccordionItem key={item.id} value={`item-${item.id}`}>
-          <AccordionTrigger>{item.title}</AccordionTrigger>
+          <AccordionTrigger className="scroll-m-20 text-lg font-bold tracking-tight lg:text-xl text-primary-foreground">
+            {item.title}
+          </AccordionTrigger>
           <AccordionDate>
             {item.created_at
               ? new Date(item.created_at).toLocaleDateString()

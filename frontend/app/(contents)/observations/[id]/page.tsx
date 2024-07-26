@@ -50,7 +50,7 @@ export default function Page({ params }: { params: { id: number } }) {
     <>
       <div className="flex space-between justify-between pb-10">
         <div>
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary-foreground">
+          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
             {isFetching ? <span className="loader"></span> : observation.name}
           </h1>
         </div>
