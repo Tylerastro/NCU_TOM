@@ -11,5 +11,9 @@ export default function ContentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={styles.contents}>{children}</div>;
+  return (
+    <div className={`${styles.contents} animate-page-transition`}>
+      {children}
+    </div>
+  );
 }
