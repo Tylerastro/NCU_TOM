@@ -2,6 +2,7 @@ import math
 from typing import List
 
 from astropy import units as u
+from astropy.constants import c
 from astropy.coordinates import SkyCoord
 from django.db import transaction
 from helpers.models import Tags
@@ -181,19 +182,33 @@ class TargetSEDSerializer(serializers.Serializer):
     flux = serializers.ListField(child=serializers.FloatField())
     fluxe = serializers.ListField(child=serializers.FloatField())
     fluxv = serializers.ListField(child=serializers.FloatField())
-    frequency = serializers.FloatField()
+    frequency = serializers.FloatField(
+        required=False, help_text="Frequency in GHz")
+    wavelength = serializers.FloatField(
+        required=False, help_text="Wavelength in micrometers")
 
     def to_internal_value(self, data):
         """
-        Converts incoming JSON data to a dictionary.
+        Converts incoming JSON data to a dictionary and handles wavelength/frequency conversion.
         """
-        return {
+        validated_data = {
             'filter': data.get('filter'),
             'flux': data.get('flux'),
             'fluxe': data.get('fluxe'),
-            'frequency': data.get('frequency'),
             'fluxv': data.get('fluxv'),
         }
+
+        frequency = data.get('frequency')
+
+        if frequency is not None:
+            validated_data['frequency'] = frequency
+            validated_data['wavelength'] = self.frequency_to_wavelength(
+                frequency)
+        else:
+            raise serializers.ValidationError(
+                "Frequency or wavelength must be provided.")
+
+        return validated_data
 
     def to_representation(self, instance):
         """
@@ -214,3 +229,15 @@ class TargetSEDSerializer(serializers.Serializer):
         if value is not None and (math.isinf(value) or math.isnan(value)):
             return None
         return value
+
+    def frequency_to_wavelength(self, frequency_ghz):
+        """
+        Convert frequency (in GHz) to wavelength (in micrometers).
+        """
+        return c.to('μm * GHz').value / frequency_ghz
+
+    def wavelength_to_frequency(self, wavelength_micron):
+        """
+        Convert wavelength (in micrometers) to frequency (in GHz).
+        """
+        return c.to('μm * GHz').value / wavelength_micron
