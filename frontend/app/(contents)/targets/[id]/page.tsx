@@ -8,6 +8,19 @@ import Image from "next/image";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 
+function formatCoordinate(
+  coordinate: string | undefined,
+  decimalPlaces: number
+): string {
+  if (!coordinate) {
+    return "0.00"; // Default value if coordinate is undefined
+  }
+  const parts = coordinate.split(":");
+  const lastPart = parseFloat(parts[2]).toFixed(decimalPlaces);
+  const formattedLastPart = lastPart.padStart(decimalPlaces + 3, "0");
+  return `${parts[0]}:${parts[1]}:${formattedLastPart}`;
+}
+
 export default function DashboardPage(params: { params: { id: number } }) {
   const { data: target } = useQuery({
     queryKey: ["targets"],
@@ -67,7 +80,10 @@ export default function DashboardPage(params: { params: { id: number } }) {
                         RA:
                       </span>
                       <span className="text-lg font-bold">
-                        {target?.coordinates?.split(" ")[0]}
+                        {formatCoordinate(
+                          target?.coordinates?.split(" ")[0],
+                          3
+                        )}
                       </span>
                     </div>
                     <div className="flex items-center justify-around">
@@ -75,7 +91,10 @@ export default function DashboardPage(params: { params: { id: number } }) {
                         Dec:
                       </span>
                       <span className="text-lg font-bold">
-                        {target?.coordinates?.split(" ")[1]}
+                        {formatCoordinate(
+                          target?.coordinates?.split(" ")[1],
+                          3
+                        )}
                       </span>
                     </div>
                   </CardContent>
@@ -160,7 +179,7 @@ export default function DashboardPage(params: { params: { id: number } }) {
                       strokeWidth="2"
                       className="h-4 w-4 text-muted-foreground"
                     >
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                   </CardHeader>
                   <CardContent>
