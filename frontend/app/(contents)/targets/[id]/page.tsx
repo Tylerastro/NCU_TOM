@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
+import AladinViewer from "./aladin";
 
 function formatCoordinate(
   coordinate: string | undefined,
@@ -196,7 +197,7 @@ export default function DashboardPage(params: { params: { id: number } }) {
                     <CardTitle>Overview</CardTitle>
                   </CardHeader>
                   <CardContent className="pl-2">
-                    <Overview />
+                    <AladinViewer coord={target?.coordinates} fov={5} />
                   </CardContent>
                 </Card>
                 <Card className="col-span-3">
