@@ -16,6 +16,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,21 +38,39 @@ function isHourAngleFormat(input: string) {
   const decMinSecPattern = /^(\+|-)?(\d{1,3}d)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
   const decimalPattern =
     /^(\+|-)?(\d{1,2})\s+(\d{1,2})\s+(\d{1,2}(\.\d+)?)\s*$/;
+  const colonSeparatedPattern =
+    /^(-?\d{1,2}:\d{2}:\d{2}(\.\d+)?)(\s+(-?\d{1,2}:\d{2}:\d{2}(\.\d+)?))?$/;
 
   return (
     hourMinSecPattern.test(input) ||
     decMinSecPattern.test(input) ||
-    decimalPattern.test(input)
+    decimalPattern.test(input) ||
+    colonSeparatedPattern.test(input)
   );
 }
 
 function convertHourAngleToDegrees(hourAngle: unknown) {
-  console.log(hourAngle);
   if (typeof hourAngle !== "string") {
-    return Error("Invalid hour angle format");
+    return Error("Invalid hour angle type");
   }
-  if (!isHourAngleFormat(hourAngle)) {
+
+  hourAngle.trim(); // Trim the input
+
+  if (typeof hourAngle === "string" && !isHourAngleFormat(hourAngle)) {
     return parseFloat(hourAngle);
+  }
+
+  // Handle colon-separated format
+  if (typeof hourAngle === "string" && hourAngle.includes(":")) {
+    const [ra, dec] = hourAngle.split(/\s+/);
+    if (ra && !dec) {
+      // Only RA is provided
+      const [hours, minutes, seconds] = ra.split(":").map(parseFloat);
+      return (hours + minutes / 60 + seconds / 3600) * 15;
+    }
+    // If both RA and Dec are provided, we assume it's the RA part
+    const [hours, minutes, seconds] = ra.split(":").map(parseFloat);
+    return (hours + minutes / 60 + seconds / 3600) * 15;
   }
 
   const parts = hourAngle.split(/:|h|m|s|\s/).slice(0, 3); // Match colon, h, m, s, or whitespace
@@ -62,34 +81,53 @@ function convertHourAngleToDegrees(hourAngle: unknown) {
   const hours = parseFloat(parts[0]);
   const minutes = parseFloat(parts[1]);
   const seconds = parseFloat(parts[2]);
-  console.log(hours, minutes, seconds);
 
   const degrees = (hours + minutes / 60 + seconds / 3600) * 15;
   return degrees;
 }
 
-function convertSexagesimalDegreesToDecimal(sexagesimal: unknown) {
+function convertSexagesimalDegreesToDecimal(
+  sexagesimal: unknown
+): number | Error {
   if (typeof sexagesimal !== "string") {
     return Error("Invalid sexagesimal format");
   }
-  if (!isHourAngleFormat(sexagesimal)) {
+
+  sexagesimal.trim(); // Trim the input
+
+  if (typeof sexagesimal === "string" && !isHourAngleFormat(sexagesimal)) {
     return parseFloat(sexagesimal);
   }
 
-  const parts = sexagesimal
-    .slice(0, -1)
-    .split(/:|d|m|s|\s/)
-    .slice(0, 3);
-  if (parts.length !== 3) {
+  // Remove any whitespace and replace degree/minute/second symbols
+  const cleanedInput = sexagesimal.replace(/[°'"]/g, "");
+
+  // Determine the sign
+  const isNegative = cleanedInput.startsWith("-");
+  const sign = isNegative ? -1 : 1;
+
+  // Remove the sign for parsing
+  const unsignedInput = isNegative ? cleanedInput.slice(1) : cleanedInput;
+
+  let parts: string[];
+
+  // Handle colon-separated format
+  if (unsignedInput.includes(":")) {
+    parts = unsignedInput.split(":");
+  } else {
+    // Handle space-separated or dms format
+    parts = unsignedInput.split(/\s+|[dms]/).filter(Boolean);
+  }
+
+  if (parts.length < 1 || parts.length > 3) {
     return Error("Invalid sexagesimal format");
   }
 
-  const degrees = parseFloat(parts[0]);
-  const minutes = parseFloat(parts[1]);
-  const seconds = parseFloat(parts[2]);
-  const decimalDegrees = degrees + minutes / 60 + seconds / 3600;
-  console.log(degrees, minutes, seconds);
-  return decimalDegrees;
+  const degrees = parseFloat(parts[0]) || 0;
+  const minutes = parts.length > 1 ? parseFloat(parts[1]) || 0 : 0;
+  const seconds = parts.length > 2 ? parseFloat(parts[2]) || 0 : 0;
+
+  return sign * (degrees + minutes / 60 + seconds / 3600);
 }
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
@@ -111,7 +149,9 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   });
 
   const formSchema = z.object({
-    name: z.string({ required_error: "Name is required" }),
+    name: z.string().min(1, {
+      message: "Name is required",
+    }),
     ra: z.preprocess(
       convertHourAngleToDegrees,
       z
@@ -186,6 +226,9 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage>
+                    {form.formState.errors.name?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -231,6 +274,10 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage>
+                      {" "}
+                      {form.formState.errors.ra?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -275,6 +322,10 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage>
+                      {" "}
+                      {form.formState.errors.dec?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
