@@ -8,6 +8,10 @@ import Image from "next/image";
 import { Overview } from "./overview";
 import { RecentSales } from "./recent-sales";
 import AladinViewer from "./aladin";
+import React, { useInsertionEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Edit2, Check, MapPinned } from "lucide-react";
 
 function formatCoordinate(
   coordinate: string | undefined,
@@ -23,10 +27,27 @@ function formatCoordinate(
 }
 
 export default function DashboardPage(params: { params: { id: number } }) {
-  const { data: target } = useQuery({
-    queryKey: ["targets"],
+  const { data: target, refetch } = useQuery({
+    queryKey: ["targets", params.params.id],
     queryFn: () => getTarget(params.params.id),
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedRA, setEditedRA] = useState(target?.coordinates?.split(" ")[0]);
+  const [editedDec, setEditedDec] = useState(
+    target?.coordinates?.split(" ")[1]
+  );
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = async () => {
+    // Here you would typically call an API to update the coordinates
+    // For now, we'll just update the local state and refetch the data
+    setIsEditing(false);
+    await refetch();
+  };
 
   return (
     <>
@@ -55,48 +76,58 @@ export default function DashboardPage(params: { params: { id: number } }) {
                     <CardTitle className="text-sm font-medium">
                       Coords
                     </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={isEditing ? handleSaveClick : handleEditClick}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                      />
-                    </svg>
+                      {isEditing ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <MapPinned className="h-4 w-4" />
+                      )}
+                    </Button>
                   </CardHeader>
                   <CardContent className="grid grid-rows-2 gap-2">
                     <div className="flex items-center justify-around">
                       <span className="text-sm font-medium text-muted-foreground mr-2">
                         RA:
                       </span>
-                      <span className="text-lg font-bold">
-                        {formatCoordinate(
-                          target?.coordinates?.split(" ")[0],
-                          3
-                        )}
-                      </span>
+                      {isEditing ? (
+                        <Input
+                          value={editedRA}
+                          onChange={(e) => setEditedRA(e.target.value)}
+                          placeholder={target?.coordinates?.split(" ")[0]}
+                          className="w-32 text-right"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold">
+                          {formatCoordinate(
+                            target?.coordinates?.split(" ")[0],
+                            3
+                          )}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center justify-around">
                       <span className="text-sm font-medium text-muted-foreground mr-2">
                         Dec:
                       </span>
-                      <span className="text-lg font-bold">
-                        {formatCoordinate(
-                          target?.coordinates?.split(" ")[1],
-                          3
-                        )}
-                      </span>
+                      {isEditing ? (
+                        <Input
+                          value={editedDec}
+                          onChange={(e) => setEditedDec(e.target.value)}
+                          placeholder={target?.coordinates?.split(" ")[1]}
+                          className="w-32 text-right"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold">
+                          {formatCoordinate(
+                            target?.coordinates?.split(" ")[1],
+                            3
+                          )}
+                        </span>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -191,24 +222,13 @@ export default function DashboardPage(params: { params: { id: number } }) {
                   </CardContent>
                 </Card>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
+              <div className="grid max-xl: gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="col-span-7">
                   <CardHeader>
                     <CardTitle>Overview</CardTitle>
                   </CardHeader>
-                  <CardContent className="pl-2">
-                    <AladinViewer coord={target?.coordinates} fov={5} />
-                  </CardContent>
-                </Card>
-                <Card className="col-span-3">
-                  <CardHeader>
-                    <CardTitle>Recent Observations</CardTitle>
-                    {/* <CardDescription>
-                      You made 265 sales this month.
-                    </CardDescription> */}
-                  </CardHeader>
-                  <CardContent>
-                    <RecentSales />
+                  <CardContent className="p-2">
+                    <AladinViewer coord={target?.coordinates} fov={1.5} />
                   </CardContent>
                 </Card>
               </div>
