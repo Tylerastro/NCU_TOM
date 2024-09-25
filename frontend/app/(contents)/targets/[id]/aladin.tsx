@@ -22,7 +22,7 @@ interface AladinLiteProps {
 const AladinLite: React.FC<AladinLiteProps> = ({
   aspectRatio = "4/3",
   maxWidth = "100%",
-  fov = 360,
+  fov = 1,
   projection = "AIT",
   cooFrame = "equatorial",
   showCooGridControl = true,

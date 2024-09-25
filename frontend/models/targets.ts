@@ -16,6 +16,11 @@ export interface Target {
   notes?: string;
 }
 
+export interface PutTarget {
+  ra: number;
+  dec: number;
+  tags: Tag[];
+}
 interface AltAzData {
   time: string;
   alt: number;
