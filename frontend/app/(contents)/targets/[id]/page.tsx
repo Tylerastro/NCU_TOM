@@ -8,7 +8,7 @@ import { Check, MapPinned } from "lucide-react";
 import { getTarget } from "@/apis/targets/getTarget";
 import { putTarget } from "@/apis/targets/putTarget";
 import { PutTarget, Target } from "@/models/targets";
-import { CoordCard, PhotometryCard } from "./cards";
+import { CoordCard, ExternalLinksCard, SimbadCard } from "./cards";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,12 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
   const { data: target, refetch } = useQuery({
     queryKey: ["targets", params.id],
     queryFn: () => getTarget(params.id),
+  });
+
+  const { data: simbadData } = useQuery({
+    queryKey: ["targets", params.id, "simbad"],
+    queryFn: () => getTargetSimbad(params.id),
+    enabled: !!target,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -165,11 +171,12 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
                   )}
                 </CardContent>
               </Card>
-              {PhotometryCard()}
+              {/* External Links Card */}
+              <ExternalLinksCard />
             </div>
             {/* Aladin Viewer */}
             <div className="grid max-xl: gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-7">
+              <Card className="col-span-6">
                 <CardHeader>
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
@@ -177,6 +184,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
                   <AladinViewer coord={target?.coordinates} fov={1.5} />
                 </CardContent>
               </Card>
+              <SimbadCard data={simbadData} />
             </div>
           </TabsContent>
         </Tabs>

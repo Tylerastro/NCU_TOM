@@ -7,12 +7,14 @@ import { Check, MapPinned } from "lucide-react";
 
 import { getTarget } from "@/apis/targets/getTarget";
 import { putTarget } from "@/apis/targets/putTarget";
-import { PutTarget, Target } from "@/models/targets";
+import { PutTarget, Target, TargetSimbad } from "@/models/targets";
 
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getTargetSimbad } from "@/apis/targets/getTargetSimbad";
+import { Badge } from "@/components/ui/badge";
 
 function formatCoordinate(
   coordinate: string | undefined,
@@ -93,15 +95,85 @@ function CoordCard(
   );
 }
 
-function PhotometryCard() {
+function ExternalLinksCard() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Photometry</CardTitle>
+        <CardTitle className="text-sm font-medium">External Links</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-rows-2 gap-2"></CardContent>
+      <CardContent className="grid grid-rows-2 gap-2">
+        <div className="flex items-center justify-around">
+          <span className="text-sm font-medium text-muted-foreground mr-2">
+            Simbad:
+          </span>
+        </div>
+        <div className="flex items-center justify-around">
+          <span className="text-sm font-medium text-muted-foreground mr-2">
+            NED:
+          </span>
+        </div>
+      </CardContent>
     </Card>
   );
 }
 
-export { CoordCard, PhotometryCard };
+interface PhotometryCardProps {
+  simbadData: TargetSimbad;
+}
+
+const PhotometryCard: React.FC<PhotometryCardProps> = ({ simbadData }) => {
+  const photometryData = [
+    { label: "U", value: simbadData.flux_U },
+    { label: "B", value: simbadData.flux_B },
+    { label: "V", value: simbadData.flux_V },
+    { label: "R", value: simbadData.flux_R },
+    { label: "I", value: simbadData.flux_I },
+    { label: "J", value: simbadData.flux_J },
+    { label: "H", value: simbadData.flux_H },
+    { label: "K", value: simbadData.flux_K },
+    { label: "u", value: simbadData.flux_u },
+    { label: "g", value: simbadData.flux_g },
+    { label: "r", value: simbadData.flux_r },
+    { label: "i", value: simbadData.flux_i },
+    { label: "z", value: simbadData.flux_z },
+  ];
+
+  return (
+    <Card className="col-span-1 overflow-hidden">
+      <CardHeader className="bg-primary/10 pb-2">
+        <CardTitle className="  text-primary-foreground">Photometry</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <Table>
+          <TableBody>
+            {photometryData.map(
+              ({ label, value }) =>
+                value !== null &&
+                value !== undefined && (
+                  <TableRow key={label}>
+                    <TableCell className="font-medium text-sm py-2 prevent-select">
+                      {label}
+                    </TableCell>
+                    <TableCell className="text-right py-2">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs font-mono prevent-select"
+                      >
+                        {value.toFixed(2)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                )
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
+function SimbadCard({ data }: { data?: TargetSimbad }) {
+  return data ? <PhotometryCard simbadData={data} /> : null;
+}
+
+export { CoordCard, ExternalLinksCard, SimbadCard };
