@@ -1,5 +1,5 @@
 import { Paginator } from "@/models/helpers";
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 interface GetTargetsOptions {
   page?: number;

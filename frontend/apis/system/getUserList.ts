@@ -1,5 +1,5 @@
 import { UserProfile } from "@/models/users";
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const getUserList = async (): Promise<UserProfile[]> => {
   try {

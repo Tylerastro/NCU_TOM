@@ -1,5 +1,5 @@
 import { Announcements } from "@/models/helpers";
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const createAnnouncement = async (newAnnouncement: Announcements) => {
   try {

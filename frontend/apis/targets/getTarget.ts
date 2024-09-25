@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { Target } from "@/models/targets";
 
 export const getTarget = async (targetId: number): Promise<Target> => {

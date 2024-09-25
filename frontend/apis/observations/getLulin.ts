@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { LulinObservations } from "@/models/observations";
 
 export const getLulin = async (id: number): Promise<LulinObservations[]> => {

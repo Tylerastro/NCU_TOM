@@ -1,4 +1,4 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const editUserRole = async (userID: number, role: number) => {
   try {

@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { Tag } from "@/models/helpers";
 export const getTags = async (): Promise<Tag[]> => {
   try {

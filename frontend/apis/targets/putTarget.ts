@@ -1,5 +1,5 @@
 import { PutTarget, Target } from "@/models/targets";
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const putTarget = async (target_id: number, target: PutTarget) => {
   try {

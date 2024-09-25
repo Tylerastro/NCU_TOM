@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { NewTag } from "@/models/helpers";
 
 export const createNewTag = async (tag: NewTag) => {

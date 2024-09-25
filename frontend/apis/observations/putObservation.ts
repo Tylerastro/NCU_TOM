@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { ObservationUpdate } from "@/models/observations";
 
 export const putObservation = async (

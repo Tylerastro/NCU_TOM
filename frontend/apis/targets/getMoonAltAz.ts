@@ -1,4 +1,4 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const getMoonAltAz = async (start_time: string, end_time: string) => {
   try {

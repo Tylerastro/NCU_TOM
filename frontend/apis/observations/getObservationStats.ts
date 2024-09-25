@@ -1,5 +1,5 @@
 import { ObservationStats } from "@/models/observations";
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const getObservationStats = async (): Promise<ObservationStats> => {
   try {

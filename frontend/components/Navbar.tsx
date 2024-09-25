@@ -33,10 +33,10 @@ const pages = [
 
 function NavBar() {
   return (
-    <div className="w-full h-16 max-w-12xl px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
+    <div className="w-full min-w-0 h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
       <Logo />
       <div>
-        <nav className="flex">
+        <nav className="flex ">
           {pages.map((page) => (
             <Button
               disabled={!page.enabled}

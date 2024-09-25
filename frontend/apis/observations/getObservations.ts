@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { Paginator } from "@/models/helpers";
 
 interface GetObservationsOptions {

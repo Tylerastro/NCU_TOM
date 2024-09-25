@@ -1,4 +1,4 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const deleteObservation = async (observationIds: number[]) => {
   try {

@@ -1,4 +1,4 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 import { UserUpdate } from "@/models/users";
 
 export const updateUser = async (userId: number, data: UserUpdate) => {

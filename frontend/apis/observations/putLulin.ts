@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { LulinObservationsUpdate } from "@/models/observations";
 
 export const putLulin = async (

@@ -1,4 +1,5 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
+
 import { format, toZonedTime } from "date-fns-tz";
 import { addDays } from "date-fns";
 

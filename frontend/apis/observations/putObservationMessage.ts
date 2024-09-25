@@ -1,4 +1,4 @@
-import api from "../axiosAuth";
+import api from "@/apis/axios";
 
 export const postObservationMessages = async (id: number, message: string) => {
   try {
