@@ -146,10 +146,6 @@ export default function ObservationsTable() {
     : [];
 
   useEffect(() => {
-    console.log(isFetchingData);
-    console.log(tagIsFetching);
-    console.log(userIsFetching);
-    console.log(observationStatIsFetching);
     setIsLoading(
       isFetchingData ||
         tagIsFetching ||

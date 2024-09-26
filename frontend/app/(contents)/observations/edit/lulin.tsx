@@ -15,11 +15,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import LulinData from "./lulinData";
-import MoonAltAz from "./moonAltAz";
-import { getObservations } from "@/apis/observations/getObservations";
 import { Button } from "@/components/ui/button";
 import { getObservation } from "@/apis/observations/getObservation";
 import { NewTargetLulinForm } from "./newlulinForm";
+import AltChart from "@/components/AltitudePlot";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -84,7 +83,7 @@ export default function Lulin(props: { observation_id: number }) {
         {isFetching ? (
           <LoadingSkeleton />
         ) : (
-          <MoonAltAz observation_id={props.observation_id} />
+          <AltChart observation_id={props.observation_id} />
         )}
 
         <div className="flex flex-col items-center py-4">

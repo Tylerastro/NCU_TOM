@@ -8,9 +8,9 @@ import { useState } from "react";
 import CodeBlock from "./codeblock";
 import Feeds from "./feeds";
 import LulinData from "./lulinData";
-import MoonAltAz from "./moonAltAz";
 import { Badge } from "@/components/ui/badge";
 import { getObservation } from "@/apis/observations/getObservation";
+import AltChart from "@/components/AltitudePlot";
 
 function LoadingSkeleton() {
   return (
@@ -159,7 +159,7 @@ export default function Lulin(props: { observation_id: number }) {
 
       {dataReady ? (
         <div className="flex justify-center w-full py-5">
-          <MoonAltAz observation_id={props.observation_id} />
+          <AltChart observation_id={props.observation_id} />
         </div>
       ) : (
         LoadingSkeleton()
