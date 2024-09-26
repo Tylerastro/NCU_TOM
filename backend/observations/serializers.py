@@ -6,7 +6,8 @@ from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
 from rest_framework import serializers
 from targets.serializers import TargetGetSerializer
 
-from .models import Lulin, Observation, Target
+from .models import (LulinRun, Observation, Observatories, Priorities,
+                     Statuses, Target)
 
 
 class ObservationGetSerializer(serializers.ModelSerializer):
@@ -75,8 +76,8 @@ class ObservationPostSerializer(serializers.ModelSerializer):
 
         for target_instance in targets_data:
             observation.targets.add(target_instance)
-            if observation.observatory == Observation.observatories.LULIN:
-                Lulin.objects.get_or_create(
+            if observation.observatory == Observatories.LULIN:
+                LulinRun.objects.get_or_create(
                     observation=observation,
                     target=target_instance,
                     start_date=observation.start_date,
@@ -128,7 +129,7 @@ class LulinGetSerializer(serializers.ModelSerializer):
     observation = serializers.SerializerMethodField()
 
     class Meta:
-        model = Lulin
+        model = LulinRun
         fields = "__all__"
 
     def get_observation(self, obj):
@@ -137,7 +138,7 @@ class LulinGetSerializer(serializers.ModelSerializer):
 
 class LulinPutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lulin
+        model = LulinRun
         fields = "__all__"
 
 
@@ -146,9 +147,9 @@ class LulinPostSerializer(serializers.ModelSerializer):
         many=True, queryset=Target.objects.all())
 
     class Meta:
-        model = Lulin
-        fields = ('priority', 'filters', 'binning', 'frames',
-                  'instruments', 'exposure_time', 'targets')
+        model = LulinRun
+        fields = ('priority', 'filter', 'binning', 'frames',
+                  'instrument', 'exposure_time', 'targets')
         extra_kwargs = {
             'targets': {'required': False, 'read_only': True},
         }
@@ -170,7 +171,7 @@ class LulinPostSerializer(serializers.ModelSerializer):
 
         lulin_instances = []
         for target_instance in targets_data:
-            lulin = Lulin.objects.create(
+            lulin = LulinRun.objects.create(
                 observation=observation,
                 target=target_instance,
                 **validated_data
@@ -209,7 +210,7 @@ class ObservationStatsSerializer(serializers.Serializer):
         return [
             {
                 'id': item['observatory'],
-                'name': dict(Observation.observatories.choices).get(item['observatory'], 'Unknown'),
+                'name': item['observatory'],
                 'count': item['count']
             } for item in counts
         ]
@@ -217,10 +218,13 @@ class ObservationStatsSerializer(serializers.Serializer):
     def get_priority_counts(self):
         counts = Observation.objects.values(
             'priority').annotate(count=Count('priority'))
+
+        priority_map = dict(Priorities.choices)
+
         return [
             {
                 'id': item['priority'],
-                'name': dict(Observation.priorities.choices).get(item['priority'], 'Unknown'),
+                'name': priority_map.get(item['priority'], 'Unknown'),
                 'count': item['count']
             } for item in counts
         ]
@@ -228,10 +232,11 @@ class ObservationStatsSerializer(serializers.Serializer):
     def get_status_counts(self):
         counts = Observation.objects.values(
             'status').annotate(count=Count('status'))
+        status_map = dict(Observation.statuses.choices)
         return [
             {
                 'id': item['status'],
-                'name': dict(Observation.statuses.choices).get(item['status'], 'Unknown'),
+                'name': status_map.get(item['status'], 'Unknown'),
                 'count': item['count']
             } for item in counts
         ]

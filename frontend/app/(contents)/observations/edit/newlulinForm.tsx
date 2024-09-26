@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { LulinFilter, LulinInstrument } from "@/models/enums";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -28,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
 import { Priority } from "@/models/enums";
-import { LulinObservations, Observation } from "@/models/observations";
+import { LulinRuns, Observation } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -77,16 +78,16 @@ const instruments = [
 const formSchema = z.object({
   targets: z.array(z.number()).min(1, { message: "Please select targets" }),
   priority: z.number().transform(Number),
-  filters: z.record(z.boolean()).default({}),
+  filter: z.number(),
   binning: z.coerce.number().int().min(1).default(1),
   frames: z.coerce.number().int().min(1).default(1),
-  instruments: z.record(z.boolean()).default({}),
+  instrument: z.number(),
   exposure_time: z.coerce.number().int().default(10),
   start_date: z.date(),
   end_date: z.date(),
 });
 
-export function NewTargetLulinForm({
+export function NewLulinRun({
   observation,
   refetch,
 }: {
@@ -97,20 +98,10 @@ export function NewTargetLulinForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       priority: Priority.MEDIUM,
-      filters: {
-        u: true,
-        g: true,
-        r: true,
-        i: true,
-        z: true,
-      },
+      filter: 1,
       binning: 1,
       frames: 1,
-      instruments: {
-        LOT: true,
-        SLT: true,
-        TRIPOL: true,
-      },
+      instrument: 1,
       exposure_time: 30,
       start_date: new Date(observation.start_date),
       end_date: new Date(observation.end_date),
@@ -175,43 +166,38 @@ export function NewTargetLulinForm({
         />{" "}
         <FormField
           control={form.control}
-          name="filters"
+          name="filter"
           render={() => (
             <FormItem>
               <div className="mb-4">
                 <FormLabel className="text-base">Filters</FormLabel>
               </div>
               <div className="flex gap-3">
-                {filters.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="filters"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.[item.id] ?? false}
-                              onCheckedChange={(checked) => {
-                                field.onChange({
-                                  ...field.value,
-                                  [item.id]: checked,
-                                });
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                {Object.entries(LulinFilter)
+                  .filter(([key]) => isNaN(Number(key)))
+                  .map(([key, value]) => (
+                    <FormField
+                      key={key}
+                      control={form.control}
+                      name="filter"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={key}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value === value}
+                                onCheckedChange={() => field.onChange(value)}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{key}</FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
               </div>
             </FormItem>
           )}
@@ -269,42 +255,37 @@ export function NewTargetLulinForm({
           />
           <FormField
             control={form.control}
-            name="instruments"
+            name="instrument"
             render={() => (
               <FormItem>
                 <div className="mb-4">
                   <FormLabel className="text-base">Instruments</FormLabel>
                 </div>
-                {instruments.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="instruments"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.[item.id] ?? false}
-                              onCheckedChange={(checked) => {
-                                field.onChange({
-                                  ...field.value,
-                                  [item.id]: checked,
-                                });
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                {Object.entries(LulinInstrument)
+                  .filter(([key]) => isNaN(Number(key)))
+                  .map(([key, value]) => (
+                    <FormField
+                      key={key}
+                      control={form.control}
+                      name="instrument"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={key}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value === value}
+                                onCheckedChange={() => field.onChange(value)}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{key}</FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
               </FormItem>
             )}
           />

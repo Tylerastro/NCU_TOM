@@ -5,7 +5,7 @@ from typing import List
 import astropy.units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
-from observations.models import Lulin, Observation
+from observations.models import LulinRun, Observation
 from targets.models import Target
 from targets.visibility import Visibility
 
@@ -74,7 +74,7 @@ class LulinScheduler:
         return schedule
 
     def gen_code(self, observation_id):
-        observations = Lulin.objects.filter(
+        observations = LulinRun.objects.filter(
             observation=observation_id)
 
         code = ""
@@ -85,13 +85,13 @@ class LulinScheduler:
             exposure = ""
             filters = ""
 
-            for key in ['u', 'g', 'r', 'i', 'z']:
-                val = obs.filters.get(key, False)
-                if val:
-                    filters += self.get_filter_full_name(key) + ","
-                    binning += str(obs.binning) + ","
-                    frames += str(obs.frames) + ","
-                    exposure += str(obs.exposure_time) + ","
+            if not obs.filter:
+                continue
+            if obs.filter:
+                filters += obs.get_filter_display() + ","
+                binning += str(obs.binning) + ","
+                frames += str(obs.frames) + ","
+                exposure += str(obs.exposure_time) + ","
 
             tmp = f"""
 #REPEAT 1

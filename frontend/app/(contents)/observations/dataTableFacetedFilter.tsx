@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Status } from "@/models/enums";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/components/utils";
 import { Tag } from "@/models/helpers";

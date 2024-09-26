@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
-from helpers.models import Tags, Users
+from helpers.models import Tags, User
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -18,7 +18,7 @@ class TargetModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = Users.objects.create(
+        cls.user = User.objects.create(
             username='basic user', password='12345', email='basicuser@example.com')
         cls.target = Target.objects.create(
             user=cls.user,
@@ -28,10 +28,10 @@ class TargetModelTest(TestCase):
             redshift=0.5,
             notes="Test notes"
         )
-        cls.demo_user = Users.objects.create(username='testuser', password='12345', email='a@a.com', role=Users.roles.USER, use_demo_targets=True,
-                                             institute='testinstitute', first_name='testfirst', last_name='testlast')
-        cls.no_demo_user = Users.objects.create(username='userNoDemo', password='12345', email='b@b.com', role=Users.roles.USER, use_demo_targets=False,
-                                                institute='testinstitute', first_name='testfirst', last_name='testlast')
+        cls.demo_user = User.objects.create(username='testuser', password='12345', email='a@a.com', role=User.roles.USER, use_demo_targets=True,
+                                            institute='testinstitute', first_name='testfirst', last_name='testlast')
+        cls.no_demo_user = User.objects.create(username='userNoDemo', password='12345', email='b@b.com', role=User.roles.USER, use_demo_targets=False,
+                                               institute='testinstitute', first_name='testfirst', last_name='testlast')
 
         test_tag = Tags.objects.create(name='testtag', user=cls.demo_user)
         target = Target.objects.create(
@@ -61,10 +61,10 @@ class TargetModelTest(TestCase):
         self.assertEqual(str(target), target.name)
 
     def test_user_has_targets(self):
-        user = Users.objects.get(username='testuser')
+        user = User.objects.get(username='testuser')
         self.assertTrue(user.targets.exists())
 
-        user_no_demo = Users.objects.get(username='userNoDemo')
+        user_no_demo = User.objects.get(username='userNoDemo')
         self.assertFalse(user_no_demo.targets.exists())
 
     def test_field_max_lengths(self):
@@ -157,10 +157,10 @@ class TargetModelTest(TestCase):
 class TargetApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = Users.objects.create_user(
+        self.user = User.objects.create_user(
             username='testuser', password='testpass', email='test@example.com', use_demo_targets=False)
-        self.admin_user = Users.objects.create_user(
-            username='adminuser', password='adminpass', email='admin@example.com', role=Users.roles.ADMIN, use_demo_targets=False)
+        self.admin_user = User.objects.create_user(
+            username='adminuser', password='adminpass', email='admin@example.com', role=User.roles.ADMIN, use_demo_targets=False)
         self.client.force_authenticate(user=self.user)
 
         self.target = Target.objects.create(

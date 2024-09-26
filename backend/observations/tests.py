@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, patch
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from helpers.models import Tags, Users
-from observations.models import Lulin, Observation, Target
+from helpers.models import Tags, User
+from observations.models import LulinRun, Observation, Target
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -19,14 +19,14 @@ class TestObservationModel(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
             'use_demo_targets': False,
             'is_superuser': True
         }
-        self.user = Users.objects.create(**user_profile)
+        self.user = User.objects.create(**user_profile)
         self.target = Target.objects.create(
             name="Test Target", user=self.user, ra=12, dec=34)
         self.start_date = timezone.now() + timedelta(hours=+1)
@@ -150,14 +150,14 @@ class TestLulinModel(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
             'use_demo_targets': False,
             'is_superuser': True
         }
-        self.user = Users.objects.create(**user_profile)
+        self.user = User.objects.create(**user_profile)
         self.target = Target.objects.create(
             name="Test Target", user=self.user, ra=12, dec=34)
         self.observation = Observation.objects.create(
@@ -167,18 +167,18 @@ class TestLulinModel(TestCase):
         )
 
     def test_lulin_creation(self):
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target
         )
         self.assertIsNotNone(lulin.pk)
-        self.assertEqual(lulin.priority, Lulin.priorities.LOW)
+        self.assertEqual(lulin.priority, LulinRun.priorities.LOW)
         self.assertEqual(lulin.binning, 1)
         self.assertEqual(lulin.frames, 1)
         self.assertEqual(lulin.exposure_time, 10)
 
     def test_default_filters(self):
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target
         )
@@ -187,7 +187,7 @@ class TestLulinModel(TestCase):
         self.assertEqual(lulin.filters, expected_filters)
 
     def test_default_instruments(self):
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target
         )
@@ -197,7 +197,7 @@ class TestLulinModel(TestCase):
     def test_custom_filters(self):
         custom_filters = {'u': False, 'g': True,
                           'r': True, 'i': False, 'z': True}
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
             filters=custom_filters
@@ -206,7 +206,7 @@ class TestLulinModel(TestCase):
 
     def test_custom_instruments(self):
         custom_instruments = {'LOT': False, 'SLT': True, 'TRIPOL': True}
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
             instruments=custom_instruments
@@ -214,15 +214,15 @@ class TestLulinModel(TestCase):
         self.assertEqual(lulin.instruments, custom_instruments)
 
     def test_priority_choices(self):
-        lulin = Lulin.objects.create(
+        lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            priority=Lulin.priorities.HIGH
+            priority=LulinRun.priorities.HIGH
         )
-        self.assertEqual(lulin.priority, Lulin.priorities.HIGH)
+        self.assertEqual(lulin.priority, LulinRun.priorities.HIGH)
 
         with self.assertRaises(ValidationError):
-            observation = Lulin.objects.create(
+            observation = LulinRun.objects.create(
                 observation=self.observation,
                 target=self.target,
                 priority=10  # Invalid priority
@@ -235,7 +235,7 @@ class ObservationsViewTestCase(TestCase):
         self.client = APIClient()
 
         # Create a test user
-        self.user = Users.objects.create_user(
+        self.user = User.objects.create_user(
             username='testuser', password='testpass', email='test@example.com', use_demo_targets=False)
         self.client.force_authenticate(user=self.user)
 
@@ -335,7 +335,7 @@ class LulinSchedulerTestCase(TestCase):
     def setUp(self):
         self.scheduler = LulinScheduler()
 
-        self.user = Users.objects.create_user(
+        self.user = User.objects.create_user(
             username='testuser', password='testpass', email='test@example.com', use_demo_targets=False)
         # Create test data
         self.target = Target.objects.create(
@@ -352,10 +352,10 @@ class LulinSchedulerTestCase(TestCase):
             end_date=timezone.now() + timedelta(days=2),
             status=1
         )
-        self.lulin = Lulin.objects.create(
+        self.lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            priority=Lulin.priorities.HIGH,
+            priority=LulinRun.priorities.HIGH,
             filters={'u': True, 'g': False, 'r': True, 'i': False, 'z': False},
             binning=2,
             frames=10,
@@ -422,14 +422,14 @@ class LulinViewTestCase(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
             'use_demo_targets': False,
             'is_superuser': True
         }
-        self.user = Users.objects.create(**user_profile)
+        self.user = User.objects.create(**user_profile)
         target_profile = {
             'user': self.user,
             'name': 'Test Target',
@@ -446,7 +446,7 @@ class LulinViewTestCase(TestCase):
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2)
         )
-        self.lulin = Lulin.objects.create(
+        self.lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
         )
@@ -472,14 +472,14 @@ class CodeViewTestCase(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
             'use_demo_targets': False,
             'is_superuser': True
         }
-        self.user = Users.objects.create(**user_profile)
+        self.user = User.objects.create(**user_profile)
         self.client.force_authenticate(user=self.user)
         self.observation = Observation.objects.create(
             name='Test Observation',
@@ -504,14 +504,14 @@ class ObservationMessagesViewTestCase(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
             'use_demo_targets': False,
             'is_superuser': True
         }
-        self.user = Users.objects.create(**user_profile)
+        self.user = User.objects.create(**user_profile)
         self.client.force_authenticate(user=self.user)
         self.observation = Observation.objects.create(
             name='Test Observation',

@@ -19,6 +19,19 @@ enum Observatory {
   Lulin = 1,
 }
 
+enum LulinInstrument {
+  LOT = 1,
+  SLT,
+  TRIPOL,
+}
+
+enum LulinFilter {
+  u = 1,
+  g,
+  r,
+  i,
+  z,
+}
 enum UserRole {
   Admin = 1,
   Faculty,
@@ -26,4 +39,11 @@ enum UserRole {
   Visitor,
 }
 
-export { Priority, Status, Observatory, UserRole };
+export {
+  Priority,
+  Status,
+  Observatory,
+  UserRole,
+  LulinInstrument,
+  LulinFilter,
+};

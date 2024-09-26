@@ -4,19 +4,33 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from helpers.models import Comments
 from targets.models import Target
 
 
-class Observation(models.Model):
-    class observatories(models.IntegerChoices):
-        LULIN = 1
+class Priorities(models.IntegerChoices):
+    HIGH = 1, _('High')
+    MEDIUM = 2, _('Medium')
+    LOW = 3, _('Low')
+    TOO = 4, _('Too')
 
-    class priorities(models.IntegerChoices):
-        HIGH = 1
-        MEDIUM = 2
-        LOW = 3
-        Too = 4
+
+class Statuses(models.IntegerChoices):
+    SUCCESS = 1, _('Success')
+    FAIL = 2, _('Fail')
+    PENDING = 3, _('Pending')
+    PARTIAL_SUCCESS = 4, _('Partial Success')
+    RESCHEDULED = 5, _('Rescheduled')
+
+
+class Observatories(models.IntegerChoices):
+    LULIN = 1
+
+
+class Observation(models.Model):
+    Priorities = Priorities
+    Observatories = Observatories
 
     class statuses(models.IntegerChoices):
         PREP = 1
@@ -27,15 +41,15 @@ class Observation(models.Model):
         DENIED = 6
         POSTPONED = 7
     name = models.CharField(max_length=100, null=False, blank=True)
-    user = models.ForeignKey('helpers.Users',
+    user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='observations')
     observatory = models.IntegerField(
-        choices=observatories.choices, default=observatories.LULIN)
+        choices=Observatories.choices, default=Observatories.LULIN)
     start_date = models.DateTimeField(null=False)
     end_date = models.DateTimeField(null=False)
     targets = models.ManyToManyField(Target)
     priority = models.IntegerField(
-        choices=priorities.choices, default=priorities.LOW)
+        choices=Priorities.choices, default=Priorities.LOW)
     status = models.IntegerField(
         choices=statuses.choices, default=statuses.PREP)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -76,41 +90,63 @@ class Observation(models.Model):
         self.save()
 
 
-def get_filters():
-    return {
-        'u': True,
-        'g': True,
-        'r': True,
-        'i': True,
-        'z': True
-    }
+class BaseRun(models.Model):
+    Priorities = Priorities
+    Statuses = Statuses
 
+    class Meta:
+        abstract = True
 
-def get_instruments():
-    return {
-        'LOT': True,
-        'SLT': False,
-        'TRIPOL': False
-    }
-
-
-class Lulin(models.Model):
-
-    class priorities(models.IntegerChoices):
-        HIGH = 1
-        MEDIUM = 2
-        LOW = 3
-        Too = 4
-
-    observation = models.ForeignKey(Observation, on_delete=models.CASCADE)
-    target = models.ForeignKey(Target, on_delete=models.CASCADE)
+    observation = models.ForeignKey('Observation', on_delete=models.CASCADE)
+    target = models.ForeignKey('targets.Target', on_delete=models.CASCADE)
     priority = models.IntegerField(
-        choices=priorities.choices, default=priorities.LOW
+        choices=Priorities.choices,
+        default=Priorities.LOW
     )
-    filters = models.JSONField(default=get_filters)
+    filter = models.IntegerField(_("Filter"), null=True)
     binning = models.IntegerField(default=1)
     frames = models.IntegerField(default=1)
-    instruments = models.JSONField(default=get_instruments)
+    instrument = models.IntegerField(_("Instruments"), null=True)
     exposure_time = models.IntegerField(default=10)
     start_date = models.DateTimeField(null=True)
     end_date = models.DateTimeField(null=True)
+    status = models.IntegerField(
+        _("Status"), choices=Statuses.choices, default=Statuses.PENDING)
+
+    class Meta:
+        abstract = True
+
+    def get_filters(self):
+        raise NotImplementedError("Subclasses must implement get_filters()")
+
+    def get_instruments(self):
+        raise NotImplementedError(
+            "Subclasses must implement get_instruments()")
+
+
+class LulinRun(BaseRun):
+    class Filters(models.IntegerChoices):
+        U = 1, _('u')
+        G = 2, _('g')
+        R = 3, _('r')
+        I = 4, _('i')
+        Z = 5, _('z')
+
+    class Instruments(models.IntegerChoices):
+        LOT = 1, _('LOT')
+        SLT = 2, _('SLT')
+        TRIPOL = 3, _('TRIPOL')
+
+    filter = models.IntegerField(
+        _("Filter"), choices=Filters.choices, default=1, null=True)
+    instrument = models.IntegerField(
+        _("Instruments"), choices=Instruments.choices, default=1, null=True)
+
+    class Meta:
+        db_table = 'LulinRun'
+
+    def get_filters(self):
+        return self.Filters.choices
+
+    def get_instruments(self):
+        return self.Instruments.choices

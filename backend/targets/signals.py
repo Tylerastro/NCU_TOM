@@ -1,7 +1,7 @@
 # yourapp/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from helpers.models import Users
+from helpers.models import User
 
 from .models import Target
 
@@ -27,7 +27,7 @@ DEFAULT_TARGETS = [
 ]
 
 
-@receiver(post_save, sender=Users)
+@receiver(post_save, sender=User)
 def create_user_default_targets(sender, instance, created, **kwargs):
     if created and instance.use_demo_targets:
         for target_data in DEFAULT_TARGETS:

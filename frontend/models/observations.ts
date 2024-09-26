@@ -1,6 +1,6 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
 import { Comments, Tag, User } from "./helpers";
-import { Target } from "./targets";
+import { LulinTarget, Target } from "./targets";
 export interface Observation {
   id: number;
   user?: User;
@@ -30,26 +30,26 @@ export interface NewObservation {
   code?: string;
 }
 
-export interface LulinObservations {
+export interface LulinRuns {
   id: number;
   observation: string;
   priority: number;
-  filters: { [key: string]: boolean };
+  filter: number;
   binning: number;
   frames: number;
-  instruments: { [key: string]: boolean };
+  instrument: number;
   exposure_time: number;
   start_date: Date;
   end_date: Date;
-  target: Target;
+  target: LulinTarget;
 }
 
 export interface LulinObservationsCreate {
   priority: number;
-  filters: { [key: string]: boolean };
+  filter: number;
   binning: number;
   frames: number;
-  instruments: { [key: string]: boolean };
+  instrument: number;
   exposure_time: number;
   targets: number[];
 }

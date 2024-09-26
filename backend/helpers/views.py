@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
-from .models import Announcements, Tags, Users
+from .models import Announcement, Tags, User
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
                           FullUserSerializer, TagsGetSerializer,
                           TagsSerializer, UserPutSerializer)
@@ -120,14 +120,14 @@ class TagsDetailView(APIView):
 @permission_classes((AllowAny,))
 class AnnouncementsView(APIView):
     @extend_schema(request=None, responses=AnnouncementsSerializer)
-    def get(self, request) -> List[Announcements]:
-        announcements = Announcements.objects.all()
+    def get(self, request) -> List[Announcement]:
+        announcements = Announcement.objects.all()
         serializer = AnnouncementsSerializer(announcements, many=True)
         return Response(serializer.data, status=200)
 
     @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def post(self, request):
-        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
         serializer = AnnouncementsPostSerializer(
             data=request.data, context={'request': request})
@@ -140,9 +140,9 @@ class AnnouncementsView(APIView):
 class AnnouncementsDetailView(APIView):
     @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def put(self, request, pk):
-        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
-        announcement_instance = get_object_or_404(Announcements, pk=pk)
+        announcement_instance = get_object_or_404(Announcement, pk=pk)
         serializer = AnnouncementsPostSerializer(
             announcement_instance, data=request.data, partial=True)
         if serializer.is_valid():
@@ -151,9 +151,9 @@ class AnnouncementsDetailView(APIView):
         return Response(serializer.errors, status=400)
 
     def delete(self, request, pk):
-        if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
-        announcement_instance = get_object_or_404(Announcements, pk=pk)
+        announcement_instance = get_object_or_404(Announcement, pk=pk)
         announcement_instance.deleted_at = datetime.now()
         return Response(status=204)
 
@@ -174,33 +174,33 @@ def send_observation_mail(request: HttpRequest):
 
 @permission_classes((IsAuthenticated, ))
 class UserView(APIView):
-    def get(self, request) -> Users:
-        if request.user.role != Users.roles.ADMIN:
+    def get(self, request) -> User:
+        if request.user.role != User.roles.ADMIN:
             return Response({"detail": "Forbidden"}, status=403)
 
-        users = Users.objects.all()
+        users = User.objects.all()
         serializer = FullUserSerializer(users, many=True)
         return Response(serializer.data, status=200)
 
 
 @permission_classes((IsAuthenticated, ))
 class UserDetailView(APIView):
-    def put(self, request, pk) -> Users:
-        if request.user != Users.objects.get(id=pk):
+    def put(self, request, pk) -> User:
+        if request.user != User.objects.get(id=pk):
             return Response({"detail": "Forbidden"}, status=403)
 
-        user = Users.objects.get(id=pk)
+        user = User.objects.get(id=pk)
         serializer = UserPutSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
-    def delete(self, request, pk) -> Users:
-        if request.user != Users.objects.get(id=pk):
+    def delete(self, request, pk) -> User:
+        if request.user != User.objects.get(id=pk):
             return Response({"detail": "Forbidden"}, status=403)
 
-        user = Users.objects.get(id=pk)
+        user = User.objects.get(id=pk)
         user.deleted_at = datetime.now()
         user.is_active = False
         user.save()
@@ -210,10 +210,10 @@ class UserDetailView(APIView):
 @api_view(['PUT'])
 @permission_classes((IsAuthenticated, ))
 def EditUserRole(request, pk):
-    if request.user.role != Users.roles.ADMIN:
+    if request.user.role != User.roles.ADMIN:
         return Response({"detail": "Forbidden"}, status=403)
 
-    user = Users.objects.get(id=pk)
+    user = User.objects.get(id=pk)
     if user == request.user:
         return Response({"detail": "You can't edit your own role"}, status=403)
     user.role = request.data['role']

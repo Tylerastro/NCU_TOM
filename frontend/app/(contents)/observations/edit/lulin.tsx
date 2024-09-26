@@ -1,7 +1,7 @@
 "use client";
 import { getLulin } from "@/apis/observations/getLulin";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LulinObservations, Observation } from "@/models/observations";
+import { LulinRuns, Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ import {
 import LulinData from "./lulinData";
 import { Button } from "@/components/ui/button";
 import { getObservation } from "@/apis/observations/getObservation";
-import { NewTargetLulinForm } from "./newlulinForm";
+import { NewLulinRun } from "./newlulinForm";
 import AltChart from "@/components/AltitudePlot";
 function LoadingSkeleton() {
   return (
@@ -31,7 +31,7 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Lulin(props: { observation_id: number }) {
+export default function LulinPage(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
 
   const { data: observation, isFetching: observationIsFetching } = useQuery({
@@ -53,7 +53,7 @@ export default function Lulin(props: { observation_id: number }) {
       getLulin(props.observation_id).then((data) => {
         return data;
       }),
-    initialData: [] as LulinObservations[],
+    initialData: [] as LulinRuns[],
   });
 
   return (
@@ -70,10 +70,16 @@ export default function Lulin(props: { observation_id: number }) {
               <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
                 {observation?.name}
               </span>
-              <Badge key={`${observation?.id}-start`} className="mr-1">
+              <Badge
+                key={`${observation?.id}-start`}
+                className="mr-1 prevent-select"
+              >
                 {observation?.start_date.split(" ")[0]}
               </Badge>
-              <Badge key={`${observation?.id}-end`} className="mr-1">
+              <Badge
+                key={`${observation?.id}-end`}
+                className="mr-1 prevent-select"
+              >
                 {observation?.end_date.split(" ")[0]}
               </Badge>
             </div>
@@ -88,6 +94,7 @@ export default function Lulin(props: { observation_id: number }) {
 
         <div className="flex flex-col items-center py-4">
           <LulinData
+            observation_id={props.observation_id}
             data={lulinObservations}
             setCodeUpdate={setCodeUpdate}
             refetch={refetch}
@@ -100,7 +107,7 @@ export default function Lulin(props: { observation_id: number }) {
               </Button>
             </SheetTrigger>
             <SheetContent className="w-[400px] sm:w-[540px]">
-              <NewTargetLulinForm observation={observation} refetch={refetch} />
+              <NewLulinRun observation={observation} refetch={refetch} />
             </SheetContent>
           </Sheet>
         </div>

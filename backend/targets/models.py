@@ -7,7 +7,7 @@ from django.db import models
 
 
 class Target(models.Model):
-    user = models.ForeignKey('helpers.Users',
+    user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)
     ra = models.FloatField(null=False, validators=[

@@ -2,7 +2,7 @@ import { getLulin } from "@/apis/observations/getLulin";
 import { getObservations } from "@/apis/observations/getObservations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LulinObservations } from "@/models/observations";
+import { LulinRuns } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import CodeBlock from "./codeblock";
@@ -35,7 +35,7 @@ export default function Lulin(props: { observation_id: number }) {
         setDataReady(true);
         return data;
       }),
-    initialData: [] as LulinObservations[],
+    initialData: [] as LulinRuns[],
   });
 
   const { data: observation } = useQuery({

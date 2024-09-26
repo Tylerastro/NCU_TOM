@@ -1,15 +1,16 @@
+from django.conf import settings
 from django.contrib.auth.models import (AbstractUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 from django.db.models import UniqueConstraint
 
 
-class Observatories(models.IntegerChoices):
-    LULIN = 1
+def get_default_is_active() -> bool:
+    return settings.DEBUG
 
 
 class Tags(models.Model):
-    user = models.ForeignKey('helpers.Users',
+    user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -20,20 +21,25 @@ class Tags(models.Model):
 
 class Comments(models.Model):
     user = models.ForeignKey(
-        'helpers.Users', on_delete=models.CASCADE, null=True)
+        'helpers.User', on_delete=models.CASCADE, null=True)
     context = models.TextField(max_length=500, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class Announcements(models.Model):
+class Announcement(models.Model):
+
+    class Meta:
+        ordering = ['-created_at']
+        db_table = 'Announcement'
+
     class types(models.IntegerChoices):
         INFO = 1
         WARNING = 2
         ERROR = 3
         URGENT = 4
 
-    user = models.ForeignKey('helpers.Users',
+    user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=False, blank=False)
     context = models.TextField(max_length=1000, null=False, blank=False)
@@ -68,11 +74,12 @@ class UserManager(BaseUserManager):
         return user
 
 
-class Users(AbstractUser, PermissionsMixin):
+class User(AbstractUser, PermissionsMixin):
     objects = UserManager()
 
     class Meta:
         ordering = ['id']
+        db_table = 'User'
 
     class roles(models.IntegerChoices):
         ADMIN = 1
@@ -89,7 +96,7 @@ class Users(AbstractUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     use_demo_targets = models.BooleanField(default=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=get_default_is_active())
     deleted_at = models.DateTimeField(null=True)
     is_superuser = models.BooleanField(default=False)
 
@@ -109,7 +116,7 @@ class RequestLog(models.Model):
     headers = models.TextField(null=True, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user = models.ForeignKey(
-        Users, on_delete=models.SET_NULL, null=True, blank=True)
+        User, on_delete=models.SET_NULL, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     response_status = models.PositiveIntegerField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
@@ -121,3 +128,4 @@ class RequestLog(models.Model):
         indexes = [
             models.Index(fields=["path"], name="api_path"),
         ]
+        db_table = 'RequestLog'

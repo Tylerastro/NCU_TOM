@@ -64,8 +64,6 @@ export const columns: ColumnDef<Observation>[] = [
       const id: number = props.row.getValue("id");
       const status: number = props.row.getValue("status");
       const observatory: number = props.row.getValue("observatory");
-      const start_date: string = props.row.getValue("start_date");
-      const end_date: string = props.row.getValue("end_date");
 
       const routerMapping: { [key: number]: string } = {
         1: "edit",
@@ -84,8 +82,6 @@ export const columns: ColumnDef<Observation>[] = [
               query: {
                 id: id,
                 observatory: observatory,
-                start_date: start_date,
-                end_date: end_date,
               },
             }}
           >

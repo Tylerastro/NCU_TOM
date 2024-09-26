@@ -144,7 +144,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
                     onSelect={() => setSelectedTargets([])}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    Clear
                   </CommandItem>
                 </CommandGroup>
               </>

@@ -1,18 +1,18 @@
 from rest_framework import serializers
 
-from .models import Announcements, Comments, Tags, Users
+from .models import Announcement, Comments, Tags, User
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Users
+        model = User
         fields = ('id', 'username', 'institute',
                   'role', 'created_at', 'is_active')
 
 
 class UserPutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Users
+        model = User
         fields = ('username', 'institute', 'first_name', 'last_name')
 
 
@@ -21,7 +21,7 @@ class FullUserSerializer(serializers.ModelSerializer):
     observations = serializers.SerializerMethodField()
 
     class Meta:
-        model = Users
+        model = User
         fields = ('id', 'username', 'institute', 'email',
                   'targets', 'observations', 'deleted_at',
                   'role', 'created_at', 'is_active', 'last_login')
@@ -77,18 +77,18 @@ class AnnouncementsSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Announcements
+        model = Announcement
         fields = 'id', 'user', 'title', 'context', 'type', 'created_at'
 
 
 class AnnouncementsPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Announcements
+        model = Announcement
         fields = 'user', 'title', 'context', 'type'
         extra_kwargs = {'user': {'read_only': True}}
 
     def create(self, validated_data):
         user = self.context['request'].user
-        target = Announcements.objects.create(**validated_data, user=user)
+        target = Announcement.objects.create(**validated_data, user=user)
 
         return target

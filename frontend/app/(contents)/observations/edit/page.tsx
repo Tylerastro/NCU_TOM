@@ -1,15 +1,13 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import Lulin from "./lulin";
+import LulinPage from "./lulin";
 
 function PageContent() {
   const searchParams = useSearchParams();
   const observatory = searchParams.get("observatory");
   const observation_id = searchParams.get("id") || "";
-  const start_date = searchParams.get("start_date") || "";
-  const end_date = searchParams.get("end_date") || "";
-  return <Lulin observation_id={parseInt(observation_id)} />;
+  return <LulinPage observation_id={parseInt(observation_id)} />;
 }
 
 export default function Page() {

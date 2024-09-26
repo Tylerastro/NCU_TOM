@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import Comments, Users
+from helpers.models import Comments, User
 from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
 from rest_framework.decorators import api_view, permission_classes
@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from targets.views import get_targets_altaz
 from targets.visibility import TargetAltAz
 
-from .models import Lulin, Observation
+from .models import LulinRun, Observation
 from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
                           LulinPostSerializer, LulinPutSerializer,
                           ObservationGetSerializer, ObservationPostSerializer,
@@ -58,7 +58,7 @@ class ObservationsView(APIView):
         for condition in conditions:
             combined_conditions &= condition
 
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             observations = Observation.objects.filter(
                 combined_conditions
             )
@@ -86,7 +86,7 @@ class ObservationsView(APIView):
         try:
             observation_ids = serializer.validated_data['observation_ids']
 
-            if request.user.role == Users.roles.ADMIN:
+            if request.user.role == User.roles.ADMIN:
                 observations = Observation.objects.filter(
                     id__in=observation_ids)
             else:
@@ -105,7 +105,7 @@ class ObservationDetailView(APIView):
 
     @extend_schema(responses=ObservationGetSerializer, operation_id='Get Single Observation')
     def get(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             observation = get_object_or_404(Observation, pk=pk)
         else:
             observation = get_object_or_404(
@@ -115,7 +115,7 @@ class ObservationDetailView(APIView):
 
     @extend_schema(operation_id='Delete Single Observation')
     def delete(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             observation = get_object_or_404(Observation, pk=pk)
         else:
             observation = get_object_or_404(
@@ -154,15 +154,15 @@ class LulinView(APIView):
         for condition in conditions:
             combined_conditions &= condition
 
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
-            observations = Lulin.objects.filter(
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
+            observations = LulinRun.objects.filter(
                 combined_conditions
             )
             if pk:
                 observations = observations.filter(observation__id=pk).select_related(
                     'observation')
         else:
-            observations = Lulin.objects.filter(
+            observations = LulinRun.objects.filter(
                 Q(observation__user=request.user) & combined_conditions
             )
             if pk:
@@ -185,24 +185,29 @@ class LulinView(APIView):
 
 
 class LulinDetailView(APIView):
-    def get_lulin_object(self, pk, user):
-        if user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
-            return get_object_or_404(Lulin, pk=pk)
-        return get_object_or_404(Lulin, pk=pk, observation__user=user)
+    def _get_lulin_run(self, pk, user):
+        if user.role in (User.roles.ADMIN, User.roles.FACULTY):
+            return get_object_or_404(LulinRun, pk=pk)
+        return get_object_or_404(LulinRun, pk=pk, observation__user=user)
 
     @ extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
     def get(self, request, pk):
-        lulin = self.get_lulin_object(pk, request.user)
+        lulin = self._get_lulin_run(pk, request.user)
         serializer = LulinGetSerializer(lulin)
         return Response(serializer.data, status=200)
 
     def put(self, request, pk):
-        lulin = self.get_lulin_object(pk, request.user)
+        lulin = self._get_lulin_run(pk, request.user)
         serializer = LulinPutSerializer(lulin, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        lulin = self._get_lulin_run(pk, request.user)
+        lulin.delete()
+        return Response(status=204)
 
 
 @ permission_classes((IsAuthenticated, ))
@@ -211,7 +216,7 @@ class LulinCodeView(APIView):
     def get(self, request, pk):
         service = LulinScheduler()
         try:
-            if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+            if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
                 lulin = Observation.objects.get(pk=pk)
             else:
                 lulin = Observation.objects.get(pk=pk, user=request.user)
@@ -228,7 +233,7 @@ class LulinCodeView(APIView):
 
 @ api_view(['GET'])
 def get_lulin_compiled_codes(request):
-    if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+    if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
         return Response({"detail": "Unauthorized"}, status=401)
 
     service = LulinScheduler()
@@ -254,13 +259,13 @@ def get_observation_stats(request):
 @ api_view(['POST'])
 @ permission_classes((IsAuthenticated, ))
 def get_observation_altaz(request, pk):
-    if request.user.role not in (Users.roles.ADMIN, Users.roles.FACULTY):
+    if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
         observation = Observation.objects.get(id=pk, user=request.user)
-        observations = Lulin.objects.filter(observation__id=pk, observation__user=request.user).select_related(
+        observations = LulinRun.objects.filter(observation__id=pk, observation__user=request.user).select_related(
             'observation', 'observation__user')
     else:
         observation = Observation.objects.get(id=pk)
-        observations = Lulin.objects.filter(observation__id=pk).select_related(
+        observations = LulinRun.objects.filter(observation__id=pk).select_related(
             'observation', 'observation__user')
 
     targets = [x.target for x in observations]
@@ -281,7 +286,7 @@ class ObservationMessagesView(APIView):
         return Response(serializer.data, status=200)
 
     def post(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             observation = get_object_or_404(Observation, pk=pk)
         else:
             observation = get_object_or_404(

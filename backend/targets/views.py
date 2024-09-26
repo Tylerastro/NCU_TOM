@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import Users
+from helpers.models import User
 from helpers.paginator import Pagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -29,7 +29,7 @@ class TargetsView(APIView):
 
     def get(self, request):
         is_admin_or_faculty = request.user.role in (
-            Users.roles.ADMIN, Users.roles.FACULTY
+            User.roles.ADMIN, User.roles.FACULTY
         )
         conditions = []
         conditions.append(Q(deleted_at__isnull=True))
@@ -76,7 +76,7 @@ class TargetsView(APIView):
         try:
             target_ids = serializer.validated_data['target_ids']
 
-            if request.user.role == Users.roles.ADMIN:
+            if request.user.role == User.roles.ADMIN:
                 targets = Target.objects.filter(id__in=target_ids)
             else:
                 targets = Target.objects.filter(
@@ -92,7 +92,7 @@ class TargetsView(APIView):
 class TargetDetailView(APIView):
     @extend_schema(operation_id='Get Single Target')
     def get(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)
         else:
             target = get_object_or_404(
@@ -102,7 +102,7 @@ class TargetDetailView(APIView):
 
     @extend_schema(operation_id='Delete Single Target')
     def delete(self, request, pk):
-        if request.user.role in (Users.roles.ADMIN, Users.roles.FACULTY):
+        if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
             target = get_object_or_404(Target, pk=pk, deleted_at__isnull=True)
         else:
             target = get_object_or_404(

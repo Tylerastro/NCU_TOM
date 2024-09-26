@@ -14,28 +14,91 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LulinObservations } from "@/models/observations";
+import { LulinInstrument, LulinFilter } from "@/models/enums";
+import { LulinRuns } from "@/models/observations";
+import { createLulin } from "@/apis/observations/createLulin";
+import { Files, CircleX } from "lucide-react";
+
 import * as React from "react";
 import { TargetLulinForm } from "./lulinForm";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { deleteLulin } from "@/apis/observations/deleteLulinRun";
 interface LulinDataProps {
-  data: LulinObservations[];
+  observation_id: number;
+  data: LulinRuns[];
   setCodeUpdate: React.Dispatch<boolean>;
   refetch: () => void;
 }
 
-const filterOrder = ["u", "g", "r", "i", "z"];
-
 export default function LulinData(props: LulinDataProps) {
   const { setCodeUpdate, ...otherProps } = props;
+  const [sortedData, setSortedData] = useState<LulinRuns[]>([]);
+
+  useEffect(() => {
+    const sorted = [...props.data].sort((a, b) =>
+      a.target.name.localeCompare(b.target.name)
+    );
+    setSortedData(sorted);
+  }, [props.data]);
+
+  const handleDelete = async (rowData: LulinRuns) => {
+    try {
+      await deleteLulin(rowData.id);
+      toast.success("Run deleted successfully");
+      props.refetch();
+    } catch (error: any) {
+      if (error.data) {
+        for (const key in error.data) {
+          toast.error(`${key}: ${error.data[key][0]}`);
+        }
+      } else {
+        toast.error("Failed to delete the run");
+      }
+      console.error("Error deleting row:", error);
+    }
+  };
+
+  const handleDuplicate = async (rowData: LulinRuns) => {
+    try {
+      const duplicateData = {
+        targets: [rowData.target.id],
+        priority: rowData.priority,
+        filter: rowData.filter,
+        binning: rowData.binning,
+        frames: rowData.frames,
+        instrument: rowData.instrument,
+        exposure_time: rowData.exposure_time,
+        start_date: new Date(rowData.start_date),
+        end_date: new Date(rowData.end_date),
+      };
+
+      await createLulin(props.observation_id, duplicateData);
+      toast.success("Observation duplicated successfully");
+      props.refetch();
+    } catch (error: any) {
+      if (error.data) {
+        for (const key in error.data) {
+          toast.error(`${key}: ${error.data[key][0]}`);
+        }
+      } else {
+        toast.error("Failed to duplicate the observation");
+      }
+      console.error("Error duplicating row:", error);
+    }
+  };
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Edit</TableHead>
+          <TableHead className="w-[75px]">Delete</TableHead>
+          <TableHead className="w-[75px]">Duplicate</TableHead>
+          <TableHead className="w-[55px]">Edit</TableHead>
           <TableHead className="w-[100px]">Target</TableHead>
-          <TableHead>Ra</TableHead>
-          <TableHead>Dec</TableHead>
+          <TableHead className="text-center">Ra</TableHead>
+          <TableHead className="text-center">Dec</TableHead>
+          <TableHead className="text-right">Exposure time</TableHead>
           <TableHead className="text-right">Binning</TableHead>
           <TableHead className="text-right">Frames</TableHead>
           <TableHead className="text-right">Instrument</TableHead>
@@ -43,10 +106,22 @@ export default function LulinData(props: LulinDataProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {props.data.map((data) => (
+        {sortedData.map((data) => (
           <TableRow key={data.id}>
+            <TableCell className="text-center items-center justify-center ">
+              <CircleX
+                className="cursor-pointer hover:text-red-500 duration-300"
+                onClick={() => handleDelete(data)}
+              />
+            </TableCell>
+            <TableCell className="text-center items-center justify-center ">
+              <Files
+                className="cursor-pointer hover:text-blue-500 duration-300"
+                onClick={() => handleDuplicate(data)}
+              />
+            </TableCell>
             <TableCell>
-              <Sheet modal={false}>
+              <Sheet modal={true}>
                 <SheetTrigger>
                   <svg
                     width="15"
@@ -72,24 +147,16 @@ export default function LulinData(props: LulinDataProps) {
               </Sheet>
             </TableCell>
             <TableCell className="font-medium">{data.target.name}</TableCell>
-            <TableCell>{data.target.ra}</TableCell>
-            <TableCell>{data.target.dec}</TableCell>
+            <TableCell className="text-center">{data.target.ra}</TableCell>
+            <TableCell className="text-center">{data.target.dec}</TableCell>
+            <TableCell className="text-right">{data.exposure_time}</TableCell>
             <TableCell className="text-right">{data.binning}</TableCell>
             <TableCell className="text-right">{data.frames}</TableCell>
             <TableCell className="text-right">
-              {Object.entries(data.instruments)
-                .filter(([_, value]) => value)
-                .map(([key]) => key)
-                .join(", ")}
+              {data.instrument ? LulinInstrument[data.instrument] : "Unknown"}
             </TableCell>
             <TableCell className="text-right">
-              {Object.entries(data.filters)
-                .filter(([_, value]) => value)
-                .sort(
-                  ([a], [b]) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
-                )
-                .map(([key]) => key)
-                .join(", ")}
+              {data.filter ? LulinFilter[data.filter] : "Unknown"}
             </TableCell>
           </TableRow>
         ))}

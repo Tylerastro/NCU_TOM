@@ -128,7 +128,7 @@ elif os.getenv("ENGINE") == "django.db.backends.sqlite3":
     }
 
 # Point the default user model to our custom user model
-AUTH_USER_MODEL = "helpers.Users"
+AUTH_USER_MODEL = "helpers.User"
 
 
 # Password validation

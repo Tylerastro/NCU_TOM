@@ -16,6 +16,21 @@ export interface Target {
   notes?: string;
 }
 
+export interface LulinTarget {
+  id: number;
+  name: string;
+  user?: User;
+  ra: number;
+  dec: number;
+  coordinates?: string;
+  redshift?: number;
+  created_at?: Date;
+  updated_at?: Date;
+  tags: Tag[];
+  observations?: Observation[];
+  notes?: string;
+}
+
 export interface PutTarget {
   ra: number;
   dec: number;

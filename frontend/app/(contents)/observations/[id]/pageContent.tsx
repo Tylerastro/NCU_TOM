@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Observatory, Status } from "@/models/enums";
-import { LulinObservations, Observation } from "@/models/observations";
+import { LulinRuns, Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";

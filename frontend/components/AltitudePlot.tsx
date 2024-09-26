@@ -71,20 +71,29 @@ export default function AltChart(props: { observation_id: number }) {
       const result: TargetAltAz[] = await getObservationAltAz(
         props.observation_id
       );
-      return result.map((d) => ({
-        name: d.name,
-        data: d.data.map((dd) => ({
-          ...dd,
-          time: new Date(dd.time).toLocaleDateString("en-US", {
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hourCycle: "h23",
-          }),
-        })),
-      }));
+
+      const uniqueTargets: Record<string, TargetAltAz> = {};
+
+      result.forEach((d) => {
+        if (!uniqueTargets[d.name]) {
+          uniqueTargets[d.name] = {
+            name: d.name,
+            data: d.data.map((dd) => ({
+              ...dd,
+              time: new Date(dd.time).toLocaleDateString("en-US", {
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hourCycle: "h23",
+              }),
+            })),
+          };
+        }
+      });
+
+      return Object.values(uniqueTargets);
     },
-    initialData: [],
+    initialData: [] as TargetAltAz[],
   });
 
   useEffect(() => {

@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
-import { LulinObservations } from "@/models/observations";
+import { LulinRuns } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -82,11 +82,7 @@ const formSchema = z.object({
   end_date: z.date(),
 });
 
-export function TargetLulinForm({
-  observation,
-}: {
-  observation: LulinObservations;
-}) {
+export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

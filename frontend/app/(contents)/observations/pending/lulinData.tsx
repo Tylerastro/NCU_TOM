@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LulinObservations } from "@/models/observations";
+import { LulinRuns } from "@/models/observations";
 import * as React from "react";
 
 import {
@@ -25,7 +25,7 @@ type Option = {
 };
 
 interface LulinDataProps {
-  data: LulinObservations[];
+  data: LulinRuns[];
   setCodeUpdate: React.Dispatch<boolean>;
 }
 

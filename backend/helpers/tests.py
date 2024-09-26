@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .models import Announcements, Comments, Tags, Users
+from .models import Announcement, Comments, Tags, User
 
 
 class UsersModelTest(TestCase):
@@ -20,7 +20,7 @@ class UsersModelTest(TestCase):
             'username': 'admin',
             'password': 'password',
             'email': 'admin@ncu.edu.com',
-            'role': Users.roles.ADMIN,
+            'role': User.roles.ADMIN,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin',
@@ -31,7 +31,7 @@ class UsersModelTest(TestCase):
             'username': 'faculty',
             'password': 'password',
             'email': 'faculty@ncu.edu.com',
-            'role': Users.roles.FACULTY,
+            'role': User.roles.FACULTY,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
@@ -40,7 +40,7 @@ class UsersModelTest(TestCase):
             'username': 'professor',
             'password': 'password',
             'email': 'professor@ncu.edu.com',
-            'role': Users.roles.FACULTY,
+            'role': User.roles.FACULTY,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
@@ -49,59 +49,59 @@ class UsersModelTest(TestCase):
             'username': 'student',
             'password': 'password',
             'email': 'student@ncu.edu.com',
-            'role': Users.roles.USER,
+            'role': User.roles.USER,
             'institute': 'NCU',
             'first_name': 'Tyler',
             'last_name': 'Lin'
         }
-        cls.admin = Users.objects.create(**admin)
-        cls.faculty = Users.objects.create(**faculty)
-        cls.professor = Users.objects.create(**professor)
-        cls.student = Users.objects.create(**student)
+        cls.admin = User.objects.create(**admin)
+        cls.faculty = User.objects.create(**faculty)
+        cls.professor = User.objects.create(**professor)
+        cls.student = User.objects.create(**student)
 
     def test_existed_admin(self):
-        admin = Users.objects.get(username='admin')
+        admin = User.objects.get(username='admin')
         self.assertEqual(admin.username, 'admin')
         self.assertEqual(admin.email, 'admin@ncu.edu.com')
-        self.assertEqual(admin.role, Users.roles.ADMIN)
+        self.assertEqual(admin.role, User.roles.ADMIN)
         self.assertEqual(admin.institute, 'NCU')
         self.assertTrue(admin.is_superuser)
         self.assertTrue(admin.use_demo_targets)
 
     def test_existed_faculty(self):
-        faculty = Users.objects.get(username='faculty')
+        faculty = User.objects.get(username='faculty')
         self.assertEqual(faculty.username, 'faculty')
         self.assertEqual(faculty.email, 'faculty@ncu.edu.com')
-        self.assertEqual(faculty.role, Users.roles.FACULTY)
+        self.assertEqual(faculty.role, User.roles.FACULTY)
         self.assertEqual(faculty.institute, 'NCU')
         self.assertFalse(faculty.is_superuser)
 
     def test_user_create(self):
-        user = Users.objects.create(
+        user = User.objects.create(
             username='testuser',
             password='12345',
             email='a@a.com',
-            role=Users.roles.USER,
+            role=User.roles.USER,
             institute='testinstitute',
             first_name='testfirst',
             last_name='testlast')
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.USER)
+        self.assertEqual(user.role, User.roles.USER)
         self.assertEqual(user.institute, 'testinstitute')
         self.assertEqual(user.first_name, 'testfirst')
         self.assertEqual(user.last_name, 'testlast')
 
-        user = Users.objects.get(email='a@a.com')
+        user = User.objects.get(email='a@a.com')
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.email, 'a@a.com')
-        self.assertEqual(user.role, Users.roles.USER)
+        self.assertEqual(user.role, User.roles.USER)
         self.assertEqual(user.institute, 'testinstitute')
         self.assertEqual(user.first_name, 'testfirst')
         self.assertEqual(user.last_name, 'testlast')
 
     def test_username_field(self):
-        user = Users.objects.get(username='admin')
+        user = User.objects.get(username='admin')
         user.username = ''  # setting an invalid (blank) username
         with self.assertRaises(ValidationError):
             user.full_clean()  # This should raise a ValidationError
@@ -110,11 +110,11 @@ class UsersModelTest(TestCase):
 class TagsModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = Users.objects.create(
+        user = User.objects.create(
             username='admin',
             password='password',
             email='tom@ncu.edu.com',
-            role=Users.roles.ADMIN,
+            role=User.roles.ADMIN,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
@@ -138,7 +138,7 @@ class TagsModelTest(TestCase):
             tag.full_clean()  # This should raise a ValidationError
 
     def test_user_relationship(self):
-        user = Users.objects.get(username='admin')
+        user = User.objects.get(username='admin')
         tag = Tags.objects.get(name='Test Tag')
         self.assertEqual(tag.user, user)
 
@@ -150,11 +150,11 @@ class TagsModelTest(TestCase):
 class CommentsModelTest(TestCase):
     @classmethod
     def setUpTestData(self):
-        self.user = Users.objects.create(
+        self.user = User.objects.create(
             username='admin',
             password='password',
             email='tom@ncu.edu.com',
-            role=Users.roles.ADMIN,
+            role=User.roles.ADMIN,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
@@ -177,7 +177,7 @@ class CommentsModelTest(TestCase):
             comment.full_clean()  # This should raise a ValidationError
 
     def test_user_relationship(self):
-        user = Users.objects.get(username='admin')
+        user = User.objects.get(username='admin')
         comment = Comments.objects.get(context='Test Comment')
         self.assertEqual(comment.user, user)
 
@@ -189,39 +189,39 @@ class CommentsModelTest(TestCase):
 class AnnouncementsModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = Users.objects.create(
+        cls.user = User.objects.create(
             username='admin',
             password='password',
             email='tom@ncu.edu.com',
-            role=Users.roles.ADMIN,
+            role=User.roles.ADMIN,
             institute='NCU',
             first_name='Tyler',
             last_name='Lin')
-        Announcements.objects.create(
+        Announcement.objects.create(
             user=cls.user,
             title='Test title',
             context='Id velit ea occaecat occaecat',
-            type=Announcements.types.INFO
+            type=Announcement.types.INFO
         )
 
     def test_announcement_create(self):
-        announcement = Announcements.objects.create(
-            user=self.user, context='Veniam adipiscing deserunt ut quis sunt eu ipsum non deserunt', title='Test title A', type=Announcements.types.URGENT)
+        announcement = Announcement.objects.create(
+            user=self.user, context='Veniam adipiscing deserunt ut quis sunt eu ipsum non deserunt', title='Test title A', type=Announcement.types.URGENT)
         self.assertEqual(
             announcement.context, 'Veniam adipiscing deserunt ut quis sunt eu ipsum non deserunt')
         self.assertEqual(announcement.user, self.user)
         self.assertEqual(announcement.title, 'Test title A')
-        self.assertEqual(announcement.type, Announcements.types.URGENT)
+        self.assertEqual(announcement.type, Announcement.types.URGENT)
 
     def test_announcement_creation(self):
-        announcement = Announcements.objects.get(title='Test title')
+        announcement = Announcement.objects.get(title='Test title')
 
         self.assertEqual(announcement.title, 'Test title')
         self.assertEqual(announcement.context, 'Id velit ea occaecat occaecat')
-        self.assertEqual(announcement.type, Announcements.types.INFO)
+        self.assertEqual(announcement.type, Announcement.types.INFO)
 
     def test_title_field(self):
-        announcement = Announcements.objects.get(title='Test title')
+        announcement = Announcement.objects.get(title='Test title')
         announcement.title = ''  # setting an invalid (blank) title
         with self.assertRaises(ValidationError):
             announcement.full_clean()  # This should raise a ValidationError
@@ -298,11 +298,11 @@ class ViewsTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin_user = User.objects.create_user(
-            username='admin', email='admin@example.com', password='adminpass', role=Users.roles.ADMIN, is_active=True)
+            username='admin', email='admin@example.com', password='adminpass', role=User.roles.ADMIN, is_active=True)
         self.faculty_user = User.objects.create_user(
-            username='faculty', email='faculty@example.com', password='facultypass', role=Users.roles.FACULTY, is_active=True)
+            username='faculty', email='faculty@example.com', password='facultypass', role=User.roles.FACULTY, is_active=True)
         self.regular_user = User.objects.create_user(
-            username='regular', email='regular@example.com', password='regularpass', role=Users.roles.VISITOR, is_active=True)
+            username='regular', email='regular@example.com', password='regularpass', role=User.roles.VISITOR, is_active=True)
 
     def test_tom_token_obtain_pair_view(self):
         data = {'username': 'regular', 'password': 'regularpass'}
@@ -360,7 +360,7 @@ class ViewsTestCase(TestCase):
         # Test POST (faculty user)
         self.client.force_authenticate(user=self.faculty_user)
         data = {'title': 'Test Announcement',
-                'context': 'This is a test.', 'type': Announcements.types.INFO}
+                'context': 'This is a test.', 'type': Announcement.types.INFO}
         response = self.client.post('/api/announcements/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -370,8 +370,8 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_announcements_detail_view(self):
-        announcement = Announcements.objects.create(
-            title='Test', context='Content', type=Announcements.types.INFO, user=self.admin_user)
+        announcement = Announcement.objects.create(
+            title='Test', context='Content', type=Announcement.types.INFO, user=self.admin_user)
 
         # Test PUT (faculty user)
         self.client.force_authenticate(user=self.faculty_user)
@@ -415,7 +415,7 @@ class ViewsTestCase(TestCase):
 
         # Test PUT (admin user)
         self.client.force_authenticate(user=self.admin_user)
-        data = {'role': Users.roles.FACULTY}
+        data = {'role': User.roles.FACULTY}
         response = self.client.put(
             f'/api/user/{self.regular_user.id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

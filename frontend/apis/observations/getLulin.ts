@@ -1,8 +1,8 @@
 import api from "@/apis/axios";
 
-import { LulinObservations } from "@/models/observations";
+import { LulinRuns } from "@/models/observations";
 
-export const getLulin = async (id: number): Promise<LulinObservations[]> => {
+export const getLulin = async (id: number): Promise<LulinRuns[]> => {
   try {
     const response = await api.get(`/api/observations/${id}/lulin/`);
     return response.data;

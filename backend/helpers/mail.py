@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework.response import Response
 
-from .models import Users
+from .models import User
 
 # TODO # This is a basic template which requires more design and customization
 
@@ -28,7 +28,7 @@ class MailService:
             return Response(status=400)
 
     def send_announcement_mail(self, level: str, title: str, announcement: str):
-        receivers = [user.email for user in Users.objects.all()]
+        receivers = [user.email for user in User.objects.all()]
 
         try:
             send_mail(
