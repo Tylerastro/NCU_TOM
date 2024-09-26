@@ -5,6 +5,7 @@ import { badgeVariants } from "@/components/ui/badge";
 import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
+import StatusBadge from "@/components/Status";
 import { ColumnDef } from "@tanstack/react-table";
 import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
@@ -154,7 +155,7 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Status",
     cell(props) {
       const status: number = props.row.getValue("status");
-      return <div>{Status[status].replace("_", " ")}</div>;
+      return <StatusBadge status={status} />;
     },
     filterFn: (row, id, value) => {
       const rowValue: number = row.getValue(id);

@@ -115,7 +115,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
           </h2>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
+          {/* <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="reports" disabled>
@@ -124,7 +124,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
             <TabsTrigger value="notifications" disabled>
               Others
             </TabsTrigger>
-          </TabsList>
+          </TabsList> */}
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {CoordCard(
@@ -181,7 +181,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent className="p-2">
-                  <AladinViewer coord={target?.coordinates} fov={1.5} />
+                  <AladinViewer coord={target?.coordinates} fov={0.2} />
                 </CardContent>
               </Card>
               <SimbadCard data={simbadData} />

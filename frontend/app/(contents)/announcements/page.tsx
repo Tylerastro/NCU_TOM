@@ -1,3 +1,4 @@
+"use server";
 import { AccordionAnnoucemnets } from "./accor";
 import { UserRole } from "@/models/enums";
 import { NewAnnouncementForm } from "./createAnnouncement";
