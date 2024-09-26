@@ -10,6 +10,11 @@ const config = {
     "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
+  variants: {
+    extend: {
+      transitionDuration: ["hover", "focus"],
+    },
+  },
   theme: {
     container: {
       center: true,
@@ -21,6 +26,13 @@ const config = {
     extend: {
       fontFamily: {
         Pacifico: ["Pacifico", "cursive"],
+      },
+      transitionDuration: {
+        0: "0ms",
+        800: "800ms",
+        600: "600ms",
+        2000: "2000ms",
+        3000: "3000ms",
       },
       colors: {
         border: "hsl(var(--border))",

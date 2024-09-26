@@ -57,7 +57,7 @@ function VerifyButton() {
       onClick={handleVerify}
       disabled={session?.user?.role === UserRole.User}
       variant="outline"
-      className="dark:hover:bg-green-600"
+      className="transition-colors hover:duration-600 dark:hover:bg-green-600"
     >
       Verify
     </Button>
