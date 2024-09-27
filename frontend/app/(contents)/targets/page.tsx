@@ -95,9 +95,9 @@ export default function TargetsTable() {
     <>
       <div className="flex space-between justify-between pb-2">
         <div>
-          <span className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
+          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
             Targets
-          </span>
+          </h1>
         </div>
 
         <div className="flex gap-2">

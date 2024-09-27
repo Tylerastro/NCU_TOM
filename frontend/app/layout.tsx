@@ -3,10 +3,18 @@ import { NavBar } from "@/components/Navbar";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import type { Metadata } from "next";
+import { Gowun_Batang } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NextAuthProvider from "./SessionProvider";
 import "./globals.css";
+import { cn } from "@/components/utils";
+
+const gowunBatang = Gowun_Batang({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-gowun-batang",
+});
 
 export const metadata: Metadata = {
   title: "NCU Tom",
@@ -21,7 +29,7 @@ export default function RootLayout({
   return (
     <ReactQueryClientProvider>
       <html lang="en" suppressHydrationWarning>
-        <body>
+        <body className={cn("font-sans antialiased", gowunBatang.variable)}>
           <ToastContainer />
           <NextAuthProvider>
             <ThemeProvider

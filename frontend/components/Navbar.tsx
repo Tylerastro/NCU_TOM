@@ -1,5 +1,5 @@
 import NavTooltip from "./NavTooltip";
-import { Button } from "@/components/ui/button";
+import { AnimatedButton } from "./AnimatedButton";
 import Link from "next/link";
 import Logo from "./Logo";
 
@@ -36,16 +36,15 @@ function NavBar() {
     <div className="w-full min-w-0 h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
       <Logo />
       <div>
-        <nav className="flex ">
+        <nav className="flex">
           {pages.map((page) => (
-            <Button
-              disabled={!page.enabled}
-              className="text-2xl lg:text-xl text-primary-foreground"
-              variant={"link"}
+            <AnimatedButton
               key={page.name}
+              href={page.link}
+              disabled={!page.enabled}
             >
-              <Link href={page.enabled ? page.link : "#"}>{page.name}</Link>
-            </Button>
+              {page.name}
+            </AnimatedButton>
           ))}
         </nav>
       </div>

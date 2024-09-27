@@ -12,7 +12,7 @@ export default function Logo() {
           priority
         />
       </div>
-      <h2 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl text-primary-foreground">
+      <h2 className="scroll-m-20 text-2xl font-gowunBatang font-bold tracking-tight lg:text-3xl text-primary-foreground">
         <a href="/">NCU TOM</a>
       </h2>
     </div>
