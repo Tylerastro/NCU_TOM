@@ -7,6 +7,10 @@ from django.db import models
 
 
 class Target(models.Model):
+
+    class Meta:
+        db_table = 'Target'
+
     user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)

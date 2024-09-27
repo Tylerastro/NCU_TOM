@@ -81,11 +81,7 @@ export default function Page({ params }: { params: { id: number } }) {
           )}
         </div>
       </div>
-      {isFetching ? (
-        <LoadingSkeleton />
-      ) : (
-        <PageContent observation={observation} />
-      )}
+      {isFetching ? <></> : <PageContent observation={observation} />}
     </>
   );
 }

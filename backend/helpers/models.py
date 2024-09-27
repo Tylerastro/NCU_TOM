@@ -17,6 +17,7 @@ class Tags(models.Model):
 
     class Meta:
         UniqueConstraint(fields=['user', 'name'], name='user_unique_tag')
+        db_table = 'Tag'
 
 
 class Comments(models.Model):
@@ -25,6 +26,9 @@ class Comments(models.Model):
     context = models.TextField(max_length=500, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Comment'
 
 
 class Announcement(models.Model):

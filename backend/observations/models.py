@@ -29,6 +29,10 @@ class Observatories(models.IntegerChoices):
 
 
 class Observation(models.Model):
+
+    class Meta:
+        db_table = 'Observation'
+
     Priorities = Priorities
     Observatories = Observatories
 
