@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'targets',
     'observations',
+    'dataproducts',
     'social_django',
     'helpers',
     'drf_spectacular',

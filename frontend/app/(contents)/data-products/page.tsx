@@ -21,7 +21,9 @@ export default function Component() {
     <div className="flex flex-col min-h-screen bg-muted/40">
       <header className="bg-background border-b px-4 py-3 sm:px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Datasets</h1>
+          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
+            Datasets
+          </h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -51,7 +53,11 @@ export default function Component() {
         <section>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Recent Events</h2>
-            <Link href="#" className="text-sm text-primary" prefetch={false}>
+            <Link
+              href="#"
+              className="text-sm text-primary-foreground"
+              prefetch={false}
+            >
               View All
             </Link>
           </div>
