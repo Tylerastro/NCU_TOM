@@ -1,60 +1,75 @@
+import csv
 import os
-from datetime import datetime
-from pathlib import Path
+from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-# Constants
-DAG_ID = "csv_processing_dag"
-POSTGRES_CONN_ID = "postgres_default"
-# Update this to your CSS folder path
-CSS_FOLDER_PATH = "./"
+# Define default_args dictionary to specify the default parameters of the DAG
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2023, 1, 1),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
 
-
-def process_css_files():
-    css_files = [f for f in os.listdir(CSS_FOLDER_PATH) if f.endswith('.csv')]
-    postgres_hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
-
-    for css_file in css_files:
-        file_path = os.path.join(CSS_FOLDER_PATH, css_file)
-        with open(file_path, 'r') as file:
-            content = file.read()
-
-        # Insert the CSS file content into the database
-        postgres_hook.run(
-            "INSERT INTO css_files (filename, content, created_at) VALUES (%s, %s, %s)",
-            parameters=(css_file, content, datetime.now())
-        )
-
-    return f"Processed {len(css_files)} CSS files"
+# Create the DAG
+dag = DAG(
+    'update_file_record',
+    default_args=default_args,
+    description='Read files from server path and write to PostgreSQL',
+    schedule_interval=timedelta(days=1),
+)
 
 
-with DAG(
-    dag_id=DAG_ID,
-    start_date=datetime(2020, 2, 2),
-    schedule_interval="@daily",
-    catchup=False,
-) as dag:
+def read_file_and_update_db(**kwargs):
+    # Path to the directory containing the files
+    file_directory = 'postgres_conn_id'
 
-    create_css_files_table = PostgresOperator(
-        task_id="create_css_files_table",
-        postgres_conn_id=POSTGRES_CONN_ID,
-        sql="""
-            CREATE TABLE IF NOT EXISTS css_files (
-                id SERIAL PRIMARY KEY,
-                filename VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                created_at TIMESTAMP NOT NULL
-            );
-        """
-    )
+    # Connect to the PostgreSQL database
+    pg_hook = PostgresHook(postgres_conn_id='your_postgres_conn_id')
+    conn = pg_hook.get_conn()
+    cursor = conn.cursor()
 
-    process_css = PythonOperator(
-        task_id="process_css_files",
-        python_callable=process_css_files
-    )
+    # Iterate through files in the directory
+    for filename in os.listdir(file_directory):
+        if filename.endswith('.csv'):  # Assuming CSV files, adjust as needed
+            file_path = os.path.join(file_directory, filename)
 
-    create_css_files_table >> process_css
+            with open(file_path, 'r') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)  # Skip header row if present
+
+                for row in csv_reader:
+                    # Assuming the CSV structure matches your table structure
+                    # Adjust the SQL and values according to your specific needs
+                    sql = """
+                    INSERT INTO your_table_name (column1, column2, column3)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (id) DO UPDATE
+                    SET column2 = EXCLUDED.column2,
+                        column3 = EXCLUDED.column3;
+                    """
+                    cursor.execute(sql, row)
+
+            conn.commit()
+            print(f"Processed file: {filename}")
+
+    cursor.close()
+    conn.close()
+
+
+# Define the PythonOperator
+update_db_task = PythonOperator(
+    task_id='update_db_from_files',
+    python_callable=read_file_and_update_db,
+    provide_context=True,
+    dag=dag,
+)
+
+# Set task dependencies if you have multiple tasks
+# update_db_task >> next_task

@@ -1,0 +1,10 @@
+node_modules
+build
+.DS_Store
+.git
+.gitignore
+npm-debug.log
+.env
+.env.development.local
+.env.test.local
+.env.production.local

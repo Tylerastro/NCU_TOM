@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
+import { LulinFilter, LulinInstrument } from "@/models/enums";
 import { LulinRuns } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -73,10 +74,10 @@ const instruments = [
 
 const formSchema = z.object({
   priority: z.number().transform(Number),
-  filters: z.record(z.boolean()).default({}),
+  filter: z.number(),
   binning: z.coerce.number().int().min(1).default(1),
   frames: z.coerce.number().int().min(1).default(1),
-  instruments: z.record(z.boolean()).default({}),
+  instrument: z.number(),
   exposure_time: z.number().int().default(10),
   start_date: z.date(),
   end_date: z.date(),
@@ -87,10 +88,10 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       priority: observation.priority,
-      filters: observation.filters,
+      filter: observation.filter,
       binning: observation.binning,
       frames: observation.frames,
-      instruments: observation.instruments,
+      instrument: observation.instrument,
       exposure_time: observation.exposure_time,
       start_date: new Date(observation.start_date),
       end_date: new Date(observation.end_date),
@@ -143,43 +144,38 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
         />
         <FormField
           control={form.control}
-          name="filters"
+          name="filter"
           render={() => (
             <FormItem>
               <div className="mb-4">
                 <FormLabel className="text-base">Filters</FormLabel>
               </div>
               <div className="flex gap-3">
-                {filters.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="filters"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.[item.id] ?? false}
-                              onCheckedChange={(checked) => {
-                                field.onChange({
-                                  ...field.value,
-                                  [item.id]: checked,
-                                });
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                {Object.entries(LulinFilter)
+                  .filter(([key]) => isNaN(Number(key)))
+                  .map(([key, value]) => (
+                    <FormField
+                      key={key}
+                      control={form.control}
+                      name="filter"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={key}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value === value}
+                                onCheckedChange={() => field.onChange(value)}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{key}</FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
               </div>
             </FormItem>
           )}
@@ -221,42 +217,37 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
         </div>
         <FormField
           control={form.control}
-          name="instruments"
+          name="instrument"
           render={() => (
             <FormItem>
               <div className="mb-4">
                 <FormLabel className="text-base">Instruments</FormLabel>
               </div>
-              {instruments.map((item) => (
-                <FormField
-                  key={item.id}
-                  control={form.control}
-                  name="instruments"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={item.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.[item.id] ?? false}
-                            onCheckedChange={(checked) => {
-                              field.onChange({
-                                ...field.value,
-                                [item.id]: checked,
-                              });
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {item.label}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
+              {Object.entries(LulinInstrument)
+                .filter(([key]) => isNaN(Number(key)))
+                .map(([key, value]) => (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name="instrument"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={key}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value === value}
+                              onCheckedChange={() => field.onChange(value)}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal">{key}</FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
             </FormItem>
           )}
         />

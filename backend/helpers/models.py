@@ -6,7 +6,9 @@ from django.db.models import UniqueConstraint
 
 
 def get_default_is_active() -> bool:
-    return settings.DEBUG
+    if settings.DEBUG:
+        return True
+    return False
 
 
 class Tags(models.Model):

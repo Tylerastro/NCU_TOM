@@ -87,13 +87,13 @@ export default function LulinData(props: LulinDataProps) {
             <TableCell className="text-right">{data.binning}</TableCell>
             <TableCell className="text-right">{data.frames}</TableCell>
             <TableCell className="text-right">
-              {Object.entries(data.instruments)
+              {Object.entries(data.instrument)
                 .filter(([_, value]) => value)
                 .map(([key]) => key)
                 .join(", ")}
             </TableCell>
             <TableCell className="text-right">
-              {Object.entries(data.filters)
+              {Object.entries(data.filter)
                 .filter(([_, value]) => value)
                 .sort(
                   ([a], [b]) => filterOrder.indexOf(a) - filterOrder.indexOf(b)

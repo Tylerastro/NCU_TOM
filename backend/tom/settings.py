@@ -22,9 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 STAGE = os.getenv("DJANGO_STAGE", "local")
 if STAGE == "local":
-    dotenv.load_dotenv(BASE_DIR / ".env.local")
+    dotenv.load_dotenv(BASE_DIR / ".env.local", override=True)
 else:
-    dotenv.load_dotenv(BASE_DIR / ".env.prod")
+    dotenv.load_dotenv(BASE_DIR / ".env.prod", override=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -33,20 +33,21 @@ else:
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS", "127.0.0.1,localhost,django").split(",")
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3000,http://nextjs:3000").split(",")
 CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    "CSRF_TRUSTED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3000,http://nextjs:3000").split(",")
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_COOKIE = "access"
 AUTH_COOKIE_MAX_AGE = 60 * 60 * 24
-AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "True") == "True"
+AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "True").lower() == "true"
 AUTH_COOKIE_HTTPONLY = True
 AUTH_COOKIE_PATH = "/"
 AUTH_COOKIE_SAMESITE = os.getenv("AUTH_COOKIE_SAMESITE", "strict")
@@ -108,7 +109,6 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'tom.wsgi.application'
-
 if os.getenv("ENGINE") == "django.db.backends.postgresql":
     DATABASES = {
         "default": {
@@ -228,7 +228,7 @@ REST_AUTH = {
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_ACTIVATION_EMAIL': True if not DEBUG else False,
     'PASSWORD_CHANGE_EMAIL_CONFIRMATION': False,
     'ACTIVATION_URL': 'activation/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE': True,

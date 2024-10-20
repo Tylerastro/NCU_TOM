@@ -19,9 +19,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
 import { useState } from "react";
 import SubmitLoader from "./submitLoader";
-import Image from "next/image";
 interface ErrorResponse {
   [key: string]: string[];
 }
@@ -53,6 +53,7 @@ export default function SignUp() {
       } else {
         toast.error("Error creating user");
       }
+      setIsSubmitting(false);
       console.error(responseData);
     },
   });
