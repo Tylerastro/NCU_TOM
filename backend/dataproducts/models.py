@@ -28,7 +28,7 @@ class DataProducts(models.Model):
 class LulinDataProduct(models.Model):
 
     name = models.CharField(max_length=100, null=False, blank=True)
-    file_name = models.CharField(max_length=100, null=False, blank=True)
+    file_name = models.CharField(max_length=200, null=False, blank=True)
     target = models.ForeignKey(
         'targets.Target', on_delete=models.CASCADE, null=True)
     mjd = models.FloatField(null=False)
@@ -40,8 +40,6 @@ class LulinDataProduct(models.Model):
         MinValueValidator(-90), MaxValueValidator(90)])
     exposure_time = models.FloatField(null=False)
     zp = models.FloatField(null=False)
-    instrument_mag = models.FloatField(null=False)
-    photometric_band = models.CharField(max_length=100, null=False, blank=True)
     filter = models.IntegerField(
         _("Filter"), choices=Filters.choices, default=1, null=True)
     instrument = models.IntegerField(

@@ -36,6 +36,8 @@ backend/entrypoint.sh
 *.manifest
 *.spec
 
+# airflow
+airflow*
 
 # production files
 *.prod*
