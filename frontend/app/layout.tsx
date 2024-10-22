@@ -1,4 +1,3 @@
-import Background from "@/components/Background";
 import { NavBar } from "@/components/Navbar";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -29,7 +28,12 @@ export default function RootLayout({
   return (
     <ReactQueryClientProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={cn("font-sans antialiased", gowunBatang.variable)}>
+        <body
+          className={cn(
+            "font-sans antialiased bg-gradient-to-b from-background to-secondary",
+            gowunBatang.variable
+          )}
+        >
           <ToastContainer />
           <NextAuthProvider>
             <ThemeProvider
@@ -38,11 +42,8 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <main>
-                <NavBar />
-                <Background />
-                {children}
-              </main>
+              <NavBar />
+              {children}
             </ThemeProvider>
           </NextAuthProvider>
         </body>

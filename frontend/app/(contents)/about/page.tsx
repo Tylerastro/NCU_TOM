@@ -23,7 +23,7 @@ const contributors = [
 
 export default function page() {
   return (
-    <>
+    <main>
       <section className="h-90vh" id="Developers">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
           <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
@@ -88,6 +88,6 @@ export default function page() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }
