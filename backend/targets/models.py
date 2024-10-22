@@ -10,14 +10,15 @@ class Target(models.Model):
 
     class Meta:
         db_table = 'Target'
+        indexes = [models.Index(fields=['ra', 'dec'], name='target_coords'), ]
 
     user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)
     ra = models.FloatField(null=False, validators=[
-                           MinValueValidator(0), MaxValueValidator(360)])
+                           MinValueValidator(0), MaxValueValidator(360)], db_index=True)
     dec = models.FloatField(null=False, validators=[
-                            MinValueValidator(-90), MaxValueValidator(90)])
+                            MinValueValidator(-90), MaxValueValidator(90)], db_index=True)
     redshift = models.FloatField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
