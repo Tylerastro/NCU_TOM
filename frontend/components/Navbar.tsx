@@ -33,7 +33,7 @@ const pages = [
 
 function NavBar() {
   return (
-    <div className="w-full min-w-0 h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around dark:bg-primary">
+    <div className="w-full min-w-0 h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around backdrop-blur-sm">
       <Logo />
       <div>
         <nav className="flex">
