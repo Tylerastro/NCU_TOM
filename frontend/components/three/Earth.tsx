@@ -1,10 +1,17 @@
-import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+"use client";
+import React, { useRef, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 const ParticleEarth = () => {
-  const points = useRef();
+  const points = useRef<THREE.Points>(null);
+  const { camera } = useThree();
 
+  useEffect(() => {
+    if (camera) {
+      camera.position.z = 5;
+    }
+  }, [camera]);
   // Generate particles in spherical coordinates
   const particleCount = 10000;
   const positions = new Float32Array(particleCount * 3);
@@ -49,13 +56,13 @@ const ParticleEarth = () => {
     <points ref={points}>
       <bufferGeometry>
         <bufferAttribute
-          attachObject={["attributes", "position"]}
+          attach="attributes-position"
           count={particleCount}
           array={positions}
           itemSize={3}
         />
         <bufferAttribute
-          attachObject={["attributes", "color"]}
+          attach="attributes-color"
           count={particleCount}
           array={colors}
           itemSize={3}
@@ -68,14 +75,7 @@ const ParticleEarth = () => {
 
 const Scene = () => {
   return (
-    <Canvas
-      camera={{
-        position: [0, 0, 5],
-        fov: 75,
-        near: 0.1,
-        far: 1000,
-      }}
-    >
+    <Canvas>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <ParticleEarth />
@@ -83,9 +83,9 @@ const Scene = () => {
   );
 };
 
-export default function App() {
+export default function EarthAnimation() {
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div style={{ width: "500px", height: "500px" }}>
       <Scene />
     </div>
   );

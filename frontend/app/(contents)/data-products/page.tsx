@@ -1,4 +1,5 @@
 import AstronomicalObservations from "@/components/data-products/DataPlots";
+import EarthAnimation from "@/components/three/Earth";
 import Events from "@/components/data-products/Events";
 
 export default function Component() {
@@ -14,6 +15,7 @@ export default function Component() {
         </header>
         <Events />
         <AstronomicalObservations />
+        <EarthAnimation />
       </div>
     </main>
   );
