@@ -139,9 +139,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
               )}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Observations
-                  </CardTitle>
+                  <CardTitle className=" font-medium">Observations</CardTitle>
                   {/* SVG icon */}
                 </CardHeader>
                 <CardContent>
@@ -156,7 +154,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
               {/* Tags Card */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Tags</CardTitle>
+                  <CardTitle className="font-medium">Tags</CardTitle>
                   {/* SVG icon */}
                 </CardHeader>
                 <CardContent>
@@ -167,7 +165,7 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
                       </Badge>
                     ))
                   ) : (
-                    <div className="text-sm font-medium">No tags found</div>
+                    <div className=" font-medium">No tags found</div>
                   )}
                 </CardContent>
               </Card>

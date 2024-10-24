@@ -39,7 +39,6 @@ import {
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [selectedTags, setSelectedTags] = useState<
     z.infer<typeof formSchema>["tags"]
   >([]);

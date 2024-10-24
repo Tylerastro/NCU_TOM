@@ -190,7 +190,7 @@ export default function ObservationsTable() {
         <div className="flex space-between py-2 px-2 gap-2">
           <Input
             placeholder="Filter observations..."
-            className="text-primary-foreground h-8 w-[150px] lg:w-[250px]"
+            className="text-primary-foreground h-10 w-[150px] lg:w-[250px]"
             onChange={(e) => setSearch(e.target.value)}
           />
           <SearchFilter

@@ -12,7 +12,7 @@ export default function ContentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${styles.contents} animate-page-transition`}>
+    <div className={`w-[85%] pt-12 px-12 animate-page-transition min-h-svh`}>
       {children}
     </div>
   );

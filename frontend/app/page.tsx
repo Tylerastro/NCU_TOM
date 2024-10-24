@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Block from "@/components/Block";
-import styles from "./page.module.css";
 
 export default function Home() {
   const block1_links = [
@@ -23,7 +22,7 @@ export default function Home() {
     <>
       <div>
         <Image
-          className={styles.background}
+          className="bg-cover bg-center bg-fixed fixed top-0 left-0 right-0 -z-10"
           alt="Mountains"
           width={1920}
           height={1080}

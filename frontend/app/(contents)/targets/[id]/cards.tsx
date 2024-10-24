@@ -42,7 +42,7 @@ function CoordCard(
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Coords</CardTitle>
+        <CardTitle className="font-medium">Coords</CardTitle>
         <Button
           variant="ghost"
           size="icon"
@@ -99,7 +99,7 @@ function ExternalLinksCard() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">External Links</CardTitle>
+        <CardTitle className=" font-medium">External Links</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-rows-2 gap-2">
         <div className="flex items-center justify-around">
