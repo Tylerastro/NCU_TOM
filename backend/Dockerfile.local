@@ -5,13 +5,9 @@ WORKDIR /app
 COPY . /app/
 RUN pip install -r requirements.txt
 
-# Create a script to create the superuser
-RUN echo "#!/bin/bash\n\
-    echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'password') if not User.objects.filter(username='admin').exists() else print('Admin user already exists')\" | python manage.py shell" > create_superuser.sh
-
-RUN chmod +x create_superuser.sh
 
 CMD python manage.py makemigrations && \
     python manage.py migrate --noinput && \
+    python manage.py createsuperuser --noinput --skip-checks && \
     python manage.py runserver 0.0.0.0:8000
 

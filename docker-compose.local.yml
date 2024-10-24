@@ -6,6 +6,11 @@ services:
     stdin_open: true
     ports:
       - "3000:3000"
+    develop:
+      watch:
+        - path: ./frontend
+          target: /app
+          action: sync
 
   django:
     build:
@@ -17,12 +22,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    develop:
+      watch:
+        - path: ./backend
+          target: /app
+          action: sync
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - DEBUG=true
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+      - DJANGO_SUPERUSER_USERNAME=Admin
+      - DJANGO_SUPERUSER_PASSWORD=Password
+      - DJANGO_SUPERUSER_FIRST_NAME=tom
+      - DJANGO_SUPERUSER_LAST_NAME=astro
+      - DJANGO_SUPERUSER_ROLE=1
+      - DJANGO_SUPERUSER_INSTITUTE=NCU
+      - DJANGO_SUPERUSER_USE_DEMO_TARGETS=True
     ports:
       - "8000:8000"
 

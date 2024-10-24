@@ -91,14 +91,13 @@ class User(AbstractUser, PermissionsMixin):
         ADMIN = 1
         FACULTY = 2
         USER = 3
-        VISITOR = 4
 
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     institute = models.CharField(max_length=100)
     email = models.EmailField(unique=True, verbose_name='email address')
-    role = models.IntegerField(choices=roles.choices, default=roles.VISITOR)
+    role = models.IntegerField(choices=roles.choices, default=roles.USER)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     use_demo_targets = models.BooleanField(default=True)

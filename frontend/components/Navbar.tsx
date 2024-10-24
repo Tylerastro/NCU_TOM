@@ -1,7 +1,6 @@
-import NavTooltip from "./NavTooltip";
 import { AnimatedButton } from "./AnimatedButton";
-import Link from "next/link";
 import Logo from "./Logo";
+import NavTooltip from "./NavTooltip";
 
 const pages = [
   {
