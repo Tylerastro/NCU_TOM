@@ -26,7 +26,7 @@ export default async function NavTooltip() {
 function UnAuthTooltip() {
   return (
     <>
-      <Button asChild variant="secondary">
+      <Button asChild variant="ghost">
         <Link href="/auth/signin">Login</Link>
       </Button>
     </>
@@ -37,7 +37,7 @@ function AuthTooltip(session: any) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ButtonUI className="dark:bg-primary" variant="outline">
+        <ButtonUI className="" variant="ghost">
           Hi, {session?.user.username}
         </ButtonUI>
       </DropdownMenuTrigger>

@@ -147,14 +147,7 @@ export default function AstronomicalObservations() {
               </TableHeader>
               <TableBody>
                 {filteredObservations.map((obs) => (
-                  <TableRow
-                    key={obs.id}
-                    className={
-                      selectedObservation && selectedObservation.id === obs.id
-                        ? "bg-muted"
-                        : ""
-                    }
-                  >
+                  <TableRow key={obs.id} className={"bg-muted"}>
                     <TableCell>{obs.id}</TableCell>
                     <TableCell>{obs.ra.toFixed(2)}°</TableCell>
                     <TableCell>{obs.dec.toFixed(2)}°</TableCell>
