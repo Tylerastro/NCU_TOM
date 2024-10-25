@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 CMD python manage.py makemigrations && \
     python manage.py migrate --noinput && \
-    python manage.py createsuperuser --noinput --skip-checks && \
+    python manage.py create_local_superuser && \
     python manage.py runserver 0.0.0.0:8000
 

@@ -52,3 +52,14 @@ class LulinDataProduct(models.Model):
     class Meta:
         ordering = ['-created_at']
         db_table = 'LulinDataProduct'
+
+
+class ETLLogs(models.Model):
+    name = models.CharField(max_length=100, null=False, blank=True)
+    observatory = models.IntegerField(choices=Observatories.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=False)
+    error_message = models.TextField(null=True)
+
+    class Meta:
+        db_table = 'ETLLogs'

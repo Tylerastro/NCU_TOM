@@ -1,14 +1,15 @@
 import os
-from math import acos, cos, degrees, radians, sin
+from math import radians
 
 import pandas as pd
-from dataproducts.models import LulinDataProduct
+from dataproducts.models import ETLLogs, LulinDataProduct
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from observations.lulin_models import Filters, Instruments
+from observations.models import Observatories
 from targets.models import Target
 
 from backend.helpers.models import User
@@ -63,75 +64,104 @@ class Command(BaseCommand):
         return target
 
     def handle(self, *args, **options):
-
         # Get the most recent CSV file in the directory
         csv_files = [f for f in os.listdir(FILE_PATH) if f.endswith('.csv')]
         if not csv_files:
-            self.stdout.write(self.style.ERROR(
-                f'No CSV files found in {FILE_PATH}'))
+            error_message = f'No CSV files found in {FILE_PATH}'
+            self.stdout.write(self.style.ERROR(error_message))
             return
 
         for file in csv_files:
+            etl_log = ETLLogs.objects.create(
+                name=file,
+                observatory=Observatories.LULIN,
+                success=False
+            )
+
             csv_file_path = os.path.join(FILE_PATH, file)
 
             try:
                 df = pd.read_csv(csv_file_path)
             except Exception as e:
-                self.stdout.write(self.style.ERROR(
-                    f'Error reading CSV file: {str(e)}'))
-                return
+                error_message = f'Error reading CSV file: {str(e)}'
+                self.stdout.write(self.style.ERROR(error_message))
+                etl_log.error_message = error_message
+                etl_log.save()
+                continue
 
-            with transaction.atomic():
-                for idx, row in df.iterrows():
-                    self.stdout.write(f"Processing row: {idx}")
-                    try:
-                        target = self.find_target(
-                            row['object'], row['RA_fit'], row['Dec_fit'])
-                    except Target.DoesNotExist:
-                        self.stdout.write(self.style.WARNING(
-                            f"Target '{row['object']}' not found. Creating new target."))
-                        target = Target.objects.create(
-                            name=row['object'],
-                            ra=row['RA_fit'],
-                            dec=row['Dec_fit'],
-                            user=User.objects.get(username='admin')
-                        )
+            try:
+                with transaction.atomic():
+                    error_messages = []  # Collect all warnings and errors
 
-                    try:
-                        filter_choice = Filters[row['filter']].value
-                    except KeyError:
-                        self.stdout.write(self.style.WARNING(
-                            f"Invalid filter '{row['filter']}' for target '{row['object']}'. Skipping row."))
-                        continue
+                    for idx, row in df.iterrows():
+                        self.stdout.write(f"Processing row: {idx}")
+                        try:
+                            target = self.find_target(
+                                row['object'], row['RA_fit'], row['Dec_fit'])
+                        except Target.DoesNotExist:
+                            warning = f"Target '{row['object']}' not found. Creating new target."
+                            self.stdout.write(self.style.WARNING(warning))
+                            error_messages.append(warning)
+                            target = Target.objects.create(
+                                name=row['object'],
+                                ra=row['RA_fit'],
+                                dec=row['Dec_fit'],
+                                user=User.objects.get(username='admin')
+                            )
 
-                    try:
-                        instrument_choice = Instruments[row['telescope']].value
-                    except KeyError:
-                        self.stdout.write(self.style.WARNING(
-                            f"Invalid instrument '{row['telescope']}' for target '{row['object']}'. Skipping row."))
-                        continue
+                        try:
+                            filter_choice = Filters[row['filter']].value
+                        except KeyError:
+                            warning = f"Invalid filter '{row['filter']}' for target '{row['object']}'. Skipping row."
+                            self.stdout.write(self.style.WARNING(warning))
+                            error_messages.append(warning)
+                            continue
 
-                    try:
-                        LulinDataProduct.objects.create(
-                            name=row['object'],
-                            file_name=row['complete_info_filename'],
-                            target=target,
-                            mjd=float(row['obs_midMJD']),
-                            mag=float(row['mag']),
-                            source_ra=float(row['RA_fit']),
-                            source_dec=float(row['Dec_fit']),
-                            exposure_time=float(row['intexptime']),
-                            zp=float(row['optimized_zeropoint_mag']),
-                            filter=filter_choice,
-                            instrument=instrument_choice,
-                            FWHM=float(row['estimated_FWHM']),
-                        )
-                        self.stdout.write(self.style.SUCCESS(
-                            f"Successfully imported data for target '{row['object']}'"))
-                    except ValidationError as e:
-                        self.stdout.write(self.style.WARNING(
-                            f"Validation error for target '{row['object']}': {str(e)}. Skipping row: {row}"))
-                        continue
+                        try:
+                            instrument_choice = Instruments[row['telescope']].value
+                        except KeyError:
+                            warning = f"Invalid instrument '{row['telescope']}' for target '{row['object']}'. Skipping row."
+                            self.stdout.write(self.style.WARNING(warning))
+                            error_messages.append(warning)
+                            continue
 
-            self.stdout.write(self.style.SUCCESS(
-                f'Lulin data imported successfully from {file}'))
+                        try:
+                            LulinDataProduct.objects.create(
+                                name=row['object'],
+                                file_name=row['complete_info_filename'],
+                                target=target,
+                                mjd=float(row['obs_midMJD']),
+                                mag=float(row['mag']),
+                                source_ra=float(row['RA_fit']),
+                                source_dec=float(row['Dec_fit']),
+                                exposure_time=float(row['intexptime']),
+                                zp=float(row['optimized_zeropoint_mag']),
+                                filter=filter_choice,
+                                instrument=instrument_choice,
+                                FWHM=float(row['estimated_FWHM']),
+                            )
+                            self.stdout.write(self.style.SUCCESS(
+                                f"Successfully imported data for target '{row['object']}'"))
+                        except ValidationError as e:
+                            warning = f"Validation error for target '{row['object']}': {str(e)}. Skipping row: {row}"
+                            self.stdout.write(self.style.WARNING(warning))
+                            error_messages.append(warning)
+                            continue
+
+                    # If we get here, the transaction completed successfully
+                    success_message = f'Lulin data imported successfully from {file}'
+                    self.stdout.write(self.style.SUCCESS(success_message))
+
+                    # Update ETL log with success and any warnings
+                    etl_log.success = True
+                    if error_messages:
+                        etl_log.error_message = "\n".join(error_messages)
+                    etl_log.save()
+
+            except Exception as e:
+                # Handle any unexpected errors during the transaction
+                error_message = f"Error processing file {file}: {str(e)}"
+                self.stdout.write(self.style.ERROR(error_message))
+                etl_log.error_message = error_message
+                etl_log.save()
+                continue
