@@ -1,99 +1,97 @@
-"use client";
+'use client'
 
-import React, { lazy, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import { Check, MapPinned } from "lucide-react";
+import React, { lazy, Suspense, useEffect, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { Check, MapPinned } from 'lucide-react'
 
-import { getTarget } from "@/apis/targets/getTarget";
-import { putTarget } from "@/apis/targets/putTarget";
-import { PutTarget, Target } from "@/models/targets";
-import { CoordCard, ExternalLinksCard, SimbadCard } from "./cards";
+import { getTarget } from '@/apis/targets/getTarget'
+import { putTarget } from '@/apis/targets/putTarget'
+import { PutTarget, Target } from '@/models/targets'
+import { CoordCard, ExternalLinksCard, SimbadCard } from './cards'
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import {
   convertHourAngleToDegrees,
   convertSexagesimalDegreesToDecimal,
-} from "@/utils/coordFormatter";
-import { getTargetSimbad } from "@/apis/targets/getTargetSimbad";
+} from '@/utils/coordFormatter'
+import { getTargetSimbad } from '@/apis/targets/getTargetSimbad'
 
-const AladinViewer = lazy(() => import("./aladin"));
+const AladinViewer = lazy(() => import('./aladin'))
 
 export default function DashboardPage({ params }: { params: { id: number } }) {
   const { data: target, refetch } = useQuery({
-    queryKey: ["targets", params.id],
+    queryKey: ['targets', params.id],
     queryFn: () => getTarget(params.id),
-  });
+  })
 
   const { data: simbadData } = useQuery({
-    queryKey: ["targets", params.id, "simbad"],
+    queryKey: ['targets', params.id, 'simbad'],
     queryFn: () => getTargetSimbad(params.id),
     enabled: !!target,
-  });
+  })
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedRA, setEditedRA] = useState(target?.coordinates?.split(" ")[0]);
-  const [editedDec, setEditedDec] = useState(
-    target?.coordinates?.split(" ")[1]
-  );
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedRA, setEditedRA] = useState(target?.coordinates?.split(' ')[0])
+  const [editedDec, setEditedDec] = useState(target?.coordinates?.split(' ')[1])
 
   useEffect(() => {
     if (target && target.coordinates) {
-      const [ra, dec] = target.coordinates.split(" ");
-      setEditedRA(ra);
-      setEditedDec(dec);
+      const [ra, dec] = target.coordinates.split(' ')
+      setEditedRA(ra)
+      setEditedDec(dec)
     }
-  }, [target]);
+  }, [target])
 
   const targetMutation = useMutation({
     mutationFn: (updatedTarget: PutTarget) =>
       putTarget(target?.id || 0, updatedTarget),
     onSuccess: () => {
-      refetch();
-      toast.success("Target updated successfully");
-      setIsEditing(false);
+      refetch()
+      toast.success('Target updated successfully')
+      setIsEditing(false)
     },
     onError: (error: any) => {
       if (error.response) {
         toast.error(
           error.response.data.detail ||
-            "An error occurred while updating the target"
-        );
+            'An error occurred while updating the target'
+        )
       } else {
         toast.error(
-          error.message || "An error occurred while updating the target"
-        );
+          error.message || 'An error occurred while updating the target'
+        )
       }
       if (error.response && error.response.data) {
         for (const key in error.response.data) {
-          toast.error(`${key}: ${error.response.data[key][0]}`);
+          toast.error(`${key}: ${error.response.data[key][0]}`)
         }
       }
     },
-  });
+  })
 
-  const handleEditClick = () => setIsEditing(true);
+  const handleEditClick = () => setIsEditing(true)
 
   const handleSaveClick = () => {
     if (!editedRA || !editedDec) {
-      setIsEditing(false);
-      return;
+      setIsEditing(false)
+      return
     }
 
-    const raResult = convertHourAngleToDegrees(editedRA);
-    const decResult = convertSexagesimalDegreesToDecimal(editedDec);
+    const raResult = convertHourAngleToDegrees(editedRA)
+    const decResult = convertSexagesimalDegreesToDecimal(editedDec)
 
     if (raResult instanceof Error) {
-      toast.error("Invalid Ra coordinates");
-      return;
+      toast.error('Invalid Ra coordinates')
+      return
     }
 
     if (decResult instanceof Error) {
-      toast.error("Invalid Dec coordinates");
-      return;
+      toast.error('Invalid Dec coordinates')
+      return
     }
 
     if (target) {
@@ -101,10 +99,10 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
         ...target,
         ra: raResult,
         dec: decResult,
-      };
-      targetMutation.mutate(updatedTarget);
+      }
+      targetMutation.mutate(updatedTarget)
     }
-  };
+  }
 
   return (
     <div className="hidden flex-col md:flex">
@@ -173,7 +171,12 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent className="p-2">
-                  <AladinViewer coord={target?.coordinates} fov={0.2} />
+                  {/* <AladinViewer coord={target?.coordinates} fov={0.2} /> */}
+                  {target?.coordinates && (
+                    <Suspense>
+                      <AladinViewer coord={target.coordinates} fov={0.2} />
+                    </Suspense>
+                  )}
                 </CardContent>
               </Card>
               <SimbadCard data={simbadData} />
@@ -182,5 +185,5 @@ export default function DashboardPage({ params }: { params: { id: number } }) {
         </Tabs>
       </div>
     </div>
-  );
+  )
 }
