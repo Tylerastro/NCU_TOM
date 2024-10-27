@@ -28,7 +28,7 @@ jobs:
         image: postgres:latest
         env:
           POSTGRES_DB: tom
-          POSTGRES_USER: admin
+          POSTGRES_USER: tom
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
@@ -51,10 +51,10 @@ jobs:
           pip install -r requirements.txt
       - name: Run
         env:
-          DATABASE_URL: postgresql://admin:password@localhost:5432/tom
+          DATABASE_URL: postgresql://tom:password@localhost:5432/tom
           DATABASE_PORT: 5432
           DATABASE: tom
-          USER: admin
+          USER: tom
           PASSWORD: password
         run: |
           cd backend

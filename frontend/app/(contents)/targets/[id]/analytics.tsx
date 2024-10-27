@@ -28,16 +28,6 @@ export default function Analytics({ targetId }: { targetId: number }) {
     refetchOnWindowFocus: false,
   });
 
-  if (rawData === undefined || rawData.length === 0) {
-    return (
-      <TabsContent value="analytics">
-        <div className="text-center">
-          <p className="text-3xl font-bold">No data</p>
-        </div>
-      </TabsContent>
-    );
-  }
-
   const { processedData, targetColors, uniqueTargets } = useMemo(() => {
     if (!rawData)
       return { processedData: [], targetColors: {}, uniqueTargets: [] };
@@ -46,6 +36,7 @@ export default function Analytics({ targetId }: { targetId: number }) {
     targets.forEach((target) => {
       colors[target] = stringToColor(target);
     });
+
     const processed = rawData.map((obs) => ({
       ...obs,
       obs_date_ms: new Date(obs.obs_date).getTime(),
@@ -57,6 +48,17 @@ export default function Analytics({ targetId }: { targetId: number }) {
       uniqueTargets: targets,
     };
   }, [rawData]);
+
+  if (rawData === undefined || rawData.length === 0) {
+    return (
+      <TabsContent value="analytics">
+        <div className="text-center">
+          <p className="text-3xl font-bold">No data</p>
+        </div>
+      </TabsContent>
+    );
+  }
+
   return (
     <TabsContent value="analytics">
       <div className="col-span-7">
