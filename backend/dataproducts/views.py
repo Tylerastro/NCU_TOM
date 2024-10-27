@@ -22,7 +22,6 @@ def get_etl_logs(request):
 
 class LulinTargetDataView(APIView):
     def get(self, request, pk):
-        print(pk)
         if pk == 0:
             data = LulinDataProduct.objects.all().order_by('-created_at')[:25]
             serializer = LulinDataProductSerializer(data, many=True)
@@ -35,7 +34,7 @@ class LulinTargetDataView(APIView):
             deleted_at__isnull=True
         )
 
-        data_products = target.lulidataproduct_set.all()
+        data_products = target.lulin_data_products.all()
 
         serializer = LulinDataProductSerializer(data_products, many=True)
         return Response(serializer.data, status=200)

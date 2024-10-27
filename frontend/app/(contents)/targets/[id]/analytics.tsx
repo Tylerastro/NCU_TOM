@@ -28,6 +28,16 @@ export default function Analytics({ targetId }: { targetId: number }) {
     refetchOnWindowFocus: false,
   });
 
+  if (rawData === undefined || rawData.length === 0) {
+    return (
+      <TabsContent value="analytics">
+        <div className="text-center">
+          <p className="text-3xl font-bold">No data</p>
+        </div>
+      </TabsContent>
+    );
+  }
+
   const { processedData, targetColors, uniqueTargets } = useMemo(() => {
     if (!rawData)
       return { processedData: [], targetColors: {}, uniqueTargets: [] };

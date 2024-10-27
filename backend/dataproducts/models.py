@@ -30,7 +30,7 @@ class LulinDataProduct(models.Model):
     name = models.CharField(max_length=100, null=False, blank=True)
     file_name = models.CharField(max_length=200, null=False, blank=True)
     target = models.ForeignKey(
-        'targets.Target', on_delete=models.CASCADE, null=True)
+        'targets.Target', on_delete=models.CASCADE, null=True,  related_name='lulin_data_products')
     mjd = models.FloatField(null=False)
     mag = models.FloatField(null=False)
     source_ra = models.FloatField(null=False, validators=[
