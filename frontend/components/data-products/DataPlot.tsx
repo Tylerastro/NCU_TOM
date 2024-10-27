@@ -19,13 +19,7 @@ const stringToColor = (str: string) => {
   const h = hash % 360;
   return `hsl(${h}, 70%, 50%)`;
 };
-export default function DataPlot({
-  rawData,
-  xAxisType,
-}: {
-  rawData: LulinDataProduct[];
-  xAxisType: string;
-}) {
+export default function DataPlot({ rawData }: { rawData: LulinDataProduct[] }) {
   const { processedData, targetColors, uniqueTargets } = useMemo(() => {
     if (!rawData)
       return { processedData: [], targetColors: {}, uniqueTargets: [] };
@@ -63,11 +57,9 @@ export default function DataPlot({
           <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
             <XAxis
               type="number"
-              dataKey={xAxisType === "utc" ? "obs_date_ms" : "mjd"}
-              name={xAxisType === "utc" ? "UTC" : "MJD"}
-              tickFormatter={
-                xAxisType === "utc" ? (value) => formatUTC(value) : formatMJD
-              }
+              dataKey="obs_date_ms"
+              name="UTC"
+              tickFormatter={(value) => formatUTC(value)}
               domain={["auto", "auto"]}
               angle={-15}
               textAnchor="end"

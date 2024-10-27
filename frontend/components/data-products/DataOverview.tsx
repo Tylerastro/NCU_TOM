@@ -1,13 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { LulinFilter } from "@/models/enums";
 
 import { getLulinTargetData } from "@/apis/dataProducts/getLulinTargetData";
@@ -27,7 +20,6 @@ import DataPlot from "./DataPlot";
 export default function AstronomicalObservations() {
   const [selectedObservation, setSelectedObservation] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [xAxisType, setXAxisType] = useState<"utc" | "mjd">("utc");
 
   const { data: rawData, isFetching } = useQuery({
     queryKey: ["observations"],
@@ -40,18 +32,6 @@ export default function AstronomicalObservations() {
       <section>
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Lulin Observations</h2>
-          <Select
-            value={xAxisType}
-            onValueChange={(value: "utc" | "mjd") => setXAxisType(value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select x-axis" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="utc">UTC Time</SelectItem>
-              <SelectItem value="mjd">MJD</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </section>
       <section>
@@ -63,7 +43,7 @@ export default function AstronomicalObservations() {
           />
         </div>
         <div className="grid grid-cols-10 gap-4">
-          {rawData && <DataPlot rawData={rawData} xAxisType={xAxisType} />}
+          {rawData && <DataPlot rawData={rawData} />}
           <div className="col-span-3">
             <Table>
               <TableHeader>

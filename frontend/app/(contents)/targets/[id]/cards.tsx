@@ -1,20 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import { Check, MapPinned } from "lucide-react";
 
-import { getTarget } from "@/apis/targets/getTarget";
-import { putTarget } from "@/apis/targets/putTarget";
-import { PutTarget, Target, TargetSimbad } from "@/models/targets";
+import { Target, TargetSimbad } from "@/models/targets";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getTargetSimbad } from "@/apis/targets/getTargetSimbad";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 function formatCoordinate(
   coordinate: string | undefined,
