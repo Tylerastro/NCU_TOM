@@ -23,7 +23,7 @@ def get_etl_logs(request):
 class LulinTargetDataView(APIView):
     def get(self, request, pk):
         if pk == 0:
-            data = LulinDataProduct.objects.all().order_by('-created_at')[:25]
+            data = LulinDataProduct.objects.all().order_by('-mjd')[:25]
             serializer = LulinDataProductSerializer(data, many=True)
             return Response(serializer.data, status=200)
 
