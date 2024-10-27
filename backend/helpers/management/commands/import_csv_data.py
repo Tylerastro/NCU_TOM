@@ -83,6 +83,8 @@ class Command(BaseCommand):
         for file in csv_files:
             files_c += 1
             csv_file_path = os.path.join(FILE_PATH, file)
+            if 'fail' in file:
+                continue
 
             try:
                 df = pd.read_csv(csv_file_path)
@@ -131,7 +133,7 @@ class Command(BaseCommand):
                             continue
 
                         try:
-                            LulinDataProduct.objects.create(
+                            LulinDataProduct.objects.get_or_create(
                                 name=row['object'],
                                 file_name=row['complete_info_filename'],
                                 target=target,
