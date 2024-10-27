@@ -55,11 +55,14 @@ class LulinDataProduct(models.Model):
 
 
 class ETLLogs(models.Model):
-    name = models.CharField(max_length=100, null=False, blank=True)
-    observatory = models.IntegerField(choices=Observatories.choices)
-    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255)
+    observatory = models.CharField(
+        max_length=50, choices=Observatories.choices)
     success = models.BooleanField(default=False)
-    error_message = models.TextField(null=True)
+    file_processed = models.IntegerField(default=0)
+    row_processed = models.IntegerField(default=0)
+    error_message = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'ETLLogs'

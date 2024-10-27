@@ -22,6 +22,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - /Users/tyler/Projects/tom/Calibrated_Science:/app/data:ro
     develop:
       watch:
         - path: ./backend

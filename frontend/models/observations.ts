@@ -1,6 +1,6 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
 import { Comments, Tag, User } from "./helpers";
-import { LulinTarget, Target } from "./targets";
+import { LulinTarget, SimpleTarget, Target } from "./targets";
 export interface Observation {
   id: number;
   user?: User;
@@ -120,4 +120,20 @@ interface CountItem {
   id: number;
   name: string;
   count: number;
+}
+
+export interface LulinDataProduct {
+  name: string;
+  target: SimpleTarget;
+  mjd: number;
+  obs_date: Date;
+  mag: number;
+  source_ra: number;
+  source_dec: number;
+  exposure_time: number;
+  zp: number;
+  filter: number;
+  instrument: number;
+  FWHM: number;
+  created_at: Date;
 }

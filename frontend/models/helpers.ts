@@ -60,3 +60,12 @@ export interface Paginator {
   total: number;
   results: any[];
 }
+
+export interface ETLLogs {
+  name: string;
+  observatory: number;
+  success: boolean;
+  file_processed: number;
+  row_processed: number;
+  created_at: Date;
+}

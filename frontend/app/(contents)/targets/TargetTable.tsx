@@ -1,10 +1,11 @@
 "use client";
 import { getTags } from "@/apis/tags/getTags";
+import { deleteTargets } from "@/apis/targets/deleteTargets";
 import { getTargets } from "@/apis/targets/getTargets";
+import useDebounce from "@/components/Debounce";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
 import { Button } from "@/components/ui/button";
-import useDebounce from "@/components/Debounce";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -19,7 +20,6 @@ import { toast } from "react-toastify";
 import { columns } from "./columns";
 import { NewTargetFrom } from "./createTargets";
 import { DataTable } from "./dataTable";
-import { deleteTargets } from "@/apis/targets/deleteTargets";
 
 function LoadingSkeleton() {
   return (
@@ -91,7 +91,7 @@ export default function TargetTable() {
     setPage(1);
   }, [search, searchTags]);
   return (
-    <div className=" sm:max-w-[825px] lg:max-w-full py-5">
+    <div className="sm:max-w-[825px] lg:max-w-full py-5">
       <div className="flex justify-between py-2 px-2 gap-2">
         <div className="flex gap-2">
           <Input

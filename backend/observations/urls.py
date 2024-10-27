@@ -3,11 +3,6 @@ from django.urls import path
 from helpers.views import send_observation_mail
 from rest_framework import routers
 
-router = routers.DefaultRouter()
-router.register(r'observations', views.ObservationsView,
-                basename='observations')
-
-
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
     path('observations/<int:pk>/', views.ObservationDetailView.as_view()),

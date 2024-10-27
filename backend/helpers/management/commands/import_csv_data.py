@@ -1,4 +1,5 @@
 import os
+import uuid
 from math import radians
 
 import pandas as pd
@@ -8,20 +9,20 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import ACos, Cos, Radians, Sin
+from helpers.models import User
 from observations.lulin_models import Filters, Instruments
 from observations.models import Observatories
 from targets.models import Target
 
-from backend.helpers.models import User
-
-FILE_PATH = os.getenv("PHOTOMETRY_PATH", None)
+FILE_PATH = os.getenv(
+    "PHOTOMETRY_PATH", "/app/data")
 
 
 class Command(BaseCommand):
     help = 'Import Lulin data from CSV file'
 
     @staticmethod
-    def find_targets_within_radius(self, ra, dec, radius_degrees):
+    def find_targets_within_radius(ra, dec, radius_degrees):
         # Convert to radians for calculation
         ra1_rad = radians(ra)
         dec1_rad = radians(dec)
@@ -51,7 +52,7 @@ class Command(BaseCommand):
         return targets.first()
 
     @staticmethod
-    def find_target_by_name(self, name):
+    def find_target_by_name(name):
         try:
             return Target.objects.get(name=name)
         except Target.DoesNotExist:
@@ -64,20 +65,23 @@ class Command(BaseCommand):
         return target
 
     def handle(self, *args, **options):
-        # Get the most recent CSV file in the directory
+        etl_log = ETLLogs.objects.create(
+            name=str(uuid.uuid4())[:8],
+            observatory=Observatories.LULIN,
+            success=False
+        )
+
         csv_files = [f for f in os.listdir(FILE_PATH) if f.endswith('.csv')]
         if not csv_files:
             error_message = f'No CSV files found in {FILE_PATH}'
             self.stdout.write(self.style.ERROR(error_message))
             return
 
+        files_c = 0
+        rows_c = 0
+        error_messages = []
         for file in csv_files:
-            etl_log = ETLLogs.objects.create(
-                name=file,
-                observatory=Observatories.LULIN,
-                success=False
-            )
-
+            files_c += 1
             csv_file_path = os.path.join(FILE_PATH, file)
 
             try:
@@ -85,7 +89,7 @@ class Command(BaseCommand):
             except Exception as e:
                 error_message = f'Error reading CSV file: {str(e)}'
                 self.stdout.write(self.style.ERROR(error_message))
-                etl_log.error_message = error_message
+                error_messages.append(error_message)
                 etl_log.save()
                 continue
 
@@ -94,6 +98,7 @@ class Command(BaseCommand):
                     error_messages = []  # Collect all warnings and errors
 
                     for idx, row in df.iterrows():
+                        rows_c += 1
                         self.stdout.write(f"Processing row: {idx}")
                         try:
                             target = self.find_target(
@@ -148,20 +153,23 @@ class Command(BaseCommand):
                             error_messages.append(warning)
                             continue
 
-                    # If we get here, the transaction completed successfully
+                        rows_c += 1
+
                     success_message = f'Lulin data imported successfully from {file}'
                     self.stdout.write(self.style.SUCCESS(success_message))
 
-                    # Update ETL log with success and any warnings
                     etl_log.success = True
                     if error_messages:
                         etl_log.error_message = "\n".join(error_messages)
+                    etl_log.file_processed = files_c
+                    etl_log.row_processed = rows_c
                     etl_log.save()
 
             except Exception as e:
-                # Handle any unexpected errors during the transaction
                 error_message = f"Error processing file {file}: {str(e)}"
                 self.stdout.write(self.style.ERROR(error_message))
                 etl_log.error_message = error_message
+                etl_log.file_processed = files_c
+                etl_log.row_processed = rows_c
                 etl_log.save()
                 continue

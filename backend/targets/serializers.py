@@ -21,6 +21,12 @@ class ObservationSerializer(serializers.ModelSerializer):
                   'start_date', 'end_date', 'status')
 
 
+class TargetSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Target
+        fields = ('id', 'name', 'ra', 'dec', 'redshift', 'created_at')
+
+
 class TargetGetSerializer(serializers.ModelSerializer):
     tags = TagsGetSerializer(many=True, required=False)
     user = UserSerializer()

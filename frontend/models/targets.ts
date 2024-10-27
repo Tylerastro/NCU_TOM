@@ -1,6 +1,16 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
 import { Tag, User } from "./helpers";
 import { Observation } from "./observations";
+
+export interface SimpleTarget {
+  id: number;
+  name: string;
+  ra: number;
+  dec: number;
+  redshift?: number;
+  created_at: Date;
+}
+
 export interface Target {
   id?: number;
   name: string;

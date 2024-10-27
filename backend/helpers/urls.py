@@ -1,15 +1,11 @@
 from django.urls import path, re_path
 from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
-from rest_framework import routers
 
 from .views import (AnnouncementsDetailView, AnnouncementsView, EditUserRole,
                     LogoutView, TagsDetailView, TagsView, TomProviderAuthView,
                     TomTokenObtainPairView, TomTokenRefreshView,
                     TomTokenVerifyView, UserDetailView, UserView)
-
-router = routers.DefaultRouter()
-
 
 urlpatterns = [
     re_path(r'^o/(?P<provider>\S+)/$',
