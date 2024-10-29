@@ -1,5 +1,7 @@
 import { getLulin } from "@/apis/observations/getLulin";
-import { getObservations } from "@/apis/observations/getObservations";
+import { getObservation } from "@/apis/observations/getObservation";
+import AltChart from "@/components/AltitudePlot";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinRuns } from "@/models/observations";
@@ -8,9 +10,6 @@ import { useState } from "react";
 import CodeBlock from "./codeblock";
 import Feeds from "./feeds";
 import LulinData from "./lulinData";
-import { Badge } from "@/components/ui/badge";
-import { getObservation } from "@/apis/observations/getObservation";
-import AltChart from "@/components/AltitudePlot";
 
 function LoadingSkeleton() {
   return (
@@ -158,7 +157,7 @@ export default function Lulin(props: { observation_id: number }) {
       </div>
 
       {dataReady ? (
-        <div className="flex justify-center w-full py-5">
+        <div className="flex justify-center w-full h-svh py-5">
           <AltChart observation_id={props.observation_id} />
         </div>
       ) : (

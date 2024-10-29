@@ -117,13 +117,14 @@ class NestedAltAzDataSerializer(serializers.Serializer):
     time = serializers.DateTimeField()
     alt = serializers.FloatField()
     az = serializers.FloatField()
+    airmass = serializers.FloatField()
 
 
 class AltAzDataSerializer(serializers.ListField):
     child = NestedAltAzDataSerializer()
 
 
-class TargetAltAzSerializer(serializers.Serializer):
+class TargetVisibilitySerializer(serializers.Serializer):
     name = serializers.CharField()
     data = AltAzDataSerializer()
 

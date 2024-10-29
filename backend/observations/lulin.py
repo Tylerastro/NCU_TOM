@@ -18,6 +18,7 @@ class LulinScheduler:
         self.visibility = Visibility(
             lat=self.LULIN[0],
             lon=self.LULIN[1],
+            height=2862,
             time_resolution=time_resolution,
             avoidance_angle=avoidance_angle
         )

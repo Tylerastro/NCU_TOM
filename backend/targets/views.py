@@ -17,9 +17,10 @@ from rest_framework.views import APIView
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
-from .serializers import (DeleteTargetSerializer, TargetAltAzSerializer,
-                          TargetGetSerializer, TargetPostSerializer,
-                          TargetSEDSerializer, TargetSimbadDataSerializer)
+from .serializers import (DeleteTargetSerializer, TargetGetSerializer,
+                          TargetPostSerializer, TargetSEDSerializer,
+                          TargetSimbadDataSerializer,
+                          TargetVisibilitySerializer)
 from .simbad import SimbadService
 from .vizier import VizierService
 
@@ -174,14 +175,14 @@ def targets_creation(request):
 
 @api_view(['POST'])
 def get_moon_altaz(request):
-    service = Visibility(lat=23.469444, lon=120.872639)
+    service = Visibility(lat=23.469444, lon=120.872639, height=2862)
 
     moon_altaz: TargetAltAz = service.get_moon_altaz(
         Time(request.data['start_time']),
         Time(request.data['end_time'])
     )
 
-    serializer = TargetAltAzSerializer(data=moon_altaz.to_dict())
+    serializer = TargetVisibilitySerializer(data=moon_altaz.to_dict())
 
     if serializer.is_valid():
         return Response(serializer.validated_data)
@@ -190,7 +191,7 @@ def get_moon_altaz(request):
 
 
 def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
-    service = Visibility(lat=23.469444, lon=120.872639)
+    service = Visibility(lat=23.469444, lon=120.872639, height=2862)
 
     targets_altaz: List[TargetAltAz] = service.get_targets_altaz(
         targets=targets,
@@ -200,7 +201,7 @@ def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
 
     data = [x.to_dict() for x in targets_altaz]
 
-    serializer = TargetAltAzSerializer(data=data, many=True)
+    serializer = TargetVisibilitySerializer(data=data, many=True)
 
     if serializer.is_valid():
         return serializer.data

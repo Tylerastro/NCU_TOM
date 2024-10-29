@@ -1,7 +1,7 @@
 "use client";
 
-import { getObservationAltAz } from "@/apis/observations/getObservationAltAz";
 import { getObservation } from "@/apis/observations/getObservation";
+import { getObservationAltAz } from "@/apis/observations/getObservationAltAz";
 import { getMoonAltAz } from "@/apis/targets/getMoonAltAz";
 import { Observation } from "@/models/observations";
 import { TargetAltAz } from "@/models/targets";
@@ -159,13 +159,17 @@ export default function AltChart(props: { observation_id: number }) {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="100%" height={500}>
       <LineChart
         width={500}
         height={300}
         margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+        <CartesianGrid
+          strokeOpacity={0.3}
+          strokeDasharray="3 3"
+          stroke="#444"
+        />
         <XAxis
           padding={{ left: 30, right: 30 }}
           dataKey="time"
@@ -182,9 +186,10 @@ export default function AltChart(props: { observation_id: number }) {
           stroke="#fff"
         />
         <YAxis
+          yAxisId={"alt"}
           dataKey="alt"
           label={{
-            value: "Altitude ",
+            value: "Altitude",
             angle: -90,
             position: "insideLeft",
             offset: 0,
@@ -193,6 +198,20 @@ export default function AltChart(props: { observation_id: number }) {
           tick={{ fill: "#fff" }}
           stroke="#fff"
         />
+        {/* <YAxis
+          orientation="right"
+          yAxisId={"airmass"}
+          dataKey="airmass"
+          label={{
+            value: "Airmass",
+            angle: 90,
+            position: "insideRight",
+            offset: 0,
+            fill: "#fff",
+          }}
+          tick={{ fill: "#fff" }}
+          stroke="#fff"
+        /> */}
         <Tooltip content={<CustomTooltip />} />
         <Legend
           verticalAlign="top"
@@ -203,6 +222,7 @@ export default function AltChart(props: { observation_id: number }) {
         />
         {AltAz.map((s) => (
           <Line
+            yAxisId={"alt"}
             dataKey="alt"
             data={s.data}
             name={s.name}
@@ -214,6 +234,20 @@ export default function AltChart(props: { observation_id: number }) {
             strokeWidth={2}
           />
         ))}
+        {/* {AltAz.map((s) => (
+          <Line
+            yAxisId={"airmass"}
+            dataKey="airmass"
+            data={s.data}
+            name={s.name}
+            key={s.name}
+            stroke={colorMap[s.name]}
+            dot={false}
+            activeDot={{ r: 4 }}
+            opacity={activeSeries[s.name] ? 1 : 0.2}
+            strokeWidth={2}
+          />
+        ))} */}
       </LineChart>
     </ResponsiveContainer>
   );

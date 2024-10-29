@@ -50,6 +50,7 @@ interface AltAzData {
   time: string;
   alt: number;
   az: number;
+  airmass: number;
 }
 
 export interface TargetAltAz {

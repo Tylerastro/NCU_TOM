@@ -14,10 +14,17 @@ class AltAzData:
         self.az = []
 
 
+class AirmassData:
+    def __init__(self):
+        self.time = []
+        self.airmass = []
+
+
 class TargetAltAz:
-    def __init__(self, name, data: AltAzData):
+    def __init__(self, name, altAz: AltAzData, airmass: AirmassData):
         self.name = name
-        self.altaz = data
+        self.altaz = altAz
+        self.airmass = airmass
 
     def to_dict(self):
         data = []
@@ -25,7 +32,8 @@ class TargetAltAz:
             data.append({
                 'time': self.altaz.time[i],
                 'alt': self.altaz.alt[i],
-                'az': self.altaz.az[i]
+                'az': self.altaz.az[i],
+                'airmass': self.airmass.airmass[i]
             })
 
         return {
@@ -35,10 +43,11 @@ class TargetAltAz:
 
 
 class Visibility:
-    LULIN = (23.469444, 120.872639)
+    LULIN = (23.469444, 120.872639, 2862)
 
-    def __init__(self, lat, lon, time_offset=8 * u.hour, avoidance_angle=30 * u.deg, time_resolution=15 * u.minute):
-        self.observatory_location = EarthLocation(lat=lat, lon=lon)
+    def __init__(self, lat, lon, height, time_offset=8 * u.hour, avoidance_angle=30 * u.deg, time_resolution=15 * u.minute):
+        self.observatory_location = EarthLocation(
+            lat=lat * u.deg, lon=lon * u.deg, height=height * u.m)
         self.avoidance_angle = avoidance_angle
         self.time_resolution = time_resolution
         self.time_offset = time_offset
@@ -64,49 +73,53 @@ class Visibility:
 
     def get_moon_altaz(self, start_time: Time, end_time: Time) -> TargetAltAz:
         time_resolution = TimeDelta(self.time_resolution).to(u.day).value
-
-        # Generate a range of Julian Dates using np.arange
         jd_range = np.arange(start_time.jd, end_time.jd +
                              time_resolution, time_resolution)
 
-        # Convert the Julian Date range to an array of Time objects
         observation_times = Time(jd_range, format='jd', scale='utc')
-        obs_time_offset = observation_times
-        moon_altaz = get_body('moon', obs_time_offset, location=self.observatory_location).transform_to(
-            AltAz(obstime=obs_time_offset, location=self.observatory_location))
+        # * Given UTC inputs
+        moon_altaz = get_body('moon', observation_times, location=self.observatory_location).transform_to(
+            AltAz(obstime=observation_times, location=self.observatory_location))
 
         altaz_data = AltAzData()
+        airmass_data = AirmassData()
+
+        # * Convert to local time
         observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = moon_altaz.alt.deg.tolist()
         altaz_data.az = moon_altaz.az.deg.tolist()
+        airmass_data.time = observation_times.isot.tolist()
+        airmass_data.airmass = moon_altaz.secz
+        return TargetAltAz(name='Moon', altAz=altaz_data, airmass=airmass_data)
 
-        return TargetAltAz(name='Moon', data=altaz_data)
-
-    def get_altaz(self, name, ra, dec, start_time: Time, end_time: Time) -> TargetAltAz:
+    def get_target_altaz(self, name, ra, dec, start_time: Time, end_time: Time) -> TargetAltAz:
         target = SkyCoord(ra=ra*u.deg, dec=dec*u.deg, frame='icrs')
         time_resolution = TimeDelta(self._get_time_resolution(
             start_time, end_time)).to(u.day).value
         jd_range = np.arange(start_time.jd, end_time.jd +
                              time_resolution, time_resolution)
         observation_times = Time(jd_range, format='jd', scale='utc')
-        obs_time_offset = observation_times
+        # * Given UTC inputs
         altaz = target.transform_to(
-            AltAz(obstime=obs_time_offset, location=self.observatory_location))
+            AltAz(obstime=observation_times, location=self.observatory_location))
 
         altaz_data = AltAzData()
+        airmass_data = AirmassData()
+        # * Convert to local time
         observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = altaz.alt.deg.tolist()
         altaz_data.az = altaz.az.deg.tolist()
-
-        return TargetAltAz(name, altaz_data)
+        airmass_data.time = observation_times.isot.tolist()
+        airmass_data.airmass = altaz.secz
+        return TargetAltAz(name, altaz_data, airmass_data)
 
     def get_targets_altaz(self, targets: List[Target], start_time: Time, end_time: Time) -> List[TargetAltAz]:
         targets_altaz = []
         for target in targets:
-            target_altaz = self.get_altaz(target.name,
-                                          target.ra, target.dec, start_time, end_time)
+            target_altaz = self.get_target_altaz(target.name,
+                                                 target.ra, target.dec, start_time, end_time)
             targets_altaz.append(target_altaz)
 
         return targets_altaz
