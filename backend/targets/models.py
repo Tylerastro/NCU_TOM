@@ -11,7 +11,13 @@ class Target(models.Model):
     class Meta:
         db_table = 'Target'
         indexes = [models.Index(fields=['ra', 'dec'], name='target_coords'), ]
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'name'],
+                condition=models.Q(deleted_at__isnull=True),
+                name='unique_target_name_per_user'
+            )
+        ]
     user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)

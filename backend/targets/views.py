@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 from astropy.time import Time
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -62,10 +63,22 @@ class TargetsView(APIView):
 
     def post(self, request):
         serializer = TargetPostSerializer(
-            data=request.data,  context={'request': request})
+            data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
+            try:
+                serializer.save()
+                return JsonResponse(serializer.data, status=201)
+            except IntegrityError as e:
+                if 'unique_target_name_per_user' in str(e):
+                    return Response(
+                        {'error': 'A target with this name already exists for this user.'},
+                        status=400
+                    )
+                # Handle other integrity errors
+                return Response(
+                    {'error': 'Database integrity error occurred.'},
+                    status=400
+                )
         return Response(serializer.errors, status=400)
 
     @extend_schema(request=DeleteTargetSerializer,)

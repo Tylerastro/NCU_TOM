@@ -1,5 +1,6 @@
 function isHourAngleFormat(input: string) {
-  const hourMinSecPattern = /^(\d{1,2}h)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
+  const hourMinSecPattern =
+    /^(\+|-)?(\d{1,2}h)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
   const decMinSecPattern = /^(\+|-)?(\d{1,3}d)?(\d{1,2}m)?(\d{1,2}(\.\d+)?s)?$/;
   const decimalPattern =
     /^(\+|-)?(\d{1,2})\s+(\d{1,2})\s+(\d{1,2}(\.\d+)?)\s*$/;
@@ -14,12 +15,12 @@ function isHourAngleFormat(input: string) {
   );
 }
 
-function convertHourAngleToDegrees(hourAngle: unknown) {
+function convertHourAngleToDegrees(hourAngle: any) {
   if (typeof hourAngle !== "string") {
     return Error("Invalid hour angle type");
   }
 
-  hourAngle.trim(); // Trim the input
+  hourAngle = hourAngle.trim(); // Trim the input
 
   if (typeof hourAngle === "string" && !isHourAngleFormat(hourAngle)) {
     return parseFloat(hourAngle);
@@ -51,14 +52,12 @@ function convertHourAngleToDegrees(hourAngle: unknown) {
   return degrees;
 }
 
-function convertSexagesimalDegreesToDecimal(
-  sexagesimal: unknown
-): number | Error {
+function convertSexagesimalDegreesToDecimal(sexagesimal: any): number | Error {
   if (typeof sexagesimal !== "string") {
     return Error("Invalid sexagesimal format");
   }
 
-  sexagesimal.trim(); // Trim the input
+  sexagesimal = sexagesimal.trim(); // Trim the input
 
   if (typeof sexagesimal === "string" && !isHourAngleFormat(sexagesimal)) {
     return parseFloat(sexagesimal);
