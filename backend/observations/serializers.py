@@ -109,17 +109,18 @@ class ObservationPutSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def update(self, instance, validated_data):
-        if 'status' in validated_data and validated_data['status'] != instance.status and instance.user != self.context['request'].user:
-            status = instance.statuses(validated_data['status']).label
-            comment = Comments.objects.create(
-                context=f"Observation {instance.name} is now {status}.",
-                user=self.context['request'].user
-            )
-            instance.comments.add(comment)
+        if 'status' in validated_data and validated_data['status'] != instance.status:
+            if instance.user != self.context['request'].user:
+                status = instance.statuses(validated_data['status']).label
+                comment = Comments.objects.create(
+                    context=f"Observation {instance.name} is now {status}.",
+                    user=self.context['request'].user
+                )
+                instance.comments.add(comment)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-            instance.save()
+                for attr, value in validated_data.items():
+                    setattr(instance, attr, value)
+                    instance.save()
 
         return instance
 
