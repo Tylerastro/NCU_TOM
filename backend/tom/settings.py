@@ -151,15 +151,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 DATETIME_FORMAT = "%Y-%m-%d%H:%M:%S"
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_TZ = False
+USE_TZ = True
 
 DOMAIN = os.getenv("DOMAIN", "localhost")
 SITE_NAME = os.getenv("SITE_NAME", "NCU TOM")

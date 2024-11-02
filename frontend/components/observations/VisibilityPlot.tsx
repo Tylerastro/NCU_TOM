@@ -28,7 +28,7 @@ export default function VisibilityChart(props: {
   const [activeSeries, setActiveSeries] = useState<Record<string, boolean>>({});
 
   const { data: observation } = useQuery({
-    queryKey: ["observation", props.observation_id],
+    queryKey: ["getVisibilityData", props.observation_id],
     queryFn: async () =>
       getObservation(props.observation_id).then((data) => {
         return data;
@@ -223,21 +223,19 @@ export default function VisibilityChart(props: {
             wrapperStyle={{ color: "#fff" }}
           />
           {AltAz.map((s) => (
-            <>
-              <Line
-                yAxisId={"alt"}
-                dataKey="alt"
-                data={s.data}
-                name={s.name}
-                dot={false}
-                key={s.name}
-                stroke={colorMap[s.name]}
-                activeDot={{ r: 4 }}
-                strokeDasharray={activeSeries[s.name] ? "0 0" : "10 10"}
-                opacity={activeSeries[s.name] ? 1 : 0.2}
-                strokeWidth={2}
-              />
-            </>
+            <Line
+              yAxisId={"alt"}
+              dataKey="alt"
+              data={s.data}
+              name={s.name}
+              dot={false}
+              key={s.name}
+              stroke={colorMap[s.name]}
+              activeDot={{ r: 4 }}
+              strokeDasharray={activeSeries[s.name] ? "0 0" : "10 10"}
+              opacity={activeSeries[s.name] ? 1 : 0.2}
+              strokeWidth={2}
+            />
           ))}
         </LineChart>
       </ResponsiveContainer>
@@ -288,21 +286,19 @@ export default function VisibilityChart(props: {
             />
             <Tooltip content={<AirmassTooltip />} />
             {AltAz.map((s) => (
-              <>
-                <Line
-                  yAxisId={"airmass"}
-                  dataKey="airmass"
-                  data={s.data}
-                  name={s.name}
-                  key={s.name}
-                  stroke={colorMap[s.name]}
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                  opacity={activeSeries[s.name] ? 1 : 0.2}
-                  strokeDasharray={activeSeries[s.name] ? "0 0" : "10 10"}
-                  strokeWidth={2}
-                />
-              </>
+              <Line
+                yAxisId={"airmass"}
+                dataKey="airmass"
+                data={s.data}
+                name={s.name}
+                key={s.name}
+                stroke={colorMap[s.name]}
+                dot={false}
+                activeDot={{ r: 4 }}
+                opacity={activeSeries[s.name] ? 1 : 0.2}
+                strokeDasharray={activeSeries[s.name] ? "0 0" : "10 10"}
+                strokeWidth={2}
+              />
             ))}
           </LineChart>
         </ResponsiveContainer>

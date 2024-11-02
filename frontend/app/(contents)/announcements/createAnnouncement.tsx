@@ -40,11 +40,6 @@ export function NewAnnouncementForm() {
         setOpen(false);
       })
       .catch((error) => {
-        if (error.response) {
-          toast.error(error.response.data.detail);
-        } else {
-          toast.error(error.message);
-        }
         for (const key in error.data) {
           toast.error(`${key}: ${error.data[key][0]}`);
         }

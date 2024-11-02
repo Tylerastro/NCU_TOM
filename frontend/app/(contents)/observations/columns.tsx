@@ -1,5 +1,6 @@
 "use client";
 
+import LocalTimeTooltip from "@/components/LocalTimeTooltip";
 import StatusBadge from "@/components/Status";
 import { badgeVariants } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,6 +8,9 @@ import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
 import { ColumnDef } from "@tanstack/react-table";
+import { parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+
 import Link from "next/link";
 
 export const columns: ColumnDef<Observation>[] = [
@@ -107,11 +111,13 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Start Date",
     cell(props) {
       const startDate: string = props.row.getValue("start_date");
-      const date = new Date(startDate + "Z");
+      const date = parseISO(startDate);
       return (
-        <div className="text-primary-foreground font-medium prevent-select">
-          {date.toISOString().split("T")[0]}
-        </div>
+        <LocalTimeTooltip time={date}>
+          <div className="text-primary-foreground font-medium prevent-select">
+            {formatInTimeZone(date, "UTC", "yyyy-MM-dd")}
+          </div>
+        </LocalTimeTooltip>
       );
     },
   },
@@ -120,11 +126,13 @@ export const columns: ColumnDef<Observation>[] = [
     header: "End Date",
     cell(props) {
       const endDate: string = props.row.getValue("end_date");
-      const date = new Date(endDate + "Z");
+      const date = parseISO(endDate);
       return (
-        <div className="text-primary-foreground font-medium prevent-select">
-          {date.toISOString().split("T")[0]}
-        </div>
+        <LocalTimeTooltip time={date}>
+          <div className="text-primary-foreground font-medium prevent-select">
+            {formatInTimeZone(date, "UTC", "yyyy-MM-dd")}
+          </div>
+        </LocalTimeTooltip>
       );
     },
   },

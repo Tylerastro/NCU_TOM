@@ -19,7 +19,7 @@ import { cn } from "@/components/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useSession } from "next-auth/react";
-import * as React from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -43,12 +43,12 @@ interface TargetOptionsProps {
   value: z.infer<typeof formSchema>["targets"];
 }
 
-export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
+export const TargetOptions: React.FC<TargetOptionsProps> = forwardRef(
   (props: TargetOptionsProps, ref) => {
     const { onChange, value } = props;
-    const [open, setOpen] = React.useState(false);
-    const [search, setSearch] = React.useState("");
-    const [selectedTargets, setSelectedTargets] = React.useState<number[]>([]);
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [selectedTargets, setSelectedTargets] = useState<number[]>([]);
     const { data: session } = useSession();
     const { data, refetch } = useQuery({
       queryKey: ["targets", 1, search],
@@ -61,7 +61,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
       refetchOnWindowFocus: false,
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
       onChange(selectedTargets);
     }, [selectedTargets, onChange]);
 
@@ -91,7 +91,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = React.forwardRef(
             <CommandInput
               value={search}
               onValueChange={setSearch}
-              placeholder="Search tag..."
+              placeholder="Search target..."
             />
             <CommandEmpty>
               <p>No targets found.</p>

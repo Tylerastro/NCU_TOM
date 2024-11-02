@@ -4,9 +4,8 @@ const stringToColor = (str: string) => {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   const h = hash % 360;
-  const s = Math.abs(h % 50) + 50;
-  const l = Math.abs(h % 50) + 50;
-  console.log(h, s, l);
+  const s = Math.abs(h % 55) + 45;
+  const l = Math.abs(h % 55) + 45;
   return `hsl(${h}, ${s}%, ${l}%)`;
 };
 

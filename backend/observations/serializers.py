@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Count
+from django.utils import timezone
 from helpers.models import Comments, Tags
 from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
                                  UserSerializer)
@@ -21,22 +22,6 @@ class ObservationGetSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'name', 'observatory', 'start_date', 'end_date',
                   'targets', 'priority', 'status', 'tags', 'comments',
                   'created_at', 'updated_at')
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if 'created_at' in data:
-            data['created_at'] = instance.created_at.strftime(
-                "%Y-%m-%d %H:%M:%S")
-        if 'updated_at' in data:
-            data['updated_at'] = instance.updated_at.strftime(
-                "%Y-%m-%d %H:%M:%S")
-        if 'start_date' in data:
-            data['start_date'] = instance.start_date.strftime(
-                "%Y-%m-%d %H:%M:%S")
-        if 'end_date' in data:
-            data['end_date'] = instance.end_date.strftime(
-                "%Y-%m-%d %H:%M:%S")
-        return data
 
 
 class ObservationPostSerializer(serializers.ModelSerializer):
@@ -108,6 +93,15 @@ class ObservationPutSerializer(serializers.ModelSerializer):
         model = Observation
         fields = "__all__"
 
+    def validate(self, data):
+        if 'start_date' in data:
+            start_date = data['start_date']
+            if start_date < timezone.now():
+                raise serializers.ValidationError({
+                    "start date": "cannot be in the past."
+                })
+        return data
+
     def update(self, instance, validated_data):
         if 'status' in validated_data and validated_data['status'] != instance.status:
             if instance.user != self.context['request'].user:
@@ -118,10 +112,10 @@ class ObservationPutSerializer(serializers.ModelSerializer):
                 )
                 instance.comments.add(comment)
 
-                for attr, value in validated_data.items():
-                    setattr(instance, attr, value)
-                    instance.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
 
+        instance.save()
         return instance
 
 

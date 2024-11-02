@@ -52,9 +52,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
       new Date(format(values.start_date, "yyyy-MM-dd" + " 18:00:00")),
       "Asia/Taipei"
     );
-    values.end_date.setDate(values.end_date.getDate() + 1);
+    values.end_date.setDate(values.end_date.getDate());
     values.end_date = toZonedTime(
-      new Date(format(values.end_date, "yyyy-MM-dd" + " 08:00:00")),
+      new Date(format(values.end_date, "yyyy-MM-dd" + " 06:00:00")),
       "Asia/Taipei"
     );
     createObservation(values)

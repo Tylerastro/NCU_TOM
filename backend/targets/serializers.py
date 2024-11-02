@@ -37,14 +37,7 @@ class TargetGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Target
         fields = ('id', 'name', 'ra', 'dec', 'coordinates', 'observations', 'redshift', 'tags',  'notes',
-                  'user', 'created_at')
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if 'created_at' in data:
-            data['created_at'] = instance.created_at.strftime(
-                "%Y-%m-%d %H:%M:%S")
-        return data
+                  'user', 'created_at', 'updated_at')
 
     def get_coordinates(self, instance):
         c = SkyCoord(ra=instance.ra*u.degree,

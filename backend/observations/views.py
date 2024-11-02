@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -127,13 +128,17 @@ class ObservationDetailView(APIView):
     def put(self, request, pk):
         if pk is None:
             return Response(status=400)
-        observation = get_object_or_404(Observation, pk=pk, user=request.user)
-        serializer = ObservationPutSerializer(
-            observation, data=request.data, partial=True, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
+        try:
+            observation = get_object_or_404(
+                Observation, pk=pk, user=request.user)
+            serializer = ObservationPutSerializer(
+                observation, data=request.data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=200)
+            return Response(serializer.errors, status=400)
+        except ValidationError as e:
+            return Response(e, status=400)
 
 
 class LulinView(APIView):

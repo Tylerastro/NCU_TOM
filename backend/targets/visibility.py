@@ -84,8 +84,6 @@ class Visibility:
         altaz_data = AltAzData()
         airmass_data = AirmassData()
 
-        # * Convert to local time
-        observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = moon_altaz.alt.deg.tolist()
         altaz_data.az = moon_altaz.az.deg.tolist()
@@ -106,8 +104,6 @@ class Visibility:
 
         altaz_data = AltAzData()
         airmass_data = AirmassData()
-        # * Convert to local time
-        observation_times += self.time_offset
         altaz_data.time = observation_times.isot.tolist()
         altaz_data.alt = altaz.alt.deg.tolist()
         altaz_data.az = altaz.az.deg.tolist()
