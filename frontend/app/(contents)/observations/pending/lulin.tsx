@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LulinRuns } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { format, parseISO } from "date-fns";
 import CodeBlock from "./codeblock";
 import Feeds from "./feeds";
 import LulinData from "./lulinData";
@@ -75,10 +76,12 @@ export default function Lulin(props: { observation_id: number }) {
 
                 <div className="flex items-center space-x-2">
                   <Badge key={`${observation?.id}-start`} className="">
-                    {observation?.start_date.split(" ")[0]}
+                    {observation?.start_date &&
+                      format(observation.start_date, "LLL dd, y")}
                   </Badge>
                   <Badge key={`${observation?.id}-end`} className="">
-                    {observation?.end_date.split(" ")[0]}
+                    {observation?.end_date &&
+                      format(observation.end_date, "LLL dd, y")}
                   </Badge>
                 </div>
               </div>

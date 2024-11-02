@@ -48,8 +48,6 @@ export default function ObservationTable({
                     query: {
                       id: data.id,
                       observatory: data.observatory,
-                      start_date: data.start_date,
-                      end_date: data.end_date,
                     },
                   }}
                 >
