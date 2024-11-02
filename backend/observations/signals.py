@@ -1,13 +1,18 @@
 import os
 import tempfile
+from datetime import datetime
 
+import pytz
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+
 from observations.models import Observation
+
+taipei_tz = pytz.timezone('Asia/Taipei')
 
 
 @receiver(post_save, sender=Observation)
@@ -38,14 +43,14 @@ def send_in_progress_html_email(sender, instance, **kwargs):
 
     try:
         if instance.status == Observation.statuses.IN_PROGRESS:
-
+            taipei_time = instance.start_date.astimezone(taipei_tz)
             # Prepare template context
             context = {
                 'user_name': instance.user.username,
                 'observation_name': instance.name,
                 'target_count': instance.target_count or 0,
                 'observatory': instance.get_observatory_display(),
-                'start_date': instance.start_date.strftime('%Y-%m-%d %H:%M'),
+                'start_date': taipei_time.strftime('%Y-%m-%d %H:%M'),
                 'priority': instance.get_priority_display(),
                 'current_year': timezone.now().year
             }
