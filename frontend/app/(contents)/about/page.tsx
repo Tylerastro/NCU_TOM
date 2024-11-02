@@ -1,7 +1,7 @@
 import { BugForm } from "./bugForm";
 import PersonCard from "./personCard";
 
-const contributors = [
+const developers = [
   {
     name: "Pan Yen Chen",
     image: "/ycpan.jpg",
@@ -18,6 +18,27 @@ const contributors = [
     title: "Developer",
     twitter: "",
     github: "https://github.com/Tylerastro",
+  },
+];
+
+const contributors = [
+  {
+    name: "Yishin-Jheng",
+    image: "https://avatars.githubusercontent.com/u/101865886?v=4",
+    site: "",
+    title: "Contributor",
+    facebook: "",
+    twitter: "",
+    github: "https://github.com/Yishin-Jheng",
+  },
+  {
+    name: "Li Lun Chen",
+    image: "https://avatars.githubusercontent.com/u/31957750?v=4",
+    site: "",
+    title: "Contributor",
+    facebook: "",
+    twitter: "",
+    github: "https://github.com/qpalzm126",
   },
 ];
 
@@ -44,16 +65,16 @@ export default function page() {
             </p>
           </div>
           <div className="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {contributors.map((contributor) => (
+            {developers.map((developer) => (
               <PersonCard
-                key={contributor.name}
-                name={contributor.name}
-                site={contributor.site}
-                title={contributor.title}
-                image={contributor.image}
-                facebook={contributor.facebook ? contributor.facebook : ""}
-                twitter={contributor.twitter ? contributor.twitter : ""}
-                github={contributor.github ? contributor.github : ""}
+                key={developer.name}
+                name={developer.name}
+                site={developer.site}
+                title={developer.title}
+                image={developer.image}
+                facebook={developer.facebook ? developer.facebook : ""}
+                twitter={developer.twitter ? developer.twitter : ""}
+                github={developer.github ? developer.github : ""}
               />
             ))}
           </div>
@@ -69,6 +90,20 @@ export default function page() {
               We gratefully thank all of our contributors. Here, we list all the
               contributors to this project.
             </p>
+          </div>
+          <div className="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {contributors.map((contributor) => (
+              <PersonCard
+                key={contributor.name}
+                name={contributor.name}
+                site={contributor.site}
+                title={contributor.title}
+                image={contributor.image}
+                facebook={contributor.facebook ? contributor.facebook : ""}
+                twitter={contributor.twitter ? contributor.twitter : ""}
+                github={contributor.github ? contributor.github : ""}
+              />
+            ))}
           </div>
           <div className="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
         </div>

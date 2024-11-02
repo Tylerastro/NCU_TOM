@@ -1,5 +1,3 @@
-"use client";
-
 import { badgeVariants } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag, User } from "@/models/helpers";

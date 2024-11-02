@@ -1,7 +1,6 @@
 import observations.views as views
 from django.urls import path
 from helpers.views import send_observation_mail
-from rest_framework import routers
 
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),

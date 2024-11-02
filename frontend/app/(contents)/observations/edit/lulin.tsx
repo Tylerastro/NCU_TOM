@@ -1,24 +1,17 @@
 "use client";
 import { getLulin } from "@/apis/observations/getLulin";
+import { getObservation } from "@/apis/observations/getObservation";
+import VisibilityChart from "@/components/observations/VisibilityPlot";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinRuns, Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import CodeBlock from "./codeblock";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import LulinData from "./lulinData";
-import { Button } from "@/components/ui/button";
-import { getObservation } from "@/apis/observations/getObservation";
 import { NewLulinRun } from "./newlulinForm";
-import AltChart from "@/components/AltitudePlot";
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col space-y-3 py-10">
@@ -89,7 +82,10 @@ export default function LulinPage(props: { observation_id: number }) {
         {isFetching ? (
           <LoadingSkeleton />
         ) : (
-          <AltChart observation_id={props.observation_id} />
+          <VisibilityChart
+            observation_id={props.observation_id}
+            airmass={true}
+          />
         )}
 
         <div className="flex flex-col items-center py-4">

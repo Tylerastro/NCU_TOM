@@ -11,6 +11,11 @@ const nextConfig = {
             protocol: 'https',
             hostname: 'flowbite.s3.amazonaws.com',
             port: '',
+          },
+          {
+            protocol: 'https',
+            hostname: 'avatars.githubusercontent.com',
+            port: '',
           }
         ],
       },

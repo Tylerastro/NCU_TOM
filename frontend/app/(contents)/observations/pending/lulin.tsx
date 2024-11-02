@@ -1,6 +1,6 @@
 import { getLulin } from "@/apis/observations/getLulin";
 import { getObservation } from "@/apis/observations/getObservation";
-import AltChart from "@/components/AltitudePlot";
+import VisibilityChart from "@/components/observations/VisibilityPlot";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -158,7 +158,10 @@ export default function Lulin(props: { observation_id: number }) {
 
       {dataReady ? (
         <div className="flex justify-center w-full h-svh py-5">
-          <AltChart observation_id={props.observation_id} />
+          <VisibilityChart
+            observation_id={props.observation_id}
+            airmass={true}
+          />
         </div>
       ) : (
         LoadingSkeleton()

@@ -7,11 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { UserRole } from "@/models/enums";
 import { Target } from "@/models/targets";
 import {
   ColumnDef,
   ColumnFiltersState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -20,6 +20,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
@@ -35,21 +36,30 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const { data: session } = useSession();
 
   const table = useReactTable({
     data,
     columns,
+    initialState: {
+      columnVisibility: {
+        select: true,
+        id: true,
+        user: session?.user?.role === UserRole.Admin ? true : false,
+        name: true,
+        ra: true,
+        dec: true,
+        tags: true,
+      },
+    },
     state: {
       rowSelection,
       columnFilters,
-      columnVisibility,
     },
     enableRowSelection: true,
     manualPagination: true,
     onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

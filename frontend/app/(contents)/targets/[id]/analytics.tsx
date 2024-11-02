@@ -2,6 +2,7 @@ import { getLulinTargetData } from "@/apis/dataProducts/getLulinTargetData";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { TabsContent } from "@/components/ui/tabs";
 import { LulinFilter } from "@/models/enums";
+import stringToColor from "@/utils/getColor";
 import { formatMJD, formatUTC } from "@/utils/timeFormatter";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -13,14 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-const stringToColor = (str: string) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h = hash % 360;
-  return `hsl(${h}, 70%, 50%)`;
-};
+
 export default function Analytics({ targetId }: { targetId: number }) {
   const { data: rawData, isFetching } = useQuery({
     queryKey: ["observations"],
@@ -29,7 +23,7 @@ export default function Analytics({ targetId }: { targetId: number }) {
   });
 
   const { processedData, targetColors, uniqueTargets } = useMemo(() => {
-    if (!rawData)
+    if (isFetching || !rawData)
       return { processedData: [], targetColors: {}, uniqueTargets: [] };
     const targets = Array.from(new Set(rawData.map((obs) => obs.name)));
     const colors: Record<string, string> = {};

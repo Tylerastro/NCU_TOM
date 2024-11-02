@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 
 import { getTargetSimbad } from "@/apis/targets/getTargetSimbad";
+import { Status } from "@/models/enums";
 import {
   convertHourAngleToDegrees,
   convertSexagesimalDegreesToDecimal,
@@ -127,7 +128,13 @@ export default function Overview({
               {target?.observations?.length}
             </div>
             <p className="text-xs text-muted-foreground">
-              Finished: {target?.observations?.length}
+              {/* count the number of observation status = 3 */}
+              Finished :{" "}
+              {
+                target?.observations?.filter(
+                  (observation) => observation.status === Status.Done
+                ).length
+              }
             </p>
           </CardContent>
         </Card>
@@ -149,8 +156,7 @@ export default function Overview({
             )}
           </CardContent>
         </Card>
-        {/* External Links Card */}
-        <ExternalLinksCard />
+        <ExternalLinksCard targetName={target?.name || ""} />
       </div>
       {/* Aladin Viewer */}
       <div className="grid max-xl: gap-4 md:grid-cols-2 lg:grid-cols-7">

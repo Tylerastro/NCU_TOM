@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #4a90e2;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        margin-top: 20px;
+      }
+      .details {
+        background-color: #f9f9f9;
+        border-left: 4px solid #4a90e2;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 0.8em;
+        color: #777;
+      }
+      .button {
+        display: inline-block;
+        background-color: #4a90e2;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Observation Status Update</h1>
+      </div>
+      <div class="content">
+        <p>Dear {{ observatory }} staff,</p>
+
+        <p>
+          The observation "{{ observation_name }}" has been updated to
+          <strong>IN PROGRESS</strong> status.
+        </p>
+
+        <div class="details">
+          <h3>Observation Details:</h3>
+          <p><strong>Observatory:</strong> {{ observatory }}</p>
+          <p><strong>Number of Targets:</strong> {{ target_count }}</p>
+          <p><strong>Start Date:</strong> {{ start_date }}</p>
+          <p><strong>Priority:</strong> {{ priority }}</p>
+          <span>See attachment for more a complete observation script</span>
+        </div>
+      </div>
+      <div class="footer">
+        <p>&copy; {{ current_year }} NCU TOM Observation Management System</p>
+      </div>
+    </div>
+  </body>
+</html>

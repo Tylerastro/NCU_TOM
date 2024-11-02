@@ -1,13 +1,12 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
+import StatusBadge from "@/components/Status";
 import { badgeVariants } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
 import { Observation } from "@/models/observations";
-import StatusBadge from "@/components/Status";
 import { ColumnDef } from "@tanstack/react-table";
-import { formatInTimeZone } from "date-fns-tz";
 import Link from "next/link";
 
 export const columns: ColumnDef<Observation>[] = [
@@ -108,10 +107,11 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Start Date",
     cell(props) {
       const startDate: string = props.row.getValue("start_date");
-      const date = new Date(startDate);
-      const local_date = formatInTimeZone(date, "Asia/Taipei", "yyyy-MM-dd");
+      const date = new Date(startDate + "Z");
       return (
-        <div className="text-primary-foreground font-medium">{local_date}</div>
+        <div className="text-primary-foreground font-medium prevent-select">
+          {date.toISOString().split("T")[0]}
+        </div>
       );
     },
   },
@@ -120,8 +120,12 @@ export const columns: ColumnDef<Observation>[] = [
     header: "End Date",
     cell(props) {
       const endDate: string = props.row.getValue("end_date");
-      const date = new Date(endDate).toISOString().split("T")[0];
-      return <div className="text-primary-foreground font-medium">{date}</div>;
+      const date = new Date(endDate + "Z");
+      return (
+        <div className="text-primary-foreground font-medium prevent-select">
+          {date.toISOString().split("T")[0]}
+        </div>
+      );
     },
   },
   {

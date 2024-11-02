@@ -1,9 +1,7 @@
 import { getLulinCode } from "@/apis/observations/getLulinCode";
-import { putObservation } from "@/apis/observations/putObservation";
-import { ObservationUpdate } from "@/models/observations";
+import { SendCheck } from "@/components/observations/SendCheck";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { toast } from "react-toastify";
 
 export default function CodeBlock({
   observation_id,
@@ -30,22 +28,6 @@ export default function CodeBlock({
 
   const countLines = (text: string) => {
     return text.split("\n").length;
-  };
-
-  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    const updateData: ObservationUpdate = {
-      status: 2,
-      code: codeBlock,
-    };
-    try {
-      putObservation(observation_id, updateData);
-      toast.success("Observation is now on pending.");
-      router.push("/observations");
-      router.refresh();
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
   };
 
   const resetCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -85,13 +67,7 @@ export default function CodeBlock({
           >
             Rebuild Script
           </button>
-          <button
-            onClick={handleSubmit}
-            type="submit"
-            className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-[#3fefc666] rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-[#b538c366] duration-300 transition ease-in-out"
-          >
-            Submit observation
-          </button>
+          <SendCheck observation_id={observation_id} codeBlock={codeBlock} />
         </div>
       </div>
 

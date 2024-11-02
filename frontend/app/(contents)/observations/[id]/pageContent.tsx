@@ -1,3 +1,4 @@
+import VisibilityChart from "@/components/observations/VisibilityPlot";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,12 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Observatory, Status } from "@/models/enums";
-import { LulinRuns, Observation } from "@/models/observations";
-import { useQuery } from "@tanstack/react-query";
+import { Observation } from "@/models/observations";
 import Link from "next/link";
-import { useState } from "react";
 import Feeds from "./feeds";
-import MoonAltAz from "./moonAltAz";
 
 function LoadingSkeleton() {
   return (
@@ -210,7 +208,7 @@ export default function PageContent({
       </div>
 
       <div className="flex justify-center w-full py-5">
-        <MoonAltAz observation_id={observation.id} />
+        <VisibilityChart observation_id={observation.id} airmass={false} />
       </div>
 
       <div className="grid grid-cols-2 gap-12 sm:grid-cols-2 py-6">

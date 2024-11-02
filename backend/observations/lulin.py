@@ -75,36 +75,49 @@ class LulinScheduler:
         return schedule
 
     def gen_code(self, observation_id):
-        observations = LulinRun.objects.filter(
-            observation=observation_id)
+        observations = LulinRun.objects.filter(observation=observation_id)
 
-        code = ""
-
+        targets_dict = {}
         for obs in observations:
-            binning = ""
-            frames = ""
-            exposure = ""
-            filters = ""
+            target_name = obs.target.name
+            if target_name not in targets_dict:
+                targets_dict[target_name] = {
+                    'target': obs.target,
+                    'binning': [],
+                    'frames': [],
+                    'exposure_times': [],
+                    'filters': []
+                }
 
-            if not obs.filter:
-                continue
-            if obs.filter:
-                filters += obs.get_filter_display() + ","
-                binning += str(obs.binning) + ","
-                frames += str(obs.frames) + ","
-                exposure += str(obs.exposure_time) + ","
+            # Add this observation's values
+            targets_dict[target_name]['binning'].append(str(obs.binning))
+            targets_dict[target_name]['frames'].append(str(obs.frames))
+            targets_dict[target_name]['exposure_times'].append(
+                str(obs.exposure_time))
+            targets_dict[target_name]['filters'].append(
+                obs.get_filter_display())
 
+        # Generate the code with consolidated blocks
+        code = ""
+        for target_name, target_data in targets_dict.items():
+            target = target_data['target']
+
+            # Join values with commas
+            binning = ", ".join(sorted(target_data['binning']))
+            frames = ", ".join(target_data['frames'])
+            exposure_times = ", ".join(target_data['exposure_times'])
+            filters = ", ".join(target_data['filters'])
+
+            # Create single block for target
             tmp = f"""
-#REPEAT 1
-#BINNING {binning}
-#COUNT {frames}
-#INTERVAL {exposure}
-#FILTER {filters}
-
-{obs.target.name}    {self.convert_ra(obs.target.ra)}    {self.convert_dec(obs.target.dec)}
-#WAITFOR 1
+    #REPEAT 1
+    #BINNING {binning}
+    #COUNT {frames}
+    #INTERVAL {exposure_times}
+    #FILTER {filters}
+    {target.name}    {self.convert_ra(target.ra)}    {self.convert_dec(target.dec)}
+    #WAITFOR 1
             """
-
             code += tmp
 
         return code

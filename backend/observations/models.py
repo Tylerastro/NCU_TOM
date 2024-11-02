@@ -94,6 +94,10 @@ class Observation(models.Model):
         self.deleted_at = datetime.now()
         self.save()
 
+    @property
+    def target_count(self):
+        return self.targets.count()
+
 
 class BaseRun(models.Model):
     Priorities = Priorities

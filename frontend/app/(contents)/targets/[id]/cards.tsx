@@ -89,25 +89,40 @@ function CoordCard(
   );
 }
 
-function ExternalLinksCard() {
+import { ExternalLink } from "lucide-react";
+
+export default function ExternalLinksCard({
+  targetName,
+}: {
+  targetName: string;
+}) {
+  const simbad_url = `https://simbad.u-strasbg.fr/simbad/sim-basic?Ident=${targetName}&submit=SIMBAD+search`;
+  const ned_url = `https://ned.ipac.caltech.edu/byname?objname=${targetName}&hconst=67.8&omegam=0.308&omegav=0.692&wmap=4&corr_z=1`;
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className=" font-medium">External Links</CardTitle>
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">External Links</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-rows-2 gap-2">
-        <div className="flex items-center justify-around">
-          <span className="text-sm font-medium text-muted-foreground mr-2">
-            Simbad:
-          </span>
-        </div>
-        <div className="flex items-center justify-around">
-          <span className="text-sm font-medium text-muted-foreground mr-2">
-            NED:
-          </span>
-        </div>
+      <CardContent className="grid gap-4">
+        <ExternalLinkButton name="Simbad" href={simbad_url} />
+        <ExternalLinkButton name="NED" href={ned_url} />
       </CardContent>
     </Card>
+  );
+}
+
+function ExternalLinkButton({ name, href }: { name: string; href: string }) {
+  return (
+    <Button
+      variant="outline"
+      className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
+      asChild
+    >
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        <span>{name}</span>
+        <ExternalLink className="h-4 w-4" />
+      </a>
+    </Button>
   );
 }
 
