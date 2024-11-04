@@ -206,10 +206,7 @@ export default function LulinPage(props: { observation_id: number }) {
           />
           <Sheet modal={true}>
             <SheetTrigger asChild className="w-full">
-              <Button disabled className="w-full">
-                {" "}
-                +{" "}
-              </Button>
+              <Button className="w-full"> + </Button>
             </SheetTrigger>
             <SheetContent className="w-[400px] sm:w-[540px]">
               <NewLulinRun observation={observation} refetch={refetch} />
