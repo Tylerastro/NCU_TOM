@@ -51,7 +51,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run
         env:
-          DATABASE_URL: postgresql://tom:password@localhost:5432/tom
+          DATABASE_URL: postgresql://tom:password@postgres:5432/tom
           DATABASE_PORT: 5432
           DATABASE: tom
           USER: tom
