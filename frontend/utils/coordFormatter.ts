@@ -5,7 +5,7 @@ function isHourAngleFormat(input: string) {
   const decimalPattern =
     /^(\+|-)?(\d{1,2})\s+(\d{1,2})\s+(\d{1,2}(\.\d+)?)\s*$/;
   const colonSeparatedPattern =
-    /^(-?\d{1,2}:\d{2}:\d{2}(\.\d+)?)(\s+(-?\d{1,2}:\d{2}:\d{2}(\.\d+)?))?$/;
+    /^((\+|-)?(\d{1,2}):(\d{2}):(\d{2})(\.(\d+))?)((\s+((\+|-)?(\d{1,2}):(\d{2}):(\d{2})(\.(\d+))?))?)?$/;
 
   return (
     hourMinSecPattern.test(input) ||
@@ -60,6 +60,7 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: any): number | Error {
   sexagesimal = sexagesimal.trim(); // Trim the input
 
   if (typeof sexagesimal === "string" && !isHourAngleFormat(sexagesimal)) {
+    console.log("fail");
     return parseFloat(sexagesimal);
   }
 
@@ -71,7 +72,7 @@ function convertSexagesimalDegreesToDecimal(sexagesimal: any): number | Error {
   const sign = isNegative ? -1 : 1;
 
   // Remove the sign for parsing
-  const unsignedInput = isNegative ? cleanedInput.slice(1) : cleanedInput;
+  const unsignedInput = cleanedInput.replace("-", "").replace("+", "");
 
   let parts: string[];
 
