@@ -24,7 +24,7 @@ jobs:
       status: ${{ job.status }}
 
     services:
-      postgres:
+      db:
         image: postgres:latest
         env:
           POSTGRES_DB: tom
