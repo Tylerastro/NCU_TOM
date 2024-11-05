@@ -13,9 +13,9 @@
 
 
 # Overview
-NCU TOM是基於[Tom's toolkit](https://github.com/TOMToolkit/tom_base)所產生的計畫，為增加使用者體驗以及前後端分離，我們採用Django + Next.js架構而非原本Django一體式架構。
+NCU TOM是基於[Tom's toolkit](https://github.com/TOMToolkit/tom_base)所產生的計畫，為增加使用者體驗以及前後端分離，我們採用Django + Next.js
 
-NCU TOM is a project based on [Tom's toolkit](https://github.com/TOMToolkit/tom_base). To enhance user experience and separate the frontend from the backend, we adopted a Django + Next.js architecture instead of the original monolithic Django architecture.
+NCU TOM is a project based on [Tom's toolkit](https://github.com/TOMToolkit/tom_base). To enhance user experience and separate the frontend from the backend, we adopted  Django with Next.js 
 
 ## Table of Contents
 - [中文](#簡介)
@@ -25,35 +25,28 @@ NCU TOM is a project based on [Tom's toolkit](https://github.com/TOMToolkit/tom_
 
 ## 簡介
 
-NCU TOM 是一個專為天文學家開發的觀測管理系統 (CMS)，目的協助管理觀測目標、排程、數據記錄和分析。瀏覽[NCU TOM](https://tom.astro.ncu.edu.tw)查看最新的上線版本。
+NCU TOM 是一個專為天文開發的觀測管理系統，目的協助管理觀測目標、排程、數據記錄和分析。瀏覽[NCU TOM](https://tom.astro.ncu.edu.tw)查看最新的上線版本。
+目前架構採用Next.js + Django與Django REST Framework 來設計
 
-目前架構採用Next.js + Django，使用DRF來統一API。
-
-### 安裝
+## 安裝
 > 目前CI流程支援Python 3.9, 3.10, 3.11， node 21+
 
-### 複製Repo
+
+### Docker compose
+
+1. Clone the Repo
 `git clone https://github.com/Tylerastro/NCU_TOM.git`
 
-### 環境安裝
+2. Build the docker image
+我們建議使用docker-compose.local.yml在本地端啟動並開發。
 
-請先確保你已經使用conda或者python virtualenv等環境設置以及npm來處理前端。
+建立docker image 使用`docker compose -f docker-compose.local.yml --env-file .env.local build`
 
-- `pip install -r backend/requirements.txt`
-- `npm install --prefix frontend`
+3. Start the docker container
 
-#### 使用Sqlite3
-如果你沒有安裝PostgreSQL，請使用Sqlite3來建立資料庫。
-在`backend/.env.local`當中調整為`django.db.backends.sqlite3`使用Sqlite3。
+啟動docker container 使用`docker compose -f docker-compose.local.yml --env-file .env.local up --watch` 啟動檔案監聽，在開發時可以即時看到異動。
 
-啟動後端前，請使用`python manage.py migrate`來初始化資料庫。
-
-### 本地端運行
-分別在本地執行前後端伺服器：
-在frontend目錄下執行`npm run dev`，以及在backend目錄下執行`python manage.py runserver`。
-
-透過[localhost](http://localhost:3000) 即可瀏覽當前版本。
-
+4. 造訪 [localhost:3000](http://localhost:3000)觀看目前的版本。
 
 # 加入開發者行列
 
@@ -71,37 +64,25 @@ NCU TOM 是一個專為天文學家開發的觀測管理系統 (CMS)，目的協
 
 ## Introduction
 
-NCU TOM is an Observation Management System (CMS) developed specifically for astronomers, aimed at assisting in managing observation targets, scheduling, data recording, and analysis. Visit [NCU TOM](https://tom.astro.ncu.edu.tw) to view the latest online version.
+NCU TOM is an Observation Management System developed specifically for astronomers, aimed at assisting in managing observation targets, scheduling, data recording, and analysis. Visit [NCU TOM](https://tom.astro.ncu.edu.tw) to view the latest online version.
 
-The current architecture uses Next.js + Django, with DRF for unified API.
-
-### Installation
+## Installation
 
 > The current CI process supports Python 3.9, 3.10, 3.11, and Node 21+
 
-### Clone the Repo
+### Docker compose
+
+1. Clone the Repo
 `git clone https://github.com/Tylerastro/NCU_TOM.git`
 
-### Environment Setup
+2. Build the docker image
+Use `docker compose -f docker-compose.local.yml --env-file .env.local build` to build the docker image.
 
-Please ensure that you have set up an environment using conda or python virtualenv, as well as npm for frontend handling.
+3. Start the docker container
 
-- `pip install -r backend/requirements.txt`
-- `npm install --prefix frontend`
+Use `docker compose -f docker-compose.local.yml --env-file .env.local up --watch` to start the docker container.
 
-### Using Sqlite3
-
-If you don't have PostgreSQL installed, you can use Sqlite3 to create a database.
-In `backend/.env.local`, change `django.db.backends.postgresql` to `django.db.backends.sqlite3`.
-
-Make sure to start the backend after using `python manage.py migrate` to initialize the database.
-
-
-### Local Running
-Run the frontend and backend servers locally:
-Run `npm run dev` in the frontend directory, and `python manage.py runserver` in the backend directory.
-
-You then can browse the current version through [localhost](http://localhost:3000).
+4. Visit [localhost:3000](http://localhost:3000) to view the latest online version.
 
 # Join the Development Team
 

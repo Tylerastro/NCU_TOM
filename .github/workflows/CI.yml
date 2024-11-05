@@ -51,11 +51,14 @@ jobs:
           pip install -r requirements.txt
       - name: Run
         env:
-          DATABASE_URL: postgresql://tom:password@postgres:5432/tom
-          DATABASE_PORT: 5432
+          ENGINE: django.db.backends.postgresql
           DATABASE: tom
           USER: tom
           PASSWORD: password
+          DBHOST: localhost
+          PORT: 5432
+          STAGE: test
+          DJANGO_SECRET_KEY: test-key
         run: |
           cd backend
           python manage.py test
