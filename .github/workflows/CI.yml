@@ -47,11 +47,25 @@ jobs:
       - name: Install Dependencies
         env:
           DJANGO_STAGE: test
+          ENGINE: django.db.backends.postgresql
+          DATABASE: tom
+          USER: tom
+          PASSWORD: Password
+          DBHOST: localhost
+          PORT: 5432
         run: |
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run
+      - name: Run Tests
+        env:
+          DJANGO_STAGE: test
+          ENGINE: django.db.backends.postgresql
+          DATABASE: tom
+          USER: tom
+          PASSWORD: Password
+          DBHOST: localhost
+          PORT: 5432
         run: |
           cd backend
           python manage.py test

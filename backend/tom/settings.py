@@ -111,15 +111,16 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'tom.wsgi.application'
+
 if STAGE == "test":
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "tom",
-            "USER": "tom",
-            "PASSWORD": "Password",
-            "HOST": "localhost",
-            "PORT": "5432",
+            "ENGINE": os.getenv("ENGINE", "django.db.backends.postgresql"),
+            "NAME": os.getenv("DATABASE", "tom"),
+            "USER": os.getenv("USER", "tom"),
+            "PASSWORD": os.getenv("PASSWORD", "Password"),
+            "HOST": os.getenv("DBHOST", "localhost"),
+            "PORT": os.getenv("PORT", "5432"),
         }
     }
 elif os.getenv("ENGINE") == "django.db.backends.postgresql":
