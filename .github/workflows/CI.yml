@@ -24,7 +24,7 @@ jobs:
       status: ${{ job.status }}
 
     services:
-      db:
+      postgres:
         image: postgres:latest
         env:
           POSTGRES_DB: tom
@@ -45,6 +45,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
+        env:
+          DJANGO_STAGE: test
+          DATABASE_URL: postgresql://tom:Password@localhost:5432/tom
+          DATABASE_PORT: 5432
+          DATABASE: tom
+          USER: tom
+          PASSWORD: Password
         run: |
           cd backend
           python -m pip install --upgrade pip
