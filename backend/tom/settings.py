@@ -21,9 +21,7 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 STAGE = os.getenv("DJANGO_STAGE", "local")
-if STAGE == 'test':
-    pass
-elif STAGE == "local":
+if STAGE == "local":
     dotenv.load_dotenv(BASE_DIR / ".env.local", override=True)
 else:
     dotenv.load_dotenv(BASE_DIR / ".env.prod", override=True)

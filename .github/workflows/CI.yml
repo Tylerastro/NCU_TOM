@@ -29,7 +29,7 @@ jobs:
         env:
           POSTGRES_DB: tom
           POSTGRES_USER: tom
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: Password
         ports:
           - 5432:5432
         options: >-
@@ -50,20 +50,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run
-        env:
-          ENGINE: django.db.backends.postgresql
-          DATABASE: tom
-          USER: tom
-          PASSWORD: password
-          DBHOST: 127.0.0.1
-          PORT: 5432
-          DJANGO_STAGE: test
-          DJANGO_SECRET_KEY: test-key
-          POSTGRES_DB: tom
-          POSTGRES_USER: tom
-          POSTGRES_PASSWORD: password
-          POSTGRES_HOST: 127.0.0.1
-          POSTGRES_PORT: 5432
         run: |
           cd backend
           python manage.py test
