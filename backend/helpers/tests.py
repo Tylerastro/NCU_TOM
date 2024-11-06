@@ -9,8 +9,9 @@ from helpers.authentication import TomJWTAuthentication
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import AccessToken
+from system.models import User
 
-from .models import Announcement, Comments, Tags, User
+from .models import Announcement, Comments, Tags
 
 
 class UsersModelTest(TestCase):

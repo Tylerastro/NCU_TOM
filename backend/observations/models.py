@@ -49,7 +49,7 @@ class Observation(models.Model):
     statuses = ObservationStatuses
 
     name = models.CharField(max_length=100, null=False, blank=True)
-    user = models.ForeignKey('helpers.User',
+    user = models.ForeignKey('system.User',
                              on_delete=models.CASCADE, related_name='observations')
     observatory = models.IntegerField(
         choices=Observatories.choices, default=Observatories.LULIN)

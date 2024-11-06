@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from system.models import User
 
-from .models import Announcement, Comments, Tags, User
+from .models import Announcement, Comments, Tags
 
 
 class UserSerializer(serializers.ModelSerializer):

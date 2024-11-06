@@ -6,13 +6,14 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import Comments, User
+from helpers.models import Comments
 from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from system.models import User
 from targets.views import get_targets_altaz
 from targets.visibility import TargetAltAz
 

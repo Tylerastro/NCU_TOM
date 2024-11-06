@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'dataproducts',
     'social_django',
     'helpers',
+    'system',
     'drf_spectacular',
     'rest_framework',
     'rest_framework.authtoken',
@@ -143,7 +144,7 @@ elif os.getenv("ENGINE") == "django.db.backends.sqlite3":
     }
 
 # Point the default user model to our custom user model
-AUTH_USER_MODEL = "helpers.User"
+AUTH_USER_MODEL = "system.User"
 
 
 # Password validation
