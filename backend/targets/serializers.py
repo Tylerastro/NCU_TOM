@@ -10,7 +10,6 @@ from helpers.serializers import (TagsGetSerializer, TagsSerializer,
                                  UserSerializer)
 from observations.models import Observation
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Target
 

@@ -9,9 +9,9 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import ACos, Cos, Radians, Sin
-from helpers.models import User
 from observations.lulin_models import Filters, Instruments
 from observations.models import Observatories
+from system.models import User
 from targets.models import Target
 
 FILE_PATH = os.getenv(

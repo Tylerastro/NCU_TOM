@@ -12,7 +12,7 @@ class DataProducts(models.Model):
     name = models.CharField(max_length=100, null=False, blank=True)
     observatory = models.IntegerField(choices=Observatories.choices)
     user = models.ForeignKey(
-        'helpers.User', on_delete=models.CASCADE, null=True)
+        'system.User', on_delete=models.CASCADE, null=True)
     path = models.FileField(upload_to='dataproducts/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     shareable = models.BooleanField(default=False)
@@ -46,7 +46,7 @@ class LulinDataProduct(models.Model):
         _("Instruments"), choices=Instruments.choices, default=1, null=True)
     FWHM = models.FloatField(null=False)
     user = models.ForeignKey(
-        'helpers.User', on_delete=models.CASCADE, null=True)
+        'system.User', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

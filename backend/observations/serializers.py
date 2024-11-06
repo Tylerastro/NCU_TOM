@@ -7,8 +7,7 @@ from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
 from rest_framework import serializers
 from targets.serializers import TargetGetSerializer
 
-from .models import (LulinRun, Observation, Observatories, Priorities,
-                     Statuses, Target)
+from .models import LulinRun, Observation, Observatories, Priorities, Target
 
 
 class ObservationGetSerializer(serializers.ModelSerializer):

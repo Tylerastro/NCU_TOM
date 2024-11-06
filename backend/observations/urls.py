@@ -1,6 +1,5 @@
 import observations.views as views
 from django.urls import path
-from helpers.views import send_observation_mail
 
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
@@ -13,5 +12,4 @@ urlpatterns = [
     path('observations/<int:pk>/lulin/code/', views.LulinCodeView.as_view()),
     path('observations/lulin/code/', views.get_lulin_compiled_codes),
     path('observations/stats/', views.get_observation_stats),
-    path('observations/submit/lulin/', send_observation_mail),
 ]
