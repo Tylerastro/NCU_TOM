@@ -24,6 +24,7 @@ import { TargetLulinForm } from "./lulinForm";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { deleteLulin } from "@/apis/observations/deleteLulinRun";
+import EditableTableRow from "./Editable-table";
 interface LulinDataProps {
   observation_id: number;
   data: LulinRuns[];
@@ -59,12 +60,29 @@ export default function LulinData(props: LulinDataProps) {
     }
   };
 
+  const handleUpdateRow = async (updatedData: LulinRuns) => {
+    try {
+      // Add your API call to update the data here
+      toast.success("Data updated successfully");
+      props.refetch();
+    } catch (error: any) {
+      if (error.data) {
+        for (const key in error.data) {
+          toast.error(`${key}: ${error.data[key][0]}`);
+        }
+      } else {
+        toast.error("Failed to update the data");
+      }
+      console.error("Error updating row:", error);
+    }
+  };
+
   const handleDuplicate = async (rowData: LulinRuns) => {
     try {
       const duplicateData = {
         targets: [rowData.target.id],
         priority: rowData.priority,
-        filter: rowData.filter,
+        filter: (rowData.filter % 5) + 1,
         binning: rowData.binning,
         frames: rowData.frames,
         instrument: rowData.instrument,
@@ -146,18 +164,7 @@ export default function LulinData(props: LulinDataProps) {
                 </SheetContent>
               </Sheet>
             </TableCell>
-            <TableCell className="font-medium">{data.target.name}</TableCell>
-            <TableCell className="text-center">{data.target.ra}</TableCell>
-            <TableCell className="text-center">{data.target.dec}</TableCell>
-            <TableCell className="text-right">{data.exposure_time}</TableCell>
-            <TableCell className="text-right">{data.binning}</TableCell>
-            <TableCell className="text-right">{data.frames}</TableCell>
-            <TableCell className="text-right">
-              {data.instrument ? LulinInstrument[data.instrument] : "Unknown"}
-            </TableCell>
-            <TableCell className="text-right">
-              {data.filter ? LulinFilter[data.filter] : "Unknown"}
-            </TableCell>
+            <EditableTableRow data={data} onUpdate={handleUpdateRow} />
           </TableRow>
         ))}
       </TableBody>

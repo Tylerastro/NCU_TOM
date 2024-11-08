@@ -45,6 +45,7 @@ export default function VisibilityChart(props: {
       );
       return result.data.map((d) => ({
         ...d,
+        airmass: d.airmass && d.airmass < 0 ? null : d.airmass,
         time: new Date(d.time).toLocaleDateString("en-US", {
           day: "2-digit",
           hour: "2-digit",
@@ -77,6 +78,7 @@ export default function VisibilityChart(props: {
             name: d.name,
             data: d.data.map((dd) => ({
               ...dd,
+              airmass: dd.airmass && dd.airmass < 0 ? null : dd.airmass,
               time: new Date(dd.time).toLocaleDateString("en-US", {
                 day: "2-digit",
                 hour: "2-digit",
@@ -153,7 +155,7 @@ export default function VisibilityChart(props: {
           <p className="font-bold">{`Time: ${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={`item-${index}`} style={{ color: entry.color }}>
-              {`${entry.name}: ${entry.value.toFixed(2)}°`}
+              {`${entry.name}: ${entry.value.toFixed(2)}`}
             </p>
           ))}
         </div>

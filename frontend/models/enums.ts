@@ -32,6 +32,7 @@ enum LulinFilter {
   i,
   z,
 }
+
 enum UserRole {
   Admin = 1,
   Faculty,
