@@ -6,7 +6,9 @@ import { getToken } from "@/apis/auth/getToken";
 import { getUser } from "@/apis/auth/getUser";
 import { refreshToken } from "@/apis/auth/refreshToken";
 import type { NextAuthConfig } from "next-auth";
+import GitHub from "next-auth/providers/github";
 import { object, string } from "zod";
+import type { Provider } from "next-auth/providers";
 import { z } from "zod";
 
 async function parseJwt(token: string): Promise<
@@ -39,51 +41,54 @@ const signInSchema = z.object({
     .max(32, "Password must be less than 32 characters"),
 });
 
-const config = {
-  providers: [
-    Credentials({
-      credentials: {
-        username: { label: "username", type: "text" },
-        password: { label: "password", type: "password" },
-      },
-      authorize: async (credentials, req) => {
-        if (!credentials) {
-          throw new Error("Credentials are missing.");
-        }
+const providers: Provider[] = [
+  Credentials({
+    credentials: {
+      username: { label: "username", type: "text" },
+      password: { label: "password", type: "password" },
+    },
+    authorize: async (credentials, req) => {
+      if (!credentials) {
+        throw new Error("Credentials are missing.");
+      }
 
-        let user = null;
+      let user = null;
 
-        try {
-          const { username, password } = await signInSchema.parseAsync(
-            credentials
-          );
-          const { refresh, access } = await getToken(username, password);
+      try {
+        const { username, password } = await signInSchema.parseAsync(
+          credentials
+        );
+        const { refresh, access } = await getToken(username, password);
 
-          if (!access) {
-            console.log("Access token not found.");
-            return null;
-          }
-
-          // Get user model
-          user = await getUser(access);
-
-          if (!user) {
-            console.log("User not found.");
-            return null;
-          }
-
-          return {
-            ...user,
-            accessToken: access,
-            refreshToken: refresh,
-          };
-        } catch (error) {
-          console.error("Authentication error:", error);
+        if (!access) {
+          console.log("Access token not found.");
           return null;
         }
-      },
-    }),
-  ],
+
+        // Get user model
+        user = await getUser(access);
+
+        if (!user) {
+          console.log("User not found.");
+          return null;
+        }
+
+        return {
+          ...user,
+          accessToken: access,
+          refreshToken: refresh,
+        };
+      } catch (error) {
+        console.error("Authentication error:", error);
+        return null;
+      }
+    },
+  }),
+  GitHub,
+];
+
+const config = {
+  providers: providers,
   session: {
     strategy: "jwt",
     maxAge: 7 * 24 * 60 * 60,
@@ -162,3 +167,14 @@ declare module "next-auth/jwt" {
     refreshToken?: string;
   }
 }
+
+export const providerMap = providers
+  .map((provider) => {
+    if (typeof provider === "function") {
+      const providerData = provider();
+      return { id: providerData.id, name: providerData.name };
+    } else {
+      return { id: provider.id, name: provider.name };
+    }
+  })
+  .filter((provider) => provider.id !== "credentials");
