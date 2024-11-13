@@ -1,7 +1,8 @@
 import { createObservation } from "@/apis/observations/createObservation";
 import { TagOptions } from "@/components/TagOptions";
-import { TargetOptions } from "@/components/TargetOptions";
+import TargetModal from "@/components/TargetModal";
 import { Button } from "@/components/ui/button";
+import { addDays } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
@@ -94,7 +95,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
       priority: 1,
       targets: [],
       start_date: new Date(),
-      end_date: new Date(),
+      end_date: addDays(new Date(), 1),
       tags: selectedTags,
     },
   });
@@ -195,7 +196,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                     Targets
                   </FormLabel>
                   <FormControl>
-                    <TargetOptions {...field} />
+                    <TargetModal {...field} />
                   </FormControl>
                 </FormItem>
               )}

@@ -236,7 +236,7 @@ class ObservationStatsSerializer(serializers.Serializer):
             } for item in counts
         ]
 
-    def to_representation(self, instance):
+    def to_representation(self, instance=None):
         return {
             'total_observations': self.get_total_observations(),
             'total_targets': self.get_total_targets(),
