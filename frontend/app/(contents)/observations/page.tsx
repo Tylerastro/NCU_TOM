@@ -57,7 +57,6 @@ export default function ObservationsTable() {
   } = useQuery({
     queryKey: [
       "observations",
-      page,
       debounceSearch,
       searchTags,
       searchUsers,
@@ -146,18 +145,8 @@ export default function ObservationsTable() {
     : [];
 
   useEffect(() => {
-    setIsLoading(
-      isFetchingData ||
-        tagIsFetching ||
-        userIsFetching ||
-        observationStatIsFetching
-    );
-  }, [
-    isFetchingData,
-    tagIsFetching,
-    userIsFetching,
-    observationStatIsFetching,
-  ]);
+    setIsLoading(isFetchingData || userIsFetching || observationStatIsFetching);
+  }, [isFetchingData, userIsFetching, observationStatIsFetching]);
 
   useEffect(() => {
     setPage(1);

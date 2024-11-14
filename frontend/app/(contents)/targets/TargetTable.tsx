@@ -90,6 +90,7 @@ export default function TargetTable() {
   useEffect(() => {
     setPage(1);
   }, [search, searchTags]);
+
   return (
     <div className="sm:max-w-[825px] lg:max-w-full py-5">
       <div className="flex justify-between py-2 px-2 gap-2">

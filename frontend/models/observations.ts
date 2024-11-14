@@ -54,14 +54,16 @@ export interface LulinObservationsCreate {
   targets: number[];
 }
 
-export interface LulinObservationsUpdate {
+export interface LulinRunUpdate {
   id?: number;
   observation?: string;
   priority?: number;
   start_date?: Date;
   end_date?: Date;
-  filters?: { [key: string]: boolean };
-  instruments?: { [key: string]: boolean };
+  binning?: number;
+  filter?: number;
+  frames?: number;
+  instrument?: number;
   target?: Target;
   exposure_time?: number;
 }

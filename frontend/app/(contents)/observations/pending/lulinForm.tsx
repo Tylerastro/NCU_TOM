@@ -1,5 +1,5 @@
 "use client";
-import { putLulin } from "@/apis/observations/putLulin";
+import { putLulinRun } from "@/apis/observations/putLulin";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -99,7 +99,7 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    putLulin(observation.id, values)
+    putLulinRun(observation.id, values)
       .then(() => {
         toast.success("Observation updated successfully");
         Object.assign(observation, values);

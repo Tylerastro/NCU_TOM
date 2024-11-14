@@ -1,6 +1,6 @@
 "use client";
 import { createLulin } from "@/apis/observations/createLulin";
-import { putLulin } from "@/apis/observations/putLulin";
+import { putLulinRun } from "@/apis/observations/putLulin";
 import { TargetOptions } from "@/components/TargetOptions";
 
 import { Button } from "@/components/ui/button";

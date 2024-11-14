@@ -1,5 +1,4 @@
-"use client";
-import React, { forwardRef, useState, useEffect, useRef } from "react";
+import React, { forwardRef, useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { SimpleTarget } from "@/models/targets";
@@ -15,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useDebounce from "./Debounce";
 
 interface TargetOptionsProps {
   onChange: (tags: number[]) => void;
@@ -24,6 +24,7 @@ interface TargetOptionsProps {
 const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
   (props, ref) => {
     const [searchTerm, setSearchTerm] = useState("");
+    const debouncedSearchTerm = useDebounce(searchTerm, 250);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTargets, setSelectedTargets] = useState<number[]>(
       props.value || []
@@ -61,6 +62,14 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
       },
     });
 
+    const filteredTargets = useMemo(() => {
+      return (
+        allTargets?.filter((target) =>
+          target.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+        ) || []
+      );
+    }, [allTargets, debouncedSearchTerm]);
+
     const handleTargetToggle = (targetId: number) => {
       const newSelectedTargets = selectedTargets.includes(targetId)
         ? selectedTargets.filter((id) => id !== targetId)
@@ -70,28 +79,30 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
       props.onChange(newSelectedTargets);
     };
 
-    const filteredTargets =
-      allTargets?.filter((target) =>
-        target.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ) || [];
-
     useEffect(() => {
-      if (filteredTargets.length > 0) {
-        gsap.fromTo(
-          targetRefs.current,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.1,
-          }
-        );
-      }
-    }, [filteredTargets, searchTerm, isOpen]);
+      if (!isOpen || filteredTargets.length === 0) return;
+
+      const timeoutId = setTimeout(() => {
+        const validRefs = targetRefs.current.filter(Boolean);
+        if (validRefs.length > 0) {
+          gsap.fromTo(
+            validRefs,
+            {
+              opacity: 0,
+              y: 20,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.1,
+            }
+          );
+        }
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }, [filteredTargets.length, isOpen]);
 
     return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

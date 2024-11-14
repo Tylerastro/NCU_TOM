@@ -1,11 +1,8 @@
 import api from "@/apis/axios";
 
-import { LulinObservationsUpdate } from "@/models/observations";
+import { LulinRunUpdate } from "@/models/observations";
 
-export const putLulin = async (
-  pk: number,
-  updateData: LulinObservationsUpdate
-) => {
+export const putLulinRun = async (pk: number, updateData: LulinRunUpdate) => {
   try {
     const response = await api.put(
       `/api/observations/lulin/${pk}/`,

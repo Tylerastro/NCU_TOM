@@ -136,6 +136,14 @@ class LulinPutSerializer(serializers.ModelSerializer):
         model = LulinRun
         fields = "__all__"
 
+    # validate if frames is > 0
+    def validate(self, data):
+        if 'frames' in data and data['frames'] <= 0:
+            raise serializers.ValidationError({
+                "frames": "must be greater than 0."
+            })
+        return data
+
 
 class LulinPostSerializer(serializers.ModelSerializer):
     targets = serializers.PrimaryKeyRelatedField(

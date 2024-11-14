@@ -251,10 +251,11 @@ def get_lulin_compiled_codes(request):
         start_date, end_date), content_type='text/plain')
 
 
-@api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
+@ api_view(['GET'])
+@ permission_classes((AllowAny, ))
 def get_observation_stats(request):
-    serializer = ObservationStatsSerializer(context={'request': request})
+    serializer = ObservationStatsSerializer(
+        Observation, context={'request': request})
     return Response(serializer.data, status=200)
 
 
