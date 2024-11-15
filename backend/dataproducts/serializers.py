@@ -30,10 +30,8 @@ class LulinDataProductSerializer(serializers.ModelSerializer):
         if obj.mjd is None:
             return None
 
-        # MJD epoch starts from November 17, 1858
         mjd_epoch = datetime(1858, 11, 17, 0, 0, 0)
 
-        # Convert MJD to timedelta and add to epoch
         days = timedelta(days=float(obj.mjd))
         date = mjd_epoch + days
 
