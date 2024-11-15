@@ -47,6 +47,12 @@ class User(AbstractUser, PermissionsMixin):
         FACULTY = 2
         USER = 3
 
+    class OauthProvider(models.IntegerChoices):
+        CREDENTIAL = 1
+        GOOGLE = 2
+        GITHUB = 3
+        TWITTER = 4
+
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -59,6 +65,10 @@ class User(AbstractUser, PermissionsMixin):
     is_active = models.BooleanField(default=get_default_is_active())
     deleted_at = models.DateTimeField(null=True)
     is_superuser = models.BooleanField(default=False)
+    token = models.CharField(max_length=255, null=True)
+    provider = models.IntegerField(
+        choices=OauthProvider.choices, null=False, default=OauthProvider.CREDENTIAL
+    )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'role',
