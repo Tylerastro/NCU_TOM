@@ -1,12 +1,4 @@
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
   Table,
   TableBody,
   TableCell,
@@ -19,9 +11,8 @@ import { createLulin } from "@/apis/observations/createLulin";
 import { Files, CircleX } from "lucide-react";
 import gsap from "gsap";
 import * as React from "react";
-import { TargetLulinForm } from "./lulinForm";
 import { toast } from "react-toastify";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { deleteLulin } from "@/apis/observations/deleteLulinRun";
 import InputCell from "./InputTableCell";
 import { LulinFilter, LulinInstrument } from "@/models/enums";
@@ -99,17 +90,15 @@ export default function LulinData(props: LulinDataProps) {
       instrument: updatedData.instrument,
     };
 
-    await putLulinRun(updatedData.id, updatePayload)
+    putLulinRun(updatedData.id, updatePayload)
       .then(() => {
         setCodeUpdate(true);
-        toast.success("Data updated successfully");
+        toast.success("Data updated successfully", { autoClose: 1500 });
         props.refetch();
       })
       .catch((error) => {
-        console.log(error);
-        for (const key in error.data) {
-          console.log(key, error.data[key]);
-          toast.error(`${key}: ${error.data[key][0]}`);
+        for (const key in error.response.data) {
+          toast.error(`${key}: ${error.response.data[key][0]}`);
         }
       });
   };
@@ -186,10 +175,14 @@ export default function LulinData(props: LulinDataProps) {
               <span className="prevent-select">{data.target.name}</span>
             </TableCell>
             <TableCell className="text-center items-center justify-center">
-              <span className="prevent-select">{data.target.ra}</span>
+              <span className="prevent-select">
+                {data.target.ra.toFixed(4)}
+              </span>
             </TableCell>
             <TableCell className="text-center items-center justify-center">
-              <span className="prevent-select">{data.target.dec}</span>
+              <span className="prevent-select">
+                {data.target.dec.toFixed(4)}
+              </span>
             </TableCell>
             <TableCell className="text-center items-center justify-center">
               <InputCell
