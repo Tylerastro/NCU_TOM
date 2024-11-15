@@ -1,7 +1,6 @@
 "use client";
 import { createLulin } from "@/apis/observations/createLulin";
-import { putLulinRun } from "@/apis/observations/putLulin";
-import { TargetOptions } from "@/components/TargetOptions";
+import TargetModal from "@/components/TargetModal";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
 import { Priority } from "@/models/enums";
-import { LulinRuns, Observation } from "@/models/observations";
+import { Observation } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -37,48 +36,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-const filters = [
-  {
-    id: "u",
-    label: "u",
-  },
-  {
-    id: "g",
-    label: "g",
-  },
-  {
-    id: "r",
-    label: "r",
-  },
-  {
-    id: "i",
-    label: "i",
-  },
-  {
-    id: "z",
-    label: "z",
-  },
-] as const;
-
-const instruments = [
-  {
-    id: "LOT",
-    label: "LOT",
-  },
-  {
-    id: "SLT",
-    label: "SLT",
-  },
-  {
-    id: "TRIPOL",
-    label: "TRIPOL",
-  },
-];
-
 const formSchema = z.object({
   targets: z.array(z.number()).min(1, { message: "Please select targets" }),
   priority: z.number().transform(Number),
-  filter: z.number(),
+  filter: z.array(z.number()),
   binning: z.coerce.number().int().min(1).default(1),
   frames: z.coerce.number().int().min(1).default(1),
   instrument: z.number(),
@@ -98,7 +59,7 @@ export function NewLulinRun({
     resolver: zodResolver(formSchema),
     defaultValues: {
       priority: Priority.MEDIUM,
-      filter: 1,
+      filter: [1],
       binning: 1,
       frames: 1,
       instrument: 1,
@@ -109,7 +70,15 @@ export function NewLulinRun({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    createLulin(observation.id, values)
+    const promises = values.filter.map((filterValue) => {
+      const requestData = {
+        ...values,
+        filter: filterValue,
+      };
+      return createLulin(observation.id, requestData);
+    });
+
+    Promise.all(promises)
       .then(() => {
         toast.success("Observation updated successfully");
         refetch();
@@ -134,7 +103,7 @@ export function NewLulinRun({
             <FormItem>
               <FormLabel>Target</FormLabel>
               <FormControl>
-                <TargetOptions {...field} />
+                <TargetModal {...field} />
               </FormControl>
             </FormItem>
           )}
@@ -188,8 +157,15 @@ export function NewLulinRun({
                           >
                             <FormControl>
                               <Checkbox
-                                checked={field.value === value}
-                                onCheckedChange={() => field.onChange(value)}
+                                checked={field.value?.includes(Number(value))}
+                                onCheckedChange={(checked) => {
+                                  const updatedValue = checked
+                                    ? [...field.value, Number(value)]
+                                    : field.value.filter(
+                                        (item) => item !== Number(value)
+                                      );
+                                  field.onChange(updatedValue);
+                                }}
                               />
                             </FormControl>
                             <FormLabel className="font-normal">{key}</FormLabel>

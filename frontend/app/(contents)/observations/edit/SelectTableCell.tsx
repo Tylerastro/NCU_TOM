@@ -26,7 +26,7 @@ export default function SelectCell<
   };
 
   const handleSelect = (newValue: string) => {
-    if (newValue !== value.toLocaleString()) {
+    if (enumObject[value] != newValue) {
       onUpdate(newValue);
     }
     setIsEditing(false);
@@ -45,7 +45,6 @@ export default function SelectCell<
         <Select
           defaultValue={value.toLocaleString()}
           onValueChange={(newValue) => {
-            console.log("Value selected:", newValue);
             handleSelect(newValue);
           }}
           open={isEditing}
