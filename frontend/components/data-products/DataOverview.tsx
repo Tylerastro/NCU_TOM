@@ -38,6 +38,7 @@ export default function AstronomicalObservations() {
         <div className="mb-4">
           <Input
             placeholder="Search observations..."
+            disabled={true}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
