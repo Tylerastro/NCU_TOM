@@ -1,6 +1,7 @@
 from dataproducts.models import ETLLogs, LulinDataProduct
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
+from helpers.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -36,12 +37,14 @@ class LulinTargetDataView(APIView):
             serializer = LulinDataProductSerializer(data, many=True)
             return Response(serializer.data, status=200)
 
-        target = get_object_or_404(
-            Target,
-            pk=pk,
-            user=request.user,
-            deleted_at__isnull=True
-        )
+        try:
+            if request.user.role == User.roles.ADMIN:
+                target = Target.objects.get(id=pk, deleted_at__isnull=True)
+            else:
+                target = Target.objects.get(
+                    id=pk, deleted_at__isnull=True, user=request.user)
+        except Target.DoesNotExist:
+            return Response({"detail": "Target not found"}, status=404)
 
         data_products = target.lulin_data_products.all()
 
