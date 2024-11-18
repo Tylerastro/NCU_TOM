@@ -25,15 +25,14 @@ class LulinTargetDataView(APIView):
     @permission_classes((AllowAny,))
     def get(self, request, pk):
         if pk == 0:
-            all_data = LulinDataProduct.objects.all().order_by('-mjd')
-
-            if all_data.exists():
-                latest_mjd = all_data.first().mjd
-                three_days_ago_mjd = latest_mjd - 3
-                data = all_data.filter(mjd__gte=three_days_ago_mjd)
+            latest_entry = LulinDataProduct.objects.order_by('-mjd').first()
+            if latest_entry:
+                data = LulinDataProduct.objects.filter(
+                    mjd__gte=latest_entry.mjd - 1.5,
+                    mjd__lte=latest_entry.mjd
+                ).order_by('-mjd')[:15]
             else:
-                data = all_data
-
+                data = []
             serializer = LulinDataProductSerializer(data, many=True)
             return Response(serializer.data, status=200)
 
