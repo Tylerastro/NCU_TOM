@@ -1,8 +1,8 @@
-
 import datetime
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from astropy.utils.iers import conf
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -12,6 +12,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from .models import Target
+
+conf.auto_max_age = None
 
 
 class TargetModelTest(TestCase):
@@ -341,10 +343,62 @@ class TargetApiTest(TestCase):
         self.assertEqual(len(response.data['results']), 1)
 
     def test_admin_can_see_all_targets(self):
-        Target.objects.create(user=self.admin_user,
-                              name='Admin Target', ra=0, dec=0)
+        # Create multiple targets owned by different users
+        admin_target = Target.objects.create(
+            user=self.admin_user,
+            name='Admin Target',
+            ra=0,
+            dec=0,
+            redshift=0.1,
+            notes="Admin's target"
+        )
+        user_target = Target.objects.create(
+            user=self.user,
+            name='User Target',
+            ra=10,
+            dec=20,
+            redshift=0.2,
+            notes="User's target"
+        )
+        deleted_target = Target.objects.create(
+            user=self.user,
+            name='Deleted Target',
+            ra=30,
+            dec=40,
+            redshift=0.3,
+            notes="This will be deleted"
+        )
+        deleted_target.delete()  # Soft delete the target
+
+        # Test unauthenticated access - should return empty list due to auth failure
+        self.client.force_authenticate(user=None)  # Clear any authentication
+        response = self.client.get('/api/targets/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Test regular user access - should only see their own non-deleted targets
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/targets/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 2)  # M 87 from setup + User Target
+        target_names = {t['name'] for t in response.data['results']}
+        self.assertEqual(target_names, {'M 87', 'User Target'})
+
+        # Test admin access - should see all non-deleted targets
         self.client.force_authenticate(user=self.admin_user)
         response = self.client.get('/api/targets/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Both targets visible to admin
-        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(len(response.data['results']), 3)  # Admin Target + User Target + M 87
+
+        # Verify admin can see all non-deleted targets
+        target_names = {t['name'] for t in response.data['results']}
+        self.assertEqual(target_names, {'Admin Target', 'User Target', 'M 87'})
+        self.assertNotIn('Deleted Target', target_names)
+
+        # Test admin access with specific target details
+        response = self.client.get(f'/api/targets/{user_target.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'User Target')
+        self.assertEqual(response.data['ra'], 10)
+        self.assertEqual(response.data['dec'], 20)
+        self.assertEqual(response.data['redshift'], 0.2)
+        self.assertEqual(response.data['notes'], "User's target")
