@@ -1,91 +1,150 @@
 "use client";
 import React, { useRef, useEffect } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
 import * as THREE from "three";
+import { OrbitControls } from "@react-three/drei";
 
-const ParticleEarth = () => {
-  const points = useRef<THREE.Points>(null);
-  const { camera } = useThree();
+// Shader definitions
+const vertexShader = `
+  uniform float size;
+  uniform sampler2D elevTexture;
+
+  varying vec2 vUv;
+  varying float vVisible;
+
+  void main() {
+    vUv = uv;
+    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    float elv = texture2D(elevTexture, vUv).r;
+    vec3 vNormal = normalMatrix * normal;
+    vVisible = step(0.0, dot( -normalize(mvPosition.xyz), normalize(vNormal)));
+    mvPosition.z += 0.35 * elv;
+    gl_PointSize = size;
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const fragmentShader = `
+  uniform sampler2D alphaTexture;
+
+  varying vec2 vUv;
+  varying float vVisible;
+
+  void main() {
+    if (floor(vVisible + 0.1) == 0.0) discard;
+    float alpha = 1.0 - texture2D(alphaTexture, vUv).r;
+    gl_FragColor = vec4(0.3, 0.5, 0.8, alpha); 
+  }
+`;
+
+interface EarthProps {
+  wireframe?: boolean;
+}
+
+// Convert latitude and longitude to 3D coordinates
+const latLongToVector3 = (
+  lat: number,
+  long: number,
+  radius: number
+): THREE.Vector3 => {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = -(long + 180) * (Math.PI / 180);
+
+  const x = radius * Math.sin(phi) * Math.cos(theta);
+  const z = radius * Math.sin(phi) * Math.sin(theta);
+  const y = radius * Math.cos(phi);
+
+  return new THREE.Vector3(x, y, z);
+};
+
+const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const { scene } = useThree();
 
   useEffect(() => {
-    if (camera) {
-      camera.position.z = 5;
+    if (!groupRef.current) return;
+
+    const textureLoader = new THREE.TextureLoader();
+
+    // Load textures
+    const elevMap = textureLoader.load("/textures/01_earthbump1k.jpg");
+    const alphaMap = textureLoader.load("/textures/02_earthspec1k.jpg");
+
+    // Create points geometry
+    const pointsGeo = new THREE.IcosahedronGeometry(1, 120);
+
+    // Create shader material
+    const uniforms = {
+      size: { value: 4.0 },
+      elevTexture: { value: elevMap },
+      alphaTexture: { value: alphaMap },
+    };
+
+    const pointsMat = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+    });
+
+    const points = new THREE.Points(pointsGeo, pointsMat);
+    groupRef.current.add(points);
+
+    // Add NCU marker
+    const ncuPosition = latLongToVector3(23.469444, 120.872639, 1.05);
+    const markerGeo = new THREE.SphereGeometry(0.005, 8, 8);
+    const markerMat = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const marker = new THREE.Mesh(markerGeo, markerMat);
+    marker.position.copy(ncuPosition);
+    groupRef.current.add(marker);
+
+    // Add wireframe if enabled
+    if (wireframe) {
+      const wireframeGeo = new THREE.IcosahedronGeometry(1, 10);
+      const wireframeMat = new THREE.MeshBasicMaterial({
+        color: 0x202020,
+        wireframe: true,
+      });
+      const wireframeMesh = new THREE.Mesh(wireframeGeo, wireframeMat);
+      groupRef.current.add(wireframeMesh);
     }
-  }, [camera]);
-  // Generate particles in spherical coordinates
-  const particleCount = 10000;
-  const positions = new Float32Array(particleCount * 3);
-  const colors = new Float32Array(particleCount * 3);
 
-  for (let i = 0; i < particleCount; i++) {
-    // Spherical coordinates
-    const radius = 2;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(Math.random() * 2 - 1);
+    // Cleanup
+    return () => {
+      pointsGeo.dispose();
+      pointsMat.dispose();
+      markerGeo.dispose();
+      markerMat.dispose();
+    };
+  }, [wireframe]);
 
-    const x = radius * Math.sin(phi) * Math.cos(theta);
-    const y = radius * Math.sin(phi) * Math.sin(theta);
-    const z = radius * Math.cos(phi);
-
-    positions[i * 3] = x;
-    positions[i * 3 + 1] = y;
-    positions[i * 3 + 2] = z;
-
-    // Create continents by varying colors based on position
-    const isLand = Math.random() > 0.7;
-    if (isLand) {
-      // Green for land
-      colors[i * 3] = 0.2;
-      colors[i * 3 + 1] = 0.8;
-      colors[i * 3 + 2] = 0.3;
-    } else {
-      // Blue for water
-      colors[i * 3] = 0.2;
-      colors[i * 3 + 1] = 0.4;
-      colors[i * 3 + 2] = 0.8;
-    }
-  }
-
-  useFrame((state) => {
-    if (points.current) {
-      points.current.rotation.y += 0.001;
+  useFrame(() => {
+    if (groupRef.current) {
+      // groupRef.current.rotation.y += 0.002;
     }
   });
 
-  return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particleCount}
-          array={colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.02} vertexColors transparent opacity={0.8} />
-    </points>
-  );
+  return <group ref={groupRef} />;
 };
 
-const Scene = () => {
+const Scene: React.FC = () => {
   return (
-    <Canvas>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <ParticleEarth />
+    <Canvas camera={{ position: [0, 0, 3.5], fov: 45 }}>
+      <ambientLight />
+      <hemisphereLight intensity={3} color={0xffffff} groundColor={0x080820} />
+      <Earth />
+      <OrbitControls enableDamping dampingFactor={0.05} />
     </Canvas>
   );
 };
 
 export default function EarthAnimation() {
   return (
-    <div style={{ width: "500px", height: "500px" }}>
+    <div style={{ width: "100%", height: "100vh" }}>
       <Scene />
     </div>
   );

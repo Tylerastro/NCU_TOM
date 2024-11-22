@@ -15,7 +15,6 @@ export default function DataProducts() {
       </div>
       <Events />
       <AstronomicalObservations />
-      {/* <EarthAnimation /> */}
     </main>
   );
 }
