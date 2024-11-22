@@ -17,12 +17,22 @@ class Priorities(models.IntegerChoices):
     TOO = 4, _('Too')
 
 
-class Statuses(models.IntegerChoices):
+class RunStatuses(models.IntegerChoices):
     SUCCESS = 1, _('Success')
     FAIL = 2, _('Fail')
     PENDING = 3, _('Pending')
     PARTIAL_SUCCESS = 4, _('Partial Success')
     RESCHEDULED = 5, _('Rescheduled')
+
+
+class ObservationStatuses(models.IntegerChoices):
+    PREP = 1
+    PENDING = 2
+    IN_PROGRESS = 3
+    DONE = 4
+    EXPIRED = 5
+    DENIED = 6
+    POSTPONED = 7
 
 
 class Observatories(models.IntegerChoices):
@@ -36,15 +46,8 @@ class Observation(models.Model):
 
     Priorities = Priorities
     Observatories = Observatories
+    statuses = ObservationStatuses
 
-    class statuses(models.IntegerChoices):
-        PREP = 1
-        PENDING = 2
-        IN_PROGRESS = 3
-        DONE = 4
-        EXPIRED = 5
-        DENIED = 6
-        POSTPONED = 7
     name = models.CharField(max_length=100, null=False, blank=True)
     user = models.ForeignKey('helpers.User',
                              on_delete=models.CASCADE, related_name='observations')
@@ -101,7 +104,7 @@ class Observation(models.Model):
 
 class BaseRun(models.Model):
     Priorities = Priorities
-    Statuses = Statuses
+    Statuses = RunStatuses
 
     class Meta:
         abstract = True

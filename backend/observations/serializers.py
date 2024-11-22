@@ -8,7 +8,7 @@ from rest_framework import serializers
 from targets.serializers import TargetGetSerializer
 
 from .models import (LulinRun, Observation, Observatories, Priorities,
-                     Statuses, Target)
+                     RunStatuses, Target)
 
 
 class ObservationGetSerializer(serializers.ModelSerializer):
