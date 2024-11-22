@@ -5,7 +5,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from helpers.models import Tags, User
-from observations.models import LulinRun, Observation, Target
+from observations.lulin_models import Filters
+from observations.models import (LulinRun, Observation, Observatories,
+                                 Priorities, RunStatuses, Target)
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -143,6 +145,121 @@ class TestObservationModel(TestCase):
         self.assertEqual(observation.tags.count(), 1)
         self.assertEqual(observation.tags.first(), tag)
 
+    def test_target_count_property(self):
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+        self.assertEqual(observation.target_count, 0)
+
+        # Add targets and verify count updates
+        observation.targets.add(self.target)
+        self.assertEqual(observation.target_count, 1)
+
+        # Add another target
+        target2 = Target.objects.create(
+            name="Test Target 2", user=self.user, ra=56, dec=78)
+        observation.targets.add(target2)
+        self.assertEqual(observation.target_count, 2)
+
+    def test_observatory_validation(self):
+        # Test valid observatory
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            observatory=Observatories.LULIN
+        )
+        self.assertEqual(observation.observatory,
+                         Observatories.LULIN)
+
+        # Test invalid observatory
+        with self.assertRaises(ValidationError):
+            invalid_observation = Observation.objects.create(
+                user=self.user,
+                start_date=self.start_date,
+                end_date=self.end_date,
+                observatory=999  # Invalid observatory
+            )
+            invalid_observation.full_clean()
+
+    def test_code_field(self):
+        test_code = "print('Hello, World!')"
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            code=test_code
+        )
+        self.assertEqual(observation.code, test_code)
+
+    def test_status_validation(self):
+        # Test valid status
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            status=Observation.statuses.PENDING
+        )
+        self.assertEqual(observation.status, Observation.statuses.PENDING)
+
+        # Test invalid status
+        with self.assertRaises(ValidationError):
+            invalid_observation = Observation.objects.create(
+                user=self.user,
+                start_date=self.start_date,
+                end_date=self.end_date,
+                status=999  # Invalid status
+            )
+            invalid_observation.full_clean()
+
+    def test_priority_validation(self):
+        # Test valid priority
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            priority=Priorities.HIGH
+        )
+        self.assertEqual(observation.priority, Priorities.HIGH)
+
+        # Test invalid priority
+        with self.assertRaises(ValidationError):
+            invalid_observation = Observation.objects.create(
+                user=self.user,
+                start_date=self.start_date,
+                end_date=self.end_date,
+                priority=999  # Invalid priority
+            )
+            invalid_observation.full_clean()
+
+    def test_multiple_status_transitions(self):
+        observation = Observation.objects.create(
+            user=self.user,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            status=Observation.statuses.PREP
+        )
+
+        # Test PREP to PENDING
+        observation.status = Observation.statuses.PENDING
+        observation.save()
+        self.assertEqual(observation.status, Observation.statuses.PENDING)
+
+        # Test PENDING to IN_PROGRESS
+        observation.status = Observation.statuses.IN_PROGRESS
+        observation.save()
+        self.assertEqual(observation.status, Observation.statuses.IN_PROGRESS)
+
+        # Test IN_PROGRESS to DONE
+        observation.status = Observation.statuses.DONE
+        observation.save()
+        self.assertEqual(observation.status, Observation.statuses.DONE)
+
+        # Verify comments were created for status changes
+        self.assertGreater(observation.comments.count(), 0)
+
 
 class TestLulinModel(TestCase):
     def setUp(self):
@@ -172,54 +289,135 @@ class TestLulinModel(TestCase):
             target=self.target
         )
         self.assertIsNotNone(lulin.pk)
-        self.assertEqual(lulin.priority, LulinRun.priorities.LOW)
+        self.assertEqual(lulin.priority, Priorities.LOW)
         self.assertEqual(lulin.binning, 1)
         self.assertEqual(lulin.frames, 1)
         self.assertEqual(lulin.exposure_time, 10)
+        self.assertEqual(lulin.status, RunStatuses.PENDING)
+        self.assertEqual(lulin.filter, 1)  # Default filter value
+        self.assertEqual(lulin.instrument, 1)  # Default instrument value
+
+    def test_filter_choices(self):
+        # Test default filter
+        lulin = LulinRun.objects.create(
+            observation=self.observation,
+            target=self.target
+        )
+        self.assertEqual(lulin.filter, 1)  # Default filter value
+
+        # Test custom filter
+        lulin = LulinRun.objects.create(
+            observation=self.observation,
+            target=self.target,
+            filter=Filters.gp_Astrodon_2019
+        )
+        self.assertEqual(lulin.filter, 2)
+
+        # Test invalid filter
+        with self.assertRaises(ValidationError):
+            invalid_lulin = LulinRun.objects.create(
+                observation=self.observation,
+                target=self.target,
+                filter=999  # Invalid filter value
+            )
+            invalid_lulin.full_clean()
+
+    def test_instrument_choices(self):
+        # Test default instrument
+        lulin = LulinRun.objects.create(
+            observation=self.observation,
+            target=self.target
+        )
+        self.assertEqual(lulin.instrument, 1)  # Default instrument value
+
+        # Test custom instrument
+        lulin = LulinRun.objects.create(
+            observation=self.observation,
+            target=self.target,
+            instrument=2  # Using a valid instrument choice
+        )
+        self.assertEqual(lulin.instrument, 2)
+
+        # Test invalid instrument
+        with self.assertRaises(ValidationError):
+            invalid_lulin = LulinRun.objects.create(
+                observation=self.observation,
+                target=self.target,
+                instrument=999  # Invalid instrument value
+            )
+            invalid_lulin.full_clean()
+
+    def test_run_status_transitions(self):
+        lulin = LulinRun.objects.create(
+            observation=self.observation,
+            target=self.target
+        )
+
+        # Test initial status
+        self.assertEqual(lulin.status, RunStatuses.PENDING)
+
+        # Test transition to SUCCESS
+        lulin.status = RunStatuses.SUCCESS
+        lulin.save()
+        self.assertEqual(lulin.status, RunStatuses.SUCCESS)
+
+        # Test transition to FAIL
+        lulin.status = RunStatuses.FAIL
+        lulin.save()
+        self.assertEqual(lulin.status, RunStatuses.FAIL)
+
+        # Test transition to PARTIAL_SUCCESS
+        lulin.status = RunStatuses.PARTIAL_SUCCESS
+        lulin.save()
+        self.assertEqual(lulin.status, RunStatuses.PARTIAL_SUCCESS)
 
     def test_default_filters(self):
         lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target
         )
-        expected_filters = {'u': True, 'g': True,
-                            'r': True, 'i': True, 'z': True}
-        self.assertEqual(lulin.filters, expected_filters)
+        self.assertEqual(lulin.filter, 1)  # Default filter
+        filters = lulin.get_filters()
+        self.assertTrue(isinstance(filters, list))
+        self.assertTrue(len(filters) > 0)
 
     def test_default_instruments(self):
         lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target
         )
-        expected_instruments = {'LOT': True, 'SLT': False, 'TRIPOL': False}
-        self.assertEqual(lulin.instruments, expected_instruments)
+        self.assertEqual(lulin.instrument, 1)  # Default instrument
+        instruments = lulin.get_instruments()
+        self.assertTrue(isinstance(instruments, list))
+        self.assertTrue(len(instruments) > 0)
 
-    def test_custom_filters(self):
-        custom_filters = {'u': False, 'g': True,
-                          'r': True, 'i': False, 'z': True}
+    def test_get_filter_full_name(self):
         lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            filters=custom_filters
+            filter=1  # Using first filter
         )
-        self.assertEqual(lulin.filters, custom_filters)
+        filters = lulin.get_filters()
+        # Check if filter value exists in choices
+        self.assertTrue(any(f[0] == 1 for f in filters))
 
-    def test_custom_instruments(self):
-        custom_instruments = {'LOT': False, 'SLT': True, 'TRIPOL': True}
+    def test_get_instrument_full_name(self):
         lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            instruments=custom_instruments
+            instrument=1  # Using first instrument
         )
-        self.assertEqual(lulin.instruments, custom_instruments)
+        instruments = lulin.get_instruments()
+        # Check if instrument value exists in choices
+        self.assertTrue(any(i[0] == 1 for i in instruments))
 
     def test_priority_choices(self):
         lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            priority=LulinRun.priorities.HIGH
+            priority=Priorities.HIGH
         )
-        self.assertEqual(lulin.priority, LulinRun.priorities.HIGH)
+        self.assertEqual(lulin.priority, Priorities.HIGH)
 
         with self.assertRaises(ValidationError):
             observation = LulinRun.objects.create(
@@ -246,18 +444,18 @@ class ObservationsViewTestCase(TestCase):
         self.observation1 = Observation.objects.create(
             user=self.user,
             name='Test Observation 1',
-            observatory=Observation.observatories.LULIN,
+            observatory=Observatories.LULIN,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2),
-            status=1
+            status=Observation.statuses.PREP
         )
         self.observation2 = Observation.objects.create(
             user=self.user,
             name='Test Observation 2',
-            observatory=Observation.observatories.LULIN,
+            observatory=Observatories.LULIN,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2),
-            status=2
+            status=Observation.statuses.PENDING
         )
 
     def test_get_observations(self):
@@ -271,10 +469,10 @@ class ObservationsViewTestCase(TestCase):
     def test_create_observation(self):
         data = {
             'name': 'New Observation',
-            'observatory': Observation.observatories.LULIN,
+            'observatory': Observatories.LULIN,
             'user': self.user.id,
             'targets': [self.target.id],
-            'priority': Observation.priorities.MEDIUM,
+            'priority': Priorities.MEDIUM,
             'start_date': timezone.now() + timedelta(days=1),
             'end_date': timezone.now() + timedelta(days=2),
             'status': Observation.statuses.PREP
@@ -286,7 +484,8 @@ class ObservationsViewTestCase(TestCase):
         self.assertEqual(Observation.objects.latest(
             'id').name, 'New Observation')
         self.assertEqual(Observation.objects.latest('id').user, self.user)
-        self.assertEqual(Observation.objects.latest('id').status, 1)
+        self.assertEqual(Observation.objects.latest(
+            'id').status, Observation.statuses.PREP)
         self.assertEqual(Observation.objects.latest(
             'id').targets.first(), self.target)
 
@@ -347,17 +546,16 @@ class LulinSchedulerTestCase(TestCase):
         self.observation = Observation.objects.create(
             user=self.user,
             name='Test Observation 1',
-            observatory=Observation.observatories.LULIN,
+            observatory=Observatories.LULIN,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2),
-            status=1
+            status=Observation.statuses.PREP
         )
         self.lulin = LulinRun.objects.create(
             observation=self.observation,
             target=self.target,
-            priority=LulinRun.priorities.HIGH,
-            filters={'u': True, 'g': False, 'r': True, 'i': False, 'z': False},
-            binning=2,
+            priority=Priorities.HIGH,
+            filter=Filters.up_Astrodon_2019,
             frames=10,
             exposure_time=300
         )
@@ -441,8 +639,8 @@ class LulinViewTestCase(TestCase):
         self.observation = Observation.objects.create(
             name='Test Observation',
             user=self.user,
-            observatory=Observation.observatories.LULIN,
-            status=1,
+            observatory=Observatories.LULIN,
+            status=Observation.statuses.PREP,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2)
         )
@@ -484,10 +682,10 @@ class CodeViewTestCase(TestCase):
         self.observation = Observation.objects.create(
             name='Test Observation',
             user=self.user,
-            observatory=Observation.observatories.LULIN,
+            observatory=Observatories.LULIN,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2),
-            status=1
+            status=Observation.statuses.PREP
         )
 
     def test_get_code(self):
@@ -516,10 +714,10 @@ class ObservationMessagesViewTestCase(TestCase):
         self.observation = Observation.objects.create(
             name='Test Observation',
             user=self.user,
-            observatory=Observation.observatories.LULIN,
+            observatory=Observatories.LULIN,
             start_date=timezone.now() + timedelta(days=1),
             end_date=timezone.now() + timedelta(days=2),
-            status=1
+            status=Observation.statuses.PREP
         )
 
     def test_get_observation_messages(self):
