@@ -580,10 +580,10 @@ class LulinSchedulerTestCase(TestCase):
         code = self.scheduler.gen_code(self.observation.id)
         expected_code = f"""
 #REPEAT 1
-#BINNING 2,2,
-#COUNT 10,10,
-#INTERVAL 300,300,
-#FILTER up_Astrodon_2019,rp_Astrodon_2019,
+#BINNING 1
+#COUNT 10
+#INTERVAL 300
+#FILTER up_Astrodon_2019
 
 {self.target.name}    01:00:00.000    45:00:00
 #WAITFOR 1

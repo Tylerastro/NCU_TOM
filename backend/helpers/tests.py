@@ -302,7 +302,7 @@ class ViewsTestCase(TestCase):
         self.faculty_user = User.objects.create_user(
             username='faculty', email='faculty@example.com', password='facultypass', role=User.roles.FACULTY, is_active=True)
         self.regular_user = User.objects.create_user(
-            username='regular', email='regular@example.com', password='regularpass', role=User.roles.VISITOR, is_active=True)
+            username='regular', email='regular@example.com', password='regularpass', role=User.roles.USER, is_active=True)
 
     def test_tom_token_obtain_pair_view(self):
         data = {'username': 'regular', 'password': 'regularpass'}
