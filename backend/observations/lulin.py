@@ -5,6 +5,7 @@ from typing import List
 import astropy.units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
+from observations.lulin_models import Filters
 from observations.models import LulinRun, Observation
 from targets.models import Target
 from targets.visibility import Visibility
@@ -106,17 +107,19 @@ class LulinScheduler:
             binning = ", ".join(sorted(target_data['binning']))
             frames = ", ".join(target_data['frames'])
             exposure_times = ", ".join(target_data['exposure_times'])
-            filters = ", ".join(target_data['filters'])
+            filters = ", ".join(self.get_filter_full_name(f)
+                                for f in target_data['filters'])
 
             # Create single block for target
             tmp = f"""
-    #REPEAT 1
-    #BINNING {binning}
-    #COUNT {frames}
-    #INTERVAL {exposure_times}
-    #FILTER {filters}
-    {target.name}    {self.convert_ra(target.ra)}    {self.convert_dec(target.dec)}
-    #WAITFOR 1
+#REPEAT 1
+#BINNING {binning}
+#COUNT {frames}
+#INTERVAL {exposure_times}
+#FILTER {filters}
+
+{target.name}    {self.convert_ra(target.ra)}    {self.convert_dec(target.dec)}
+#WAITFOR 1
             """
             code += tmp
 
