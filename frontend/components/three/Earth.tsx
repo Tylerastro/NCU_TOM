@@ -102,6 +102,12 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
     marker.position.copy(ncuPosition);
     groupRef.current.add(marker);
 
+    // Add LSST marker
+    const lsstPosition = latLongToVector3(-30.244639, -70.749417, 1.05);
+    const lsstMarker = new THREE.Mesh(markerGeo, markerMat);
+    lsstMarker.position.copy(lsstPosition);
+    groupRef.current.add(lsstMarker);
+
     // Add wireframe if enabled
     if (wireframe) {
       const wireframeGeo = new THREE.IcosahedronGeometry(1, 10);
@@ -126,7 +132,7 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
     if (groupRef.current) {
       groupRef.current.rotation.y += 0.002;
       // groupRef.current.rotation.x += 0.002;
-      groupRef.current.rotation.z -= 0.002;
+      // groupRef.current.rotation.z -= 0.002;
     }
   });
 

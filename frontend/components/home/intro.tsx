@@ -56,12 +56,14 @@ export default async function Intro({ className }: IntroProps) {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Button
-              size="lg"
-              className="bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90"
-            >
-              Get Started
-            </Button>
+            <Link href="/auth/signin">
+              <Button
+                size="lg"
+                className="bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90"
+              >
+                Get Started
+              </Button>
+            </Link>
             <Link target="_blank" href="https://github.com/Tylerastro/NCU_TOM">
               <Button
                 size="lg"
