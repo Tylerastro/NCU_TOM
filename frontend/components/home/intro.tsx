@@ -2,6 +2,37 @@ import Link from "next/link";
 import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
+import { TerminalTyping } from "../TerminalTypingEffect";
+
+const codeBlocks = [
+  `Initializing connection to NCU TOM...`,
+
+  `// Checking system status
+const systemStatus = await getSystemStatus();
+try {
+  if (systemStatus === 'online') {
+    console.log('System is online');
+  } else {
+    console.error('System is offline');
+  }
+} catch (error) {
+  console.error('System status check failed:', error);
+}
+`,
+
+  `// Fetching Weather Data
+async function fetchWeatherData() {
+  try {
+    const response = await fetch('https://api.windy.com');
+    const starMap = await response.json();
+    console.log('Stellar Map:', starMap);
+  } catch (error) {
+    console.error('Distortion Detected:', error);
+  }
+}
+
+fetchGalacticData();`,
+];
 
 interface IntroProps {
   className?: string;
@@ -9,9 +40,7 @@ interface IntroProps {
 
 export default async function Intro({ className }: IntroProps) {
   return (
-    <section
-      className={cn("relative min-h-screen w-full py-24 px-12", className)}
-    >
+    <section className={cn("relative w-full px-12", className)}>
       <div className="container relative mx-auto grid gap-4 px-32 md:grid-cols-5 md:gap-2">
         {/* Left column - 2/5 width */}
         <div className="col-span-2 flex flex-col justify-center space-y-8">
@@ -45,32 +74,11 @@ export default async function Intro({ className }: IntroProps) {
             </Link>
           </div>
         </div>
-
-        {/* Right column - 3/5 width */}
-        <div className="col-span-3 flex flex-col justify-center">
-          <div className="rounded-lg border border-gray-800 bg-black p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex gap-1">
-                <div className="h-3 w-3 rounded-full bg-red-500" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                <div className="h-3 w-3 rounded-full bg-green-500" />
-              </div>
-            </div>
-            <pre className="mt-4 font-mono text-sm text-gray-300">
-              <code>{`// auth.ts
-import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
-export const { auth, handlers } = NextAuth({ providers: [GitHub] })
-
-// middleware.ts
-export { auth as middleware } from "@/auth"
-
-// app/api/auth/[...nextauth]/route.ts
-import { handlers } from "@/auth"
-export const { GET, POST } = handlers`}</code>
-            </pre>
-          </div>
-        </div>
+        <TerminalTyping
+          className="col-span-3 flex flex-col justify-center"
+          codeBlocks={codeBlocks}
+          speed={30}
+        />
       </div>
     </section>
   );

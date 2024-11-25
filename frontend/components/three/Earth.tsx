@@ -96,7 +96,7 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
     const markerMat = new THREE.MeshBasicMaterial({
       color: 0xff0000,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.5,
     });
     const marker = new THREE.Mesh(markerGeo, markerMat);
     marker.position.copy(ncuPosition);
@@ -124,7 +124,9 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
 
   useFrame(() => {
     if (groupRef.current) {
-      // groupRef.current.rotation.y += 0.002;
+      groupRef.current.rotation.y += 0.002;
+      // groupRef.current.rotation.x += 0.002;
+      groupRef.current.rotation.z -= 0.002;
     }
   });
 
@@ -144,7 +146,7 @@ const Scene: React.FC = () => {
 
 export default function EarthAnimation() {
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
+    <div style={{ width: "100%", height: "80vh" }}>
       <Scene />
     </div>
   );

@@ -4,8 +4,8 @@ import Demo from "@/components/home/demo";
 export default async function Home() {
   return (
     <main className=" w-full">
-      <Intro className="pt-64" />
-      <Demo />
+      <Intro className="pt-36" />
+      <Demo className="pt-36" />
     </main>
   );
 }
