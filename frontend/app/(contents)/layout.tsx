@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import styles from "./contents.module.css";
 
 export const metadata: Metadata = {
   title: "NCU Tom",
@@ -11,9 +10,5 @@ export default function ContentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className={`w-[85%] pt-12 px-12 animate-page-transition min-h-svh`}>
-      {children}
-    </div>
-  );
+  return <div className={`w-[85%] pt-12 px-12  min-h-svh`}>{children}</div>;
 }

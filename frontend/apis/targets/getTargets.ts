@@ -1,7 +1,7 @@
 import { Paginator } from "@/models/helpers";
 import api from "@/apis/axios";
 
-interface GetTargetsOptions {
+interface getTargetsOptions {
   page?: number;
   pageSize?: number;
   name?: string;
@@ -13,7 +13,7 @@ export const getTargets = async ({
   pageSize,
   name,
   tags,
-}: GetTargetsOptions): Promise<Paginator> => {
+}: getTargetsOptions): Promise<Paginator> => {
   try {
     const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/targets/`);
     const params = new URLSearchParams();

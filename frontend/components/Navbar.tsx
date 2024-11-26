@@ -19,8 +19,8 @@ const pages = [
     enabled: true,
   },
   {
-    name: "Annoucements",
-    link: "/announcements",
+    name: "Alerts",
+    link: "/alerts",
     enabled: true,
   },
   {
