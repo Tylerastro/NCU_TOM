@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     'dj_rest_auth',
     'rest_framework',
     'rest_framework.authtoken',
@@ -251,8 +252,6 @@ REST_AUTH = {
     'PASSWORD_RESET_SERIALIZER': 'dj_rest_auth.serializers.PasswordResetSerializer',
     'PASSWORD_RESET_CONFIRM_SERIALIZER': 'dj_rest_auth.serializers.PasswordResetConfirmSerializer',
     'PASSWORD_CHANGE_SERIALIZER': 'dj_rest_auth.serializers.PasswordChangeSerializer',
-
-    'REGISTER_SERIALIZER': 'system.serializers.TOMRegisterSerializer',
 
     'REGISTER_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
 

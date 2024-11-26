@@ -1,26 +1,43 @@
 from datetime import datetime
-from typing import List
 
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+from dj_rest_auth.views import UserDetailsView
 from django.conf import settings
-from django.core.mail import send_mail
-from django.http import HttpRequest
-from django.shortcuts import get_object_or_404, render
 from djoser.social.views import ProviderAuthView
-from drf_spectacular.utils import extend_schema
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 from system.models import User
 
-from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
-                          FullUserSerializer, TagsGetSerializer,
-                          TagsSerializer, UserPutSerializer)
+from .serializers import FullUserSerializer, UserPutSerializer, UserSerializer
 
 # Create your views here.
+
+
+class TOMUserDetailsView(UserDetailsView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class GoogleLogin(SocialLoginView):
+    authentication_classes = []
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://127.0.0.1:3000"
+    client_class = OAuth2Client
+
+
+class GitHubLogin(SocialLoginView):
+    authentication_classes = []
+    adapter_class = GitHubOAuth2Adapter
+    callback_url = "http://127.0.0.1:3000"
+    client_class = OAuth2Client
 
 
 class TomProviderAuthView(ProviderAuthView):
@@ -129,14 +146,17 @@ class UserDetailView(APIView):
 
 @api_view(['PUT'])
 @permission_classes((IsAuthenticated, ))
-def EditUserRole(request, pk):
+def EditUser(request, pk):
     if request.user.role != User.roles.ADMIN:
         return Response({"detail": "Forbidden"}, status=403)
 
     user = User.objects.get(id=pk)
     if user == request.user:
         return Response({"detail": "You can't edit your own role"}, status=403)
-    user.role = request.data['role']
-    user.save()
+    serializer = UserPutSerializer(
+        user, data=request.data, partial=True, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
 
     return Response(status=200)

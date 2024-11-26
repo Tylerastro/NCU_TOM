@@ -1,13 +1,6 @@
-from django.conf import settings
 from django.contrib.auth.models import (AbstractUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
-
-
-def get_default_is_active() -> bool:
-    if settings.DEBUG:
-        return True
-    return False
 
 
 class UserManager(BaseUserManager):
@@ -61,18 +54,13 @@ class User(AbstractUser, PermissionsMixin):
     role = models.IntegerField(choices=roles.choices, default=roles.USER)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
-    use_demo_targets = models.BooleanField(default=True)
-    is_active = models.BooleanField(default=get_default_is_active())
+    is_active = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True)
     is_superuser = models.BooleanField(default=False)
-    token = models.CharField(max_length=255, null=True)
-    provider = models.IntegerField(
-        choices=OauthProvider.choices, null=False, default=OauthProvider.CREDENTIAL
-    )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'role',
-                       'institute', 'email', 'use_demo_targets']
+                       'institute', 'email']
 
     def __str__(self):
         return self.username
