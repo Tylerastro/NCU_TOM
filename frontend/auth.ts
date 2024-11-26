@@ -76,38 +76,37 @@ const signInSchema = z.object({
     .max(32, "Password must be less than 32 characters"),
 });
 
-const config = {
-  providers: [
-    Credentials({
-      credentials: {
-        username: { label: "username", type: "text" },
-        password: { label: "password", type: "password" },
-      },
-      authorize: async (credentials, req) => {
-        if (!credentials) {
-          throw new Error("Credentials are missing.");
+const providers: Provider[] = [
+  Credentials({
+    credentials: {
+      username: { label: "username", type: "text" },
+      password: { label: "password", type: "password" },
+    },
+    authorize: async (credentials, req) => {
+      if (!credentials) {
+        throw new Error("Credentials are missing.");
+      }
+
+      let user = null;
+
+      try {
+        const { username, password } = await signInSchema.parseAsync(
+          credentials
+        );
+        const { refresh, access } = await getToken(username, password);
+
+        if (!access) {
+          console.log("Access token not found.");
+          return null;
         }
 
-        let user = null;
+        // Get user model
+        user = await getUser(access);
 
-        try {
-          const { username, password } = await signInSchema.parseAsync(
-            credentials
-          );
-          const { refresh, access } = await getToken(username, password);
-
-          if (!access) {
-            console.log("Access token not found.");
-            return null;
-          }
-
-          // Get user model
-          user = await getUser(access);
-
-          if (!user) {
-            console.log("User not found.");
-            return null;
-          }
+        if (!user) {
+          console.log("User not found.");
+          return null;
+        }
 
         return {
           ...user,
@@ -136,18 +135,6 @@ const config = {
 
 const config = {
   providers: providers,
-          return {
-            ...user,
-            accessToken: access,
-            refreshToken: refresh,
-          };
-        } catch (error) {
-          console.error("Authentication error:", error);
-          return null;
-        }
-      },
-    }),
-  ],
   session: {
     strategy: "jwt",
     maxAge: BACKEND_REFRESH_TOKEN_LIFETIME,
@@ -227,3 +214,14 @@ declare module "next-auth/jwt" {
     ref?: number;
   }
 }
+
+export const providerMap = providers
+  .map((provider) => {
+    if (typeof provider === "function") {
+      const providerData = provider();
+      return { id: providerData.id, name: providerData.name };
+    } else {
+      return { id: provider.id, name: provider.name };
+    }
+  })
+  .filter((provider) => provider.id !== "credentials");
