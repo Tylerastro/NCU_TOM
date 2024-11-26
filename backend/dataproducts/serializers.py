@@ -23,10 +23,6 @@ class LulinDataProductSerializer(serializers.ModelSerializer):
                   'exposure_time', 'zp', 'filter', 'instrument', 'FWHM', 'created_at')
 
     def get_obs_date(self, obj):
-        """
-        Convert MJD to datetime.
-        MJD is the number of days since November 17, 1858
-        """
         if obj.mjd is None:
             return None
 

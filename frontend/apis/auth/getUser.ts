@@ -7,7 +7,7 @@ const api = axios.create({
 
 export async function getUser(access_token: string) {
   try {
-    const response = await api.get("/api/users/me/", {
+    const response = await api.get("/api/user/", {
       headers: {
         Authorization: `JWT ${access_token}`,
       },

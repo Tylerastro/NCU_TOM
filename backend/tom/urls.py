@@ -23,7 +23,7 @@ urlpatterns = [
     path('api/', include('observations.urls')),
     path('api/', include('dataproducts.urls')),
     path('api/', include('helpers.urls')),
-    path('api/', include('djoser.urls')),
+    path('api/', include('system.urls')),
 ]
 
 # Keep default welcome page from Django

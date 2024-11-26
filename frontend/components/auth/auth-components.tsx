@@ -18,3 +18,18 @@ export async function GitHubSignIn() {
     </form>
   );
 }
+
+export async function GoogleSignIn() {
+  return (
+    <form
+      action={async () => {
+        "use server";
+        await signIn("google", { redirectTo: "/" });
+      }}
+    >
+      <Button type="submit" variant={"outline"} className=" w-full bg-gray-900">
+        Sign in with Google
+      </Button>
+    </form>
+  );
+}
