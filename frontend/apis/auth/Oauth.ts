@@ -1,4 +1,5 @@
 import axios from "axios";
+import { access } from "fs";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_SERVER_API_HOST,
@@ -10,14 +11,12 @@ interface TokenResponse {
   access: string;
 }
 
-export async function getToken(
-  username: string,
-  password: string
+export async function loginWithGoogle(
+  id_token: string
 ): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/login/", {
-      username: username,
-      password: password,
+    const response = await api.post("/api/google/", {
+      access_token: id_token,
     });
     return response.data;
   } catch (error) {
