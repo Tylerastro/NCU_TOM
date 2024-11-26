@@ -1,5 +1,5 @@
 "use client";
-import { editUserRole } from "@/apis/system/editUserRole";
+import { editUser } from "@/apis/system/editUserRole";
 import {
   Select,
   SelectContent,
@@ -17,19 +17,10 @@ import {
 } from "@/components/ui/table";
 
 import { getUserList } from "@/apis/system/getUserList";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UserRole } from "@/models/enums";
 import { UserProfile } from "@/models/users";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-
-function LoadingSkeleton() {
-  return (
-    <div className="flex text-center justify-center">
-      <Skeleton className="h-8 w-full" />
-    </div>
-  );
-}
 
 const activeLight = (
   <div className="flex items-center justify-center">
@@ -81,7 +72,10 @@ export default function UserTable() {
 
   const mutation = useMutation({
     mutationFn: ({ userId, role }: { userId: number; role: number }) => {
-      return editUserRole(userId, role);
+      if (role == UserRole.Disabled) {
+        return editUser(userId, undefined, false);
+      }
+      return editUser(userId, role, true);
     },
     onSuccess: () => {
       refetch();
@@ -107,20 +101,24 @@ export default function UserTable() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[50px]">id</TableHead>
-          <TableHead className="w-[100px]">Username</TableHead>
-          <TableHead className="text-center">Role</TableHead>
-          <TableHead className="text-center">Institute</TableHead>
-          <TableHead className="text-center">Email</TableHead>
-          <TableHead className="text-center">Active</TableHead>
+          <TableHead className="w-[50px] text-center">id</TableHead>
+          <TableHead className="w-[100px] text-center">Username</TableHead>
+          <TableHead className="w-[150px] text-center">Role</TableHead>
+          <TableHead className="w-[100px] text-center">Institute</TableHead>
+          <TableHead className="w-[150px] text-center">Email</TableHead>
+          <TableHead className="w-[50px] text-center">Active</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user: UserProfile) => (
           <TableRow key={user.id}>
-            <TableCell className="font-medium">{user.id}</TableCell>
-            <TableCell className="font-medium">{user.username}</TableCell>
-            <TableCell className="text-center">
+            <TableCell className="font-medium text-center w-[50px]">
+              {user.id}
+            </TableCell>
+            <TableCell className="font-medium text-center w-[100px]">
+              {user.username}
+            </TableCell>
+            <TableCell className="text-center w-[150px]">
               {
                 <Select
                   onValueChange={(role) => handleRoleChange(user.id, role)}
@@ -129,7 +127,13 @@ export default function UserTable() {
                     disabled={isFetching}
                     className="flex text-center justify-center "
                   >
-                    <SelectValue placeholder={UserRole[user.role]} />
+                    <SelectValue
+                      placeholder={
+                        user.is_active
+                          ? UserRole[user.role]
+                          : UserRole[UserRole.Disabled]
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent className="flex text-center justify-center">
                     {Object.values(UserRole)
@@ -143,9 +147,13 @@ export default function UserTable() {
                 </Select>
               }
             </TableCell>
-            <TableCell className="text-center">{user.institute}</TableCell>
-            <TableCell className="text-center">{user.email}</TableCell>
-            <TableCell className="text-center">
+            <TableCell className="text-center w-[100px]">
+              {user.institute}
+            </TableCell>
+            <TableCell className="text-center w-[150px]">
+              {user.email}
+            </TableCell>
+            <TableCell className="text-center w-[50px]">
               {user.deleted_at
                 ? deletedLight
                 : user.is_active

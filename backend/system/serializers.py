@@ -1,3 +1,12 @@
+from allauth.account import app_settings as allauth_account_settings
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
+from allauth.socialaccount.helpers import complete_social_login
+from allauth.socialaccount.models import EmailAddress, SocialAccount
+from allauth.socialaccount.providers.base import AuthProcess
+from dj_rest_auth.registration.serializers import RegisterSerializer
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from system.models import User
 
@@ -10,9 +19,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserPutSerializer(serializers.ModelSerializer):
+    def validate_role(self, value):
+        request = self.context.get('request')
+        if not request.user.role == User.roles.ADMIN:
+            raise serializers.ValidationError(
+                "Only admin users can modify roles")
+
+        return value
+
     class Meta:
         model = User
-        fields = ('username', 'institute', 'first_name', 'last_name')
+        fields = ('username', 'institute', 'first_name',
+                  'last_name', 'role', 'is_active')
 
 
 class FullUserSerializer(serializers.ModelSerializer):

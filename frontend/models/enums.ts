@@ -37,6 +37,7 @@ enum UserRole {
   Admin = 1,
   Faculty,
   User,
+  Disabled,
 }
 
 export {

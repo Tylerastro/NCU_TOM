@@ -1,4 +1,6 @@
 "use client";
+import { GitHubSignIn, GoogleSignIn } from "@/components/auth/auth-components";
+import CredentialForm from "@/components/auth/credentialForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { AuthError } from "next-auth";
@@ -78,6 +80,7 @@ export default function SignInPage({
 
       <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center justify-center">
         <GitHubSignIn />
+        <GoogleSignIn />
         <p className="mt-10 text-center text-sm text-primary-foreground">
           Not a member?{" "}
           <a
