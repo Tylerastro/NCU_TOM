@@ -1,6 +1,6 @@
 from dj_rest_auth.jwt_auth import get_refresh_view
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
 from rest_framework_simplejwt.views import TokenVerifyView

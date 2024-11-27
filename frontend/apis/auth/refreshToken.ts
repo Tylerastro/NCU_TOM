@@ -7,6 +7,7 @@ const api = axios.create({
 
 interface TokenResponse {
   access: string;
+  access_expiration: Date;
 }
 
 export async function refreshToken(refresh: string): Promise<TokenResponse> {

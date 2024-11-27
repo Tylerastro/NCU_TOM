@@ -23,13 +23,16 @@ const getCurrentEpochTime = () => {
 
 const SIGN_IN_HANDLERS = {
   credentials: async (
-    user: User,
+    user: UserProfile,
     account: Account,
     profile: Profile,
     email: string,
     credentials: any
   ) => {
-    return true;
+    if (user.username && user.is_active) {
+      return true;
+    }
+    return false;
   },
   google: async (
     user: User,
@@ -141,6 +144,7 @@ const config = {
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
+      console.log("signin");
       if (account?.provider && !SIGN_IN_PROVIDERS.includes(account?.provider))
         return false;
 
@@ -155,22 +159,23 @@ const config = {
       }
     },
 
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, account, trigger }) {
       if (token) {
-        token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+        if (!token.ref) {
+          token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+        }
       }
 
       if (token.ref && getCurrentEpochTime() > token.ref) {
-        {
-          if (!token.refreshToken) {
-            return null;
-          }
-          const newToken = await refreshToken(token.refreshToken);
-          if (newToken) {
-            token.accessToken = newToken.access;
-          } else {
-            return null;
-          }
+        if (!token.refreshToken) {
+          return null;
+        }
+        const newToken = await refreshToken(token.refreshToken);
+        if (newToken) {
+          token.accessToken = newToken.access;
+          token.ref = new Date(newToken.access_expiration).getTime() / 1000;
+        } else {
+          return null;
         }
       }
 
@@ -214,14 +219,3 @@ declare module "next-auth/jwt" {
     ref?: number;
   }
 }
-
-export const providerMap = providers
-  .map((provider) => {
-    if (typeof provider === "function") {
-      const providerData = provider();
-      return { id: providerData.id, name: providerData.name };
-    } else {
-      return { id: provider.id, name: provider.name };
-    }
-  })
-  .filter((provider) => provider.id !== "credentials");
