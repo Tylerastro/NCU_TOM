@@ -16,6 +16,8 @@ import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 function onSubmit(values: z.infer<typeof formSchema>) {
   const { username, password } = values;
@@ -47,6 +49,7 @@ const formSchema = z.object({
 });
 
 export default function CredentialForm() {
+  const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,6 +57,13 @@ export default function CredentialForm() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "CredentialsSignin") {
+      toast.error("Invalid username or password");
+    }
+  }, [searchParams]);
 
   return (
     <Form {...form}>

@@ -20,8 +20,7 @@ class Command(BaseCommand):
                     "DJANGO_SUPERUSER_LAST_NAME", "astro"),
                 role=int(os.environ.get("DJANGO_SUPERUSER_ROLE", 1)),
                 institute=os.environ.get("DJANGO_SUPERUSER_INSTITUTE", "NCU"),
-                use_demo_targets=bool(os.environ.get(
-                    "DJANGO_SUPERUSER_USE_DEMO_TARGETS", "True")),
+                is_active=True
             )
             self.stdout.write(self.style.SUCCESS('Superuser created'))
         else:
