@@ -18,7 +18,7 @@ from .serializers import FullUserSerializer, UserPutSerializer, UserSerializer
 
 class TOMUserDetailsView(UserDetailsView):
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GoogleLogin(SocialLoginView):
