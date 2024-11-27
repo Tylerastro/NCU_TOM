@@ -1,18 +1,19 @@
+import { auth } from "@/auth";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
+  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import UpdateProfile from "./profile";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { auth } from "@/auth";
 import DeleteAccount from "./deleteAccount";
+import UpdateProfile from "./profile";
 
 export default async function Component() {
   const session = await auth();
+  console.log(session?.user);
 
   return (
     <div className="flex  flex-col min-h-90vh ">

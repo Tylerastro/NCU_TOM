@@ -54,11 +54,6 @@ const SIGN_IN_HANDLERS = {
         console.log("User not found.");
         return false;
       }
-      return {
-        ...user,
-        accessToken: response.access,
-        refreshToken: response.refresh,
-      };
     } catch (error) {
       console.error(error);
       return false;
@@ -144,7 +139,6 @@ const config = {
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      console.log("signin");
       if (account?.provider && !SIGN_IN_PROVIDERS.includes(account?.provider))
         return false;
 

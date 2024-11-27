@@ -32,7 +32,7 @@ const pages = [
 
 function NavBar() {
   return (
-    <div className="w-full h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around backdrop-blur-sm">
+    <div className="w-full h-16 px-2 sm:px-6 lg:px-8 static flex items-center justify-around ">
       <div className="flex-shrink-0">
         <Logo />
       </div>
