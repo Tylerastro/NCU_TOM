@@ -5,17 +5,17 @@ import { UserProfile } from "@/models/users";
 import { getToken } from "@/apis/auth/getToken";
 import { getUser } from "@/apis/auth/getUser";
 import { refreshToken } from "@/apis/auth/refreshToken";
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, Session } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { object, string } from "zod";
 import { Account, User, Profile } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import { z } from "zod";
-import axios from "axios";
 import { loginWithGoogle } from "./apis/auth/Oauth";
+import axios from "axios";
 
-const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60; // 45 minutes
+const BACKEND_ACCESS_TOKEN_LIFETIME = 5;
 const BACKEND_REFRESH_TOKEN_LIFETIME = 6 * 24 * 60 * 60; // 6 days
 const getCurrentEpochTime = () => {
   return Math.floor(new Date().getTime() / 1000);
@@ -35,27 +35,40 @@ const SIGN_IN_HANDLERS = {
     return false;
   },
   google: async (
-    user: User,
+    user: UserProfile,
     account: Account,
     profile: Profile,
     email: string,
     credentials: any
   ) => {
+    console.log("google auth");
+    if (!account.access_token) {
+      return false;
+    }
+
     try {
-      if (!account.access_token) {
-        return false;
-      }
       const response = await loginWithGoogle(account.access_token);
       if (!response.access) {
         return false;
       }
-      const user = await getUser(response.access);
-      if (!user) {
+
+      const user_data = await getUser(response.access);
+
+      if (!user_data) {
         console.log("User not found.");
         return false;
       }
+      console.log("return user_data", user_data);
+      profile.id = user_data.id;
+      profile.username = user_data.username;
+      profile.role = user_data.role;
+      profile.created_at = user_data.created_at;
+      profile.is_active = user_data.is_active;
+      profile.access = response.access;
+      profile.refresh = response.refresh;
+      return true;
     } catch (error) {
-      console.error(error);
+      console.error("Google sign-in error:", error);
       return false;
     }
   },
@@ -143,6 +156,7 @@ const config = {
         return false;
 
       if (account?.provider && account?.provider in SIGN_IN_HANDLERS) {
+        console.log("google sign in");
         return (SIGN_IN_HANDLERS as any)[account?.provider](
           user,
           account,
@@ -153,7 +167,17 @@ const config = {
       }
     },
 
-    async jwt({ token, user, account, trigger }) {
+    async jwt({ token, user, account, profile, trigger }) {
+      if (user && account) {
+        let backendResponse =
+          account.provider === "credentials" ? user : account.meta;
+        token["user"] = backendResponse.user;
+        token["access_token"] = backendResponse.access;
+        token["refresh_token"] = backendResponse.refresh;
+        token["ref"] = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+        return token;
+      }
+
       if (token) {
         if (!token.ref) {
           token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
@@ -161,7 +185,9 @@ const config = {
       }
 
       if (token.ref && getCurrentEpochTime() > token.ref) {
+        console.log("Refreshing token");
         if (!token.refreshToken) {
+          console.log("Refresh token not found.");
           return null;
         }
         const newToken = await refreshToken(token.refreshToken);
