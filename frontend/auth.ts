@@ -36,7 +36,7 @@ const SIGN_IN_HANDLERS = {
   },
   google: async (
     user: UserProfile,
-    account: Account,
+    account: any,
     profile: Profile,
     email: string,
     credentials: any
@@ -168,14 +168,9 @@ const config = {
     },
 
     async jwt({ token, user, account, profile, trigger }) {
-      if (user && account) {
-        let backendResponse =
-          account.provider === "credentials" ? user : account.meta;
-        token["user"] = backendResponse.user;
-        token["access_token"] = backendResponse.access;
-        token["refresh_token"] = backendResponse.refresh;
-        token["ref"] = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
-        return token;
+      if (user && profile && account && account.provider !== "credentials") {
+        token.accessToken = profile.access as string;
+        token.refreshToken = profile.refresh as string;
       }
 
       if (token) {
@@ -183,7 +178,6 @@ const config = {
           token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
         }
       }
-
       if (token.ref && getCurrentEpochTime() > token.ref) {
         console.log("Refreshing token");
         if (!token.refreshToken) {
