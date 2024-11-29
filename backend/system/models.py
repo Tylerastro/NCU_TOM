@@ -32,19 +32,13 @@ class User(AbstractUser, PermissionsMixin):
     objects = UserManager()
 
     class Meta:
-        ordering = ['id']
+        ordering = ['id', '-created_at']
         db_table = 'User'
 
     class roles(models.IntegerChoices):
         ADMIN = 1
         FACULTY = 2
         USER = 3
-
-    class OauthProvider(models.IntegerChoices):
-        CREDENTIAL = 1
-        GOOGLE = 2
-        GITHUB = 3
-        TWITTER = 4
 
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
