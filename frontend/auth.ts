@@ -1,21 +1,20 @@
 import Credentials from "next-auth/providers/credentials";
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
 import "next-auth/jwt";
 import { UserProfile } from "@/models/users";
 import { getToken } from "@/apis/auth/getToken";
 import { getUser } from "@/apis/auth/getUser";
 import { refreshToken } from "@/apis/auth/refreshToken";
-import type { NextAuthConfig, Session } from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { object, string } from "zod";
-import { Account, User, Profile } from "next-auth";
+import { string } from "zod";
+import { Account, Profile } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import { z } from "zod";
 import { loginWithGoogle } from "./apis/auth/Oauth";
-import axios from "axios";
 
-const BACKEND_ACCESS_TOKEN_LIFETIME = 5;
+const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60; // 45 minutes
 const BACKEND_REFRESH_TOKEN_LIFETIME = 6 * 24 * 60 * 60; // 6 days
 const getCurrentEpochTime = () => {
   return Math.floor(new Date().getTime() / 1000);
@@ -41,7 +40,6 @@ const SIGN_IN_HANDLERS = {
     email: string,
     credentials: any
   ) => {
-    console.log("google auth");
     if (!account.access_token) {
       return false;
     }
@@ -58,7 +56,6 @@ const SIGN_IN_HANDLERS = {
         console.log("User not found.");
         return false;
       }
-      console.log("return user_data", user_data);
       profile.id = user_data.id;
       profile.username = user_data.username;
       profile.role = user_data.role;
@@ -134,6 +131,11 @@ const providers: Provider[] = [
   Google({
     clientId: process.env.AUTH_GOOGLE_ID,
     clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    profile(profile) {
+      profile.first_name = profile.given_name;
+      profile.last_name = profile.family_name;
+      return profile;
+    },
     authorization: {
       params: {
         prompt: "consent",
@@ -171,6 +173,7 @@ const config = {
       if (user && profile && account && account.provider !== "credentials") {
         token.accessToken = profile.access as string;
         token.refreshToken = profile.refresh as string;
+        user = profile as any;
       }
 
       if (token) {
@@ -193,13 +196,22 @@ const config = {
         }
       }
 
+      if (trigger !== "signIn") {
+        const user_data = await getUser(token.accessToken as string);
+        if (!user_data) {
+          console.log("User not found.");
+          return null;
+        }
+        user = user_data;
+      }
+
       return {
         ...token,
         ...user,
       };
     },
 
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       if (!token?.accessToken) return { expires: session.expires };
       session.user = token as any;
 
@@ -215,7 +227,8 @@ const config = {
   debug: process.env.NODE_ENV !== "production" ? true : false,
 } satisfies NextAuthConfig;
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+export const { handlers, auth, signIn, signOut, unstable_update } =
+  NextAuth(config);
 
 declare module "next-auth" {
   interface Session {
@@ -228,6 +241,7 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
+    user?: any;
     accessToken?: string;
     refreshToken?: string;
     ref?: number;
