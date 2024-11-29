@@ -1,3 +1,4 @@
+from allauth.socialaccount.views import ConnectionsView
 from dj_rest_auth.jwt_auth import get_refresh_view
 from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from django.urls import include, path, re_path
@@ -18,6 +19,7 @@ urlpatterns = [
     path("github/", GitHubLogin.as_view(), name="github_login"),
 
     path("list/users/", UserView.as_view()),
+    path("user/link/", ConnectionsView.as_view()),
     path("user/<int:pk>/", EditUser),
     path("user/<int:pk>/edit/", UserDetailView.as_view()),
     path("user/<int:pk>/delete/", UserDetailView.as_view()),
