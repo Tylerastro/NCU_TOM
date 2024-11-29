@@ -302,4 +302,15 @@ SOCIALACCOUNT_PROVIDERS = {
         "FETCH_USERINFO": True,
         "VERIFIED_EMAIL": True,
     },
+    'github': {
+        "APP": {
+            'client_id': os.getenv("GITHUB_CLIENT_ID", None),
+            'secret': os.getenv("GITHUB_CLIENT_SECRET", None),
+        },
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
+    }
 }

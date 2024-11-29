@@ -12,7 +12,7 @@ import { string } from "zod";
 import { Account, Profile } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import { z } from "zod";
-import { loginWithGoogle } from "./apis/auth/Oauth";
+import { loginWithGithub, loginWithGoogle } from "./apis/auth/Oauth";
 
 const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60; // 45 minutes
 const BACKEND_REFRESH_TOKEN_LIFETIME = 6 * 24 * 60 * 60; // 6 days
@@ -46,6 +46,43 @@ const SIGN_IN_HANDLERS = {
 
     try {
       const response = await loginWithGoogle(account.access_token);
+      if (!response.access) {
+        return false;
+      }
+
+      const user_data = await getUser(response.access);
+
+      if (!user_data) {
+        console.log("User not found.");
+        return false;
+      }
+      profile.id = user_data.id;
+      profile.username = user_data.username;
+      profile.role = user_data.role;
+      profile.created_at = user_data.created_at;
+      profile.is_active = user_data.is_active;
+      profile.access = response.access;
+      profile.refresh = response.refresh;
+      return true;
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      return false;
+    }
+  },
+  github: async (
+    user: UserProfile,
+    account: any,
+    profile: Profile,
+    email: string,
+    credentials: any
+  ) => {
+    console.log(account);
+    if (!account.access_token) {
+      return false;
+    }
+
+    try {
+      const response = await loginWithGithub(account.access_token);
       if (!response.access) {
         return false;
       }

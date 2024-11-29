@@ -24,3 +24,15 @@ export async function loginWithGoogle(
     throw error;
   }
 }
+
+export async function loginWithGithub(code: string): Promise<TokenResponse> {
+  try {
+    const response = await api.post("/api/github/", {
+      access_token: code,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
