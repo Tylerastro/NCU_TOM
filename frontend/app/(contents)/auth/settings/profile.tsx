@@ -11,10 +11,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { unstable_update } from "@/auth";
 import { z } from "zod";
+import { updateSession } from "@/apis/auth/updateSession";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -46,7 +47,6 @@ export default function UpdateProfile({
   last_name: string;
   institute: string;
 }) {
-  const { update } = useSession();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,14 +61,6 @@ export default function UpdateProfile({
     updateUser(userId, data)
       .then(() => {
         toast.success("Profile updated successfully");
-        update({
-          user: {
-            first_name: data.first_name,
-            last_name: data.last_name,
-            institute: data.institute,
-            username: data.username,
-          },
-        });
       })
       .catch((error) => {
         toast.error(error);
