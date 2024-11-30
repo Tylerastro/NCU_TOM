@@ -10,6 +10,7 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { string } from "zod";
 import { Account, Profile } from "next-auth";
+import { GitHubProfile } from "next-auth/providers/github";
 import type { Provider } from "next-auth/providers";
 import { z } from "zod";
 import { loginWithGithub, loginWithGoogle } from "./apis/auth/Oauth";
@@ -76,7 +77,6 @@ const SIGN_IN_HANDLERS = {
     email: string,
     credentials: any
   ) => {
-    console.log(account);
     if (!account.access_token) {
       return false;
     }
@@ -102,7 +102,7 @@ const SIGN_IN_HANDLERS = {
       profile.refresh = response.refresh;
       return true;
     } catch (error) {
-      console.error("Google sign-in error:", error);
+      console.error("Github sign-in error:", error);
       return false;
     }
   },
@@ -164,7 +164,17 @@ const providers: Provider[] = [
       }
     },
   }),
-  GitHub,
+  GitHub({
+    clientId: process.env.AUTH_GITHUB_ID,
+    clientSecret: process.env.AUTH_GITHUB_SECRET,
+    authorization: {
+      params: {
+        prompt: "consent",
+        access_type: "offline",
+        response_type: "code",
+      },
+    },
+  }),
   Google({
     clientId: process.env.AUTH_GOOGLE_ID,
     clientSecret: process.env.AUTH_GOOGLE_SECRET,
@@ -239,7 +249,9 @@ const config = {
           console.log("User not found.");
           return null;
         }
+        console.log(user_data);
         user = user_data;
+        console.log(user);
       }
 
       return {
