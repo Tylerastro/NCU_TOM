@@ -225,7 +225,7 @@ ACCOUNT_ADAPTER = "system.adapters.AccountAdapter"
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ADPATER = "system.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "system.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
 REST_AUTH = {
@@ -294,8 +294,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'user',
             'email',
-            'repo',
-            'read:org',
         ],
+        "VERIFIED_EMAIL": True
     }
 }

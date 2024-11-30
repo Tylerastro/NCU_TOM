@@ -1,8 +1,6 @@
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth.account.utils import user_email
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from django.contrib.auth import get_user_model
 from system.models import User
 
 
@@ -32,8 +30,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         # with mobile numbers only, but allauth takes care of this case so just
         # ignore it
 
-        print(sociallogin)
-        print(sociallogin.account)
         print(sociallogin.account.extra_data)
         if 'email' not in sociallogin.account.extra_data:
             return
@@ -41,11 +37,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         # check if given email address already exists.
         # Note: __iexact is used to ignore cases
         try:
-            email = sociallogin.account.extra_data['email'].lower()
+            email = sociallogin.account.extra_data['email']
             user = User.objects.get(email=email)
 
         # if it does not, let allauth take care of this new social account
-        except user.DoesNotExist:
+        except User.DoesNotExist:
             return
 
         # if it does, connect this new social login to the existing user
