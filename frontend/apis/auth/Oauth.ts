@@ -15,7 +15,7 @@ export async function loginWithGoogle(
   id_token: string
 ): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/google/", {
+    const response = await api.post("/api/oauth/google/", {
       access_token: id_token,
     });
     return response.data;
@@ -27,7 +27,7 @@ export async function loginWithGoogle(
 
 export async function loginWithGithub(code: string): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/github/", {
+    const response = await api.post("/api/oauth/github/", {
       access_token: code,
     });
     return response.data;

@@ -250,3 +250,4 @@ resetDB.sh
 *.cfg
 *.db
 *.txt
+tags

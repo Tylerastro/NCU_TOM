@@ -249,9 +249,7 @@ const config = {
           console.log("User not found.");
           return null;
         }
-        console.log(user_data);
         user = user_data;
-        console.log(user);
       }
 
       return {

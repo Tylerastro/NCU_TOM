@@ -1,5 +1,4 @@
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from system.models import User
 
@@ -22,15 +21,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         - social account's email exists, link social account to existing user
         """
 
-        # Ignore existing social accounts, just do this stuff for new ones
         if sociallogin.is_existing:
             return
 
-        # some social logins don't have an email address, e.g. facebook accounts
-        # with mobile numbers only, but allauth takes care of this case so just
-        # ignore it
-
-        print(sociallogin.account.extra_data)
         if 'email' not in sociallogin.account.extra_data:
             return
 
