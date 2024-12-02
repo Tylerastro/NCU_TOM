@@ -3,7 +3,7 @@ import api from "@/apis/axios";
 
 export const getUserList = async (): Promise<UserProfile[]> => {
   try {
-    const response = await api.get("/api/list/users/");
+    const response = await api.get("/api/users/");
     return response.data;
   } catch (error) {
     console.error(error);
