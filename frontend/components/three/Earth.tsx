@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
+import { calculateArcPoint, flyArc } from "./utils/arcUtils";
 
 // Shader definitions
 const vertexShader = `
@@ -91,7 +92,9 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
     groupRef.current.add(points);
 
     // Add NCU marker
-    const ncuPosition = latLongToVector3(23.469444, 120.872639, 1.05);
+    const ncuLat = 23.469444;
+    const ncuLon = 120.872639;
+    const ncuPosition = latLongToVector3(ncuLat, ncuLon, 1.05);
     const markerGeo = new THREE.SphereGeometry(0.005, 8, 8);
     const markerMat = new THREE.MeshBasicMaterial({
       color: 0xff0000,
@@ -103,10 +106,26 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
     groupRef.current.add(marker);
 
     // Add LSST marker
-    const lsstPosition = latLongToVector3(-30.244639, -70.749417, 1.05);
+    const lsstLat = -30.244639;
+    const lsstLon = -70.749417;
+    const lsstPosition = latLongToVector3(lsstLat, lsstLon, 1.05);
     const lsstMarker = new THREE.Mesh(markerGeo, markerMat);
     lsstMarker.position.copy(lsstPosition);
     groupRef.current.add(lsstMarker);
+
+    // Add flying arc connection between markers
+    const arcLine = flyArc(
+      1.03, // radius
+      ncuLon, // from longitude
+      ncuLat, // from latitude
+      lsstLon, // to longitude
+      lsstLat, // to latitude
+      {
+        color: 0xff0000, // Arc line color
+        flyLineColor: 0xff5555, // Flying effect color
+      }
+    );
+    groupRef.current.add(arcLine);
 
     // Add wireframe if enabled
     if (wireframe) {
@@ -131,8 +150,20 @@ const Earth: React.FC<EarthProps> = ({ wireframe = true }) => {
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y += 0.002;
-      // groupRef.current.rotation.x += 0.002;
-      // groupRef.current.rotation.z -= 0.002;
+
+      // Animate flying line
+      const flyLine = groupRef.current.children.find(
+        (child) => child.userData.flyLine
+      )?.userData.flyLine;
+
+      if (flyLine) {
+        flyLine.userData.AngleZ += 0.02;
+        if (flyLine.userData.AngleZ > flyLine.userData.flyEndAngle) {
+          flyLine.userData.AngleZ = 0;
+        }
+        flyLine.rotation.z =
+          flyLine.userData.startAngle + flyLine.userData.AngleZ;
+      }
     }
   });
 
