@@ -47,7 +47,7 @@ services:
     image: postgres:latest
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - NCU_TOM_Local:/var/lib/postgresql/data
     env_file:
       - path: ./.env.local
         required: true
@@ -66,4 +66,5 @@ services:
       start_period: 30s
 
 volumes:
-  postgres_data:
+  NCU_TOM_Local:
+    name: NCU_TOM_Local
