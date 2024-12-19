@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ReactNode } from "react";
+import React, { useState, ReactNode, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 
 interface EditableTableCellProps {
@@ -16,6 +16,7 @@ export default function InputCell({
 }: EditableTableCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedValue, setEditedValue] = useState("");
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     setIsEditing(true);
@@ -26,6 +27,25 @@ export default function InputCell({
     setEditedValue(e.target.value);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsEditing(false);
+        if (editedValue !== String(value)) {
+          onUpdate(editedValue);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [editedValue, value, onUpdate]);
+
   const handleInputBlur = () => {
     setIsEditing(false);
     if (editedValue !== String(value)) {
@@ -35,7 +55,10 @@ export default function InputCell({
 
   if (isEditing) {
     return (
-      <div className="cursor-pointer flex items-center justify-center">
+      <div
+        ref={wrapperRef}
+        className="cursor-pointer items-center justify-center"
+      >
         <Input
           value={editedValue}
           onChange={handleInputChange}

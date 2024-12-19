@@ -1,6 +1,5 @@
 "use client";
 import { getLulin } from "@/apis/observations/getLulin";
-
 import { getObservation } from "@/apis/observations/getObservation";
 import VisibilityChart from "@/components/observations/VisibilityPlot";
 import { Button } from "@/components/ui/button";
@@ -14,18 +13,6 @@ import DatePickerBadges from "./DatePickerBadge";
 import LulinData from "./lulinData";
 import { NewLulinRun } from "./newlulinForm";
 import ExpireAlert from "@/components/observations/ExpireAlert";
-
-function LoadingSkeleton() {
-  return (
-    <div className="flex flex-col space-y-3 py-10">
-      <Skeleton className="h-[250px] w-full rounded-xl" />
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-8/12" />
-        <Skeleton className="h-4 w-6/12" />
-      </div>
-    </div>
-  );
-}
 
 export default function LulinPage(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
@@ -81,13 +68,13 @@ export default function LulinPage(props: { observation_id: number }) {
           <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
             Edit your observation
           </h1>
-          {observationIsFetching ? (
-            <LoadingSkeleton />
-          ) : (
-            <div className="flex items-center pt-3 space-x-2 gap-2">
-              <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
-                {observation?.name}
-              </span>
+          <div className="flex items-center pt-3 space-x-2 gap-2">
+            <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
+              {observation?.name}
+            </span>
+            {observationIsFetching ? (
+              <></>
+            ) : (
               <DatePickerBadges
                 observation={{
                   id: observation?.id,
@@ -96,18 +83,10 @@ export default function LulinPage(props: { observation_id: number }) {
                 }}
                 onDateChange={refreshAllData}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
-
-        {isFetching ? (
-          <LoadingSkeleton />
-        ) : (
-          <VisibilityChart
-            observation_id={props.observation_id}
-            airmass={true}
-          />
-        )}
+        <VisibilityChart observation_id={props.observation_id} airmass={true} />
 
         <div className="flex flex-col items-center py-4">
           <LulinData

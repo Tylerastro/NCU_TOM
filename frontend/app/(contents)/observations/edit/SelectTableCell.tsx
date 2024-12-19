@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ReactNode } from "react";
+import { useState, ReactNode, useRef, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -20,10 +20,25 @@ export default function SelectCell<
   T extends { [key: string]: string | number }
 >({ children, value, enumObject, onUpdate }: EditableTableCellProps<T>) {
   const [isEditing, setIsEditing] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     setIsEditing(true);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
+        setIsEditing(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSelect = (newValue: string) => {
     if (enumObject[value] != newValue) {
@@ -41,7 +56,7 @@ export default function SelectCell<
 
   if (isEditing) {
     return (
-      <div className="cursor-pointer flex items-center justify-center">
+      <div className="absolute">
         <Select
           defaultValue={value.toLocaleString()}
           onValueChange={(newValue) => {
@@ -49,10 +64,10 @@ export default function SelectCell<
           }}
           open={isEditing}
         >
-          <SelectTrigger className="w-24 h-8">
+          <SelectTrigger className="absolute top-0 left-0 opacity-0">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent ref={selectRef} className="relative left-0">
             {options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}

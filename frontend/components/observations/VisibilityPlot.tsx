@@ -28,7 +28,7 @@ export default function VisibilityChart(props: {
   const [activeSeries, setActiveSeries] = useState<Record<string, boolean>>({});
 
   const { data: observation } = useQuery({
-    queryKey: ["getVisibilityData", props.observation_id],
+    queryKey: ["getVisibilityData"],
     queryFn: async () =>
       getObservation(props.observation_id).then((data) => {
         return data;

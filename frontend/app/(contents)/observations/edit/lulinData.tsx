@@ -11,6 +11,7 @@ import { createLulin } from "@/apis/observations/createLulin";
 import { Files, CircleX } from "lucide-react";
 import gsap from "gsap";
 import * as React from "react";
+import { useGSAP } from "@gsap/react";
 import { toast } from "react-toastify";
 import { useEffect, useMemo, useRef } from "react";
 import { deleteLulin } from "@/apis/observations/deleteLulinRun";
@@ -27,7 +28,12 @@ interface LulinDataProps {
 
 export default function LulinData(props: LulinDataProps) {
   const { setCodeUpdate, ...otherProps } = props;
-  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+  const container = useRef<HTMLTableElement>(null);
+  const rowsRef = useRef<(HTMLTableRowElement | null)[]>([]);
+
+  useEffect(() => {
+    rowsRef.current = rowsRef.current.slice(0, props.data.length);
+  }, [props.data]);
 
   const sortedData = useMemo(() => {
     return [...props.data].sort((a, b) => {
@@ -37,32 +43,28 @@ export default function LulinData(props: LulinDataProps) {
     });
   }, [props.data]);
 
-  useEffect(() => {
-    if (sortedData.length === 0) return;
+  useGSAP(
+    () => {
+      const tl = gsap.timeline();
+      gsap.set(rowsRef.current, {
+        opacity: 0,
+        y: 50,
+        pointerEvents: "none",
+      });
 
-    const timeoutId = setTimeout(() => {
-      const validRefs = rowRefs.current;
-      if (validRefs.length > 0) {
-        gsap.fromTo(
-          validRefs,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.1,
-          }
-        );
-      }
-    }, 0);
+      tl.to(rowsRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+        pointerEvents: "auto",
+      });
+    },
+    { scope: container, dependencies: [sortedData] }
+  );
 
-    return () => clearTimeout(timeoutId);
-  }, [sortedData]);
-
-  const handleDelete = async (rowData: LulinRuns) => {
+  const handleDelete = async (rowData: LulinRuns, rowIndex: number) => {
     try {
       await deleteLulin(rowData.id);
       toast.success("Run deleted successfully");
@@ -133,7 +135,7 @@ export default function LulinData(props: LulinDataProps) {
   };
 
   return (
-    <Table>
+    <Table ref={container}>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[75px] text-center">Delete</TableHead>
@@ -150,16 +152,12 @@ export default function LulinData(props: LulinDataProps) {
       </TableHeader>
       <TableBody>
         {sortedData.map((data, index) => (
-          <TableRow
-            key={data.id}
-            ref={(el) => (rowRefs.current[index] = el)}
-            style={{ opacity: 0 }}
-          >
+          <TableRow key={data.id} ref={(el) => (rowsRef.current[index] = el)}>
             <TableCell className="text-center items-center justify-center">
               <div className="flex justify-center">
                 <CircleX
                   className="cursor-pointer hover:text-red-500 duration-300"
-                  onClick={() => handleDelete(data)}
+                  onClick={() => handleDelete(data, index)}
                 />
               </div>
             </TableCell>

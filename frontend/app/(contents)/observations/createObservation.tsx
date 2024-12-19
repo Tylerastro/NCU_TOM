@@ -18,6 +18,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -71,21 +72,26 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
       });
   }
 
-  const formSchema = z.object({
-    name: z.string().optional(),
-    observatory: z.number().transform(Number),
-    priority: z.number().transform(Number),
-    targets: z.array(z.number()).min(1, { message: "Please select targets" }),
-    start_date: z.date(),
-    end_date: z.date(),
-    tags: z.array(
-      z.object({
-        name: z.string(),
-        targets: z.array(z.number()),
-        observations: z.array(z.number()),
-      })
-    ),
-  });
+  const formSchema = z
+    .object({
+      name: z.string().optional(),
+      observatory: z.number().transform(Number),
+      priority: z.number().transform(Number),
+      targets: z.array(z.number()).min(1, { message: "Please select targets" }),
+      start_date: z.date(),
+      end_date: z.date(),
+      tags: z.array(
+        z.object({
+          name: z.string(),
+          targets: z.array(z.number()),
+          observations: z.array(z.number()),
+        })
+      ),
+    })
+    .refine((data) => data.end_date > data.start_date, {
+      message: "End date must be after start date",
+      path: ["end_date"], // This shows the error on the end_date field
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -101,7 +107,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} modal={false}>
+    <Dialog open={open} onOpenChange={setOpen} modal={true}>
       <DialogTrigger asChild>
         <Button size={"lg"} variant="outline">
           Create observation
@@ -134,6 +140,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage>
+                    {form.formState.errors.name?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -198,6 +207,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                   <FormControl>
                     <TargetModal {...field} />
                   </FormControl>
+                  <FormMessage>
+                    {form.formState.errors.targets?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -252,6 +264,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage>
+                      {form.formState.errors.start_date?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -291,6 +306,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage>
+                      {form.formState.errors.end_date?.message}
+                    </FormMessage>
                   </FormItem>
                 )}
               />

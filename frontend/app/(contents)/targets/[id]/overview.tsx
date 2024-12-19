@@ -156,7 +156,7 @@ export default function Overview({
             )}
           </CardContent>
         </Card>
-        <ExternalLinksCard targetName={target?.name || ""} />
+        <ExternalLinksCard targetCoord={target?.coordinates || ""} />
       </div>
       {/* Aladin Viewer */}
       <div className="grid max-xl: gap-4 md:grid-cols-2 lg:grid-cols-7">

@@ -92,30 +92,50 @@ function CoordCard(
 import { ExternalLink } from "lucide-react";
 
 export default function ExternalLinksCard({
-  targetName,
+  targetCoord,
 }: {
-  targetName: string;
+  targetCoord: string;
 }) {
-  const simbad_url = `https://simbad.u-strasbg.fr/simbad/sim-basic?Ident=${targetName}&submit=SIMBAD+search`;
-  const ned_url = `https://ned.ipac.caltech.edu/byname?objname=${targetName}&hconst=67.8&omegam=0.308&omegav=0.692&wmap=4&corr_z=1`;
+  const simbad_url = `https://simbad.cds.unistra.fr/simbad/sim-coo?output.format=HTML&Coord=${targetCoord}&Radius=10&Radius.unit=arcsec`;
+  const ned_url = `https:ned.ipac.caltech.edu/conesearch?search_type=Near%20Position%20Search&in_csys=Equatorial&in_equinox=J2000&ra=${
+    targetCoord.split(" ")[0]
+  }&dec=${targetCoord.split(" ")[1]}&radius=0.5`;
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">External Links</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <ExternalLinkButton name="Simbad" href={simbad_url} />
-        <ExternalLinkButton name="NED" href={ned_url} />
+        <ExternalLinkButton
+          name="Simbad"
+          href={simbad_url}
+          disabled={targetCoord.length === 0}
+        />
+        <ExternalLinkButton
+          name="NED"
+          href={ned_url}
+          disabled={targetCoord.length === 0}
+        />
       </CardContent>
     </Card>
   );
 }
 
-function ExternalLinkButton({ name, href }: { name: string; href: string }) {
+function ExternalLinkButton({
+  name,
+  href,
+  disabled = false,
+}: {
+  name: string;
+  href: string;
+  disabled?: boolean;
+}) {
   return (
     <Button
       variant="outline"
       className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
+      disabled={disabled}
       asChild
     >
       <a href={href} target="_blank" rel="noopener noreferrer">
