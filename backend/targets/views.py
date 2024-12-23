@@ -177,7 +177,7 @@ def targets_creation(request):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated))
+@permission_classes((IsAuthenticated,))
 def get_moon_altaz(request):
     service = Visibility(lat=23.469444, lon=120.872639, height=2862)
 

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 
 // Create an axios instance with common configuration
 const api = axios.create({

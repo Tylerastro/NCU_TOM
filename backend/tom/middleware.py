@@ -36,20 +36,15 @@ class RequestLogMiddleware:
 
             # Check user authentication after response is generated
             has_user = hasattr(request, 'user')
-            logger.debug(f"Has user attribute (after response): {has_user}")
 
             if has_user:
                 # Force evaluation of the lazy user object
                 user = request.user
                 if user.is_authenticated:
-                    logger.debug(f"User ID (after response): {user.id}")
-                    logger.debug(f"Username (after response): {user.username}")
                     request_data['user'] = user
                 else:
-                    logger.debug("User is not authenticated (after response)")
                     request_data['user'] = None
             else:
-                logger.debug("No user attribute on request (after response)")
                 request_data['user'] = None
 
         except Exception as e:
