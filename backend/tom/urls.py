@@ -19,12 +19,11 @@ from django.urls import include, path
 from django.views import debug
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),  # Include Django admin patterns
     path('api/', include('targets.urls')),
     path('api/', include('observations.urls')),
     path('api/', include('dataproducts.urls')),
     path('api/', include('helpers.urls')),
-    path('api/', include('djoser.urls')),
+    path('api/', include('system.urls')),
 ]
 
 # Keep default welcome page from Django

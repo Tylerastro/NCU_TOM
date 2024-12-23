@@ -8,12 +8,13 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import User
 from helpers.paginator import Pagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from system.models import User
+from system.permissions import IsActivated
 from targets.visibility import TargetAltAz, Visibility
 
 from .models import Target
@@ -25,6 +26,7 @@ from .simbad import SimbadService
 from .vizier import VizierService
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class TargetsView(APIView):
     serializer_class = TargetPostSerializer
     paginator = Pagination()
@@ -103,6 +105,7 @@ class TargetsView(APIView):
             return Response({'error': f'Error deleting targets: {str(e)}'}, status=500)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class TargetDetailView(APIView):
     @extend_schema(operation_id='Get Single Target')
     def get(self, request, pk):
@@ -138,7 +141,7 @@ class TargetDetailView(APIView):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((IsAuthenticated, IsActivated))
 def targets_creation(request):
     def handle_uploads(file):
         file_extension = file.name.split('.')[-1]
@@ -174,6 +177,7 @@ def targets_creation(request):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def get_moon_altaz(request):
     service = Visibility(lat=23.469444, lon=120.872639, height=2862)
 
@@ -211,7 +215,7 @@ def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
 
 @extend_schema(request=None, responses=TargetSimbadDataSerializer)
 @api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((IsAuthenticated, IsActivated))
 def get_target_simbad(request, pk: int):
     service = SimbadService()
     target = Target.objects.get(id=pk)
@@ -232,7 +236,7 @@ def get_target_simbad(request, pk: int):
 
 @extend_schema(request=None, responses=TargetSEDSerializer)
 @api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((IsAuthenticated, IsActivated))
 def get_target_SED(request, pk: int):
     # TODO: Implement Cache for SED data
     service = VizierService()

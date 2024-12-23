@@ -18,7 +18,7 @@ class Target(models.Model):
                 name='unique_target_name_per_user'
             )
         ]
-    user = models.ForeignKey('helpers.User',
+    user = models.ForeignKey('system.User',
                              on_delete=models.CASCADE, related_name='targets')
     name = models.CharField(max_length=100)
     ra = models.FloatField(null=False, validators=[

@@ -15,7 +15,7 @@ export async function getToken(
   password: string
 ): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/jwt/create/", {
+    const response = await api.post("/api/login/", {
       username: username,
       password: password,
     });

@@ -6,13 +6,15 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import Comments, User
+from helpers.models import Comments
 from helpers.paginator import Pagination
 from observations.lulin import LulinScheduler
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from system.models import User
+from system.permissions import IsActivated
 from targets.views import get_targets_altaz
 from targets.visibility import TargetAltAz
 
@@ -23,6 +25,7 @@ from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
                           ObservationPutSerializer, ObservationStatsSerializer)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class ObservationsView(APIView):
     serializer_class = ObservationGetSerializer
     paginator = Pagination()
@@ -101,6 +104,7 @@ class ObservationsView(APIView):
             return Response({'error': f'Error deleting observations: {str(e)}'}, status=500)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class ObservationDetailView(APIView):
     serializer_class = ObservationGetSerializer
 
@@ -141,6 +145,7 @@ class ObservationDetailView(APIView):
             return Response(e, status=400)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class LulinView(APIView):
     serializer_class = LulinGetSerializer
 
@@ -189,6 +194,7 @@ class LulinView(APIView):
         return Response(serializer.errors, status=400)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class LulinDetailView(APIView):
     def _get_lulin_run(self, pk, user):
         if user.role in (User.roles.ADMIN, User.roles.FACULTY):
@@ -215,7 +221,7 @@ class LulinDetailView(APIView):
         return Response(status=204)
 
 
-@ permission_classes((IsAuthenticated, ))
+@ permission_classes((IsAuthenticated, IsActivated))
 class LulinCodeView(APIView):
     @ extend_schema(operation_id='Get or gen code for Lulin observation')
     def get(self, request, pk):
@@ -236,7 +242,8 @@ class LulinCodeView(APIView):
             return HttpResponse(lulin.code, content_type='text/plain')
 
 
-@ api_view(['GET'])
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, IsActivated))
 def get_lulin_compiled_codes(request):
     if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
         return Response({"detail": "Unauthorized"}, status=401)
@@ -260,7 +267,7 @@ def get_observation_stats(request):
 
 
 @ api_view(['POST'])
-@ permission_classes((IsAuthenticated, ))
+@ permission_classes((IsAuthenticated, IsActivated))
 def get_observation_altaz(request, pk):
     if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
         observation = Observation.objects.get(id=pk, user=request.user)
@@ -279,6 +286,7 @@ def get_observation_altaz(request, pk):
     return JsonResponse(data, safe=False)
 
 
+@permission_classes((IsAuthenticated, IsActivated))
 class ObservationMessagesView(APIView):
     serializer_class = ObservationGetSerializer
 

@@ -1,5 +1,6 @@
 import TargetTable from "./TargetTable";
-export default function TargetsTable() {
+
+export default async function TargetsTable() {
   return (
     <main>
       <div className="flex space-between justify-between">

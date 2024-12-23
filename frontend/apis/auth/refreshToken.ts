@@ -7,11 +7,12 @@ const api = axios.create({
 
 interface TokenResponse {
   access: string;
+  access_expiration: Date;
 }
 
 export async function refreshToken(refresh: string): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/jwt/refresh/", {
+    const response = await api.post("/api/token/refresh/", {
       refresh: refresh,
     });
     return response.data;
