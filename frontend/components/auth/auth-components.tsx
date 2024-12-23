@@ -11,7 +11,12 @@ export async function GitHubSignIn() {
         await signIn("github", { redirectTo: "/" });
       }}
     >
-      <Button type="submit" variant={"outline"} className=" w-full bg-gray-900">
+      <Button
+        disabled
+        type="submit"
+        variant={"outline"}
+        className=" w-full bg-gray-900"
+      >
         <Github className="mr-2 h-4 w-4" />
         Sign in with GitHub
       </Button>
