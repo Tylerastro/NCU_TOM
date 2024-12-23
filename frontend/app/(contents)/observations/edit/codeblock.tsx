@@ -1,7 +1,6 @@
 import { getLulinCode } from "@/apis/observations/getLulinCode";
 import { SendCheck } from "@/components/observations/SendCheck";
-import { useRouter } from "next/navigation";
-import * as React from "react";
+import { useEffect, useState } from "react";
 
 export default function CodeBlock({
   observation_id,
@@ -12,10 +11,9 @@ export default function CodeBlock({
   codeUpdate: boolean;
   setCodeUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [codeBlock, setCodeBlock] = React.useState<string>("");
-  const router = useRouter();
+  const [codeBlock, setCodeBlock] = useState<string>("");
 
-  React.useEffect(() => {
+  useEffect(() => {
     getLulinCode(observation_id)
       .then((data) => {
         setCodeBlock(data);
