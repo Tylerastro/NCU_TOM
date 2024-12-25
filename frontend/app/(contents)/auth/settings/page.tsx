@@ -13,7 +13,6 @@ import UpdateProfile from "./profile";
 
 export default async function Component() {
   const session = await auth();
-  console.log(session?.user);
 
   return (
     <div className="flex  flex-col min-h-90vh ">

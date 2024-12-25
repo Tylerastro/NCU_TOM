@@ -205,7 +205,6 @@ const config = {
         return false;
 
       if (account?.provider && account?.provider in SIGN_IN_HANDLERS) {
-        console.log("google sign in");
         return (SIGN_IN_HANDLERS as any)[account?.provider](
           user,
           account,
@@ -229,9 +228,7 @@ const config = {
         }
       }
       if (token.ref && getCurrentEpochTime() > token.ref) {
-        console.log("Refreshing token");
         if (!token.refreshToken) {
-          console.log("Refresh token not found.");
           return null;
         }
         const newToken = await refreshToken(token.refreshToken);
@@ -246,7 +243,6 @@ const config = {
       if (trigger !== "signIn") {
         const user_data = await getUser(token.accessToken as string);
         if (!user_data) {
-          console.log("User not found.");
           return null;
         }
         user = user_data;
