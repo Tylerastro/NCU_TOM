@@ -1,4 +1,4 @@
-import { createObservation } from "@/apis/observations/createObservation";
+import { putObservation } from "@/apis/observations/putObservation";
 import { TagOptions } from "@/components/TagOptions";
 import TargetModal from "@/components/TargetModal";
 import { Button } from "@/components/ui/button";
@@ -32,8 +32,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
+import { Observation } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addDays } from "date-fns";
 import { format, toZonedTime } from "date-fns-tz";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
@@ -42,11 +42,14 @@ import { toast } from "sonner";
 
 import { z } from "zod";
 
-export function NewObservationFrom({ refetch }: { refetch: () => void }) {
+export function EditObservationFrom({
+  pk,
+  observation,
+}: {
+  pk: number;
+  observation: Observation;
+}) {
   const [open, setOpen] = React.useState(false);
-  const [selectedTags, setSelectedTags] = React.useState<
-    z.infer<typeof formSchema>["tags"]
-  >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // * UI is using observatory local time,
@@ -59,11 +62,10 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
       new Date(format(values.end_date, "yyyy-MM-dd" + " 06:00:00")),
       "Asia/Taipei"
     );
-    createObservation(values)
+    putObservation(pk, values)
       .then(() => {
         toast.success("Observation created successfully");
         setOpen(false);
-        refetch();
       })
       .catch((error) => {
         const error_code = error.response.status;
@@ -77,44 +79,32 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
     name: z.string().optional(),
     observatory: z.number().transform(Number),
     priority: z.number().transform(Number),
-    targets: z.array(z.number()).min(1, { message: "Please select targets" }),
     start_date: z.date(),
     end_date: z.date(),
-    tags: z.array(
-      z.object({
-        name: z.string(),
-        targets: z.array(z.number()),
-        observations: z.array(z.number()),
-      })
-    ),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      observatory: 1,
-      priority: 1,
-      targets: [],
-      start_date: new Date(),
-      end_date: addDays(new Date(), 1),
-      tags: selectedTags,
+      name: observation.name,
+      priority: observation.priority,
+      observatory: observation.observatory,
+      start_date: new Date(observation.start_date),
+      end_date: new Date(observation.end_date),
     },
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen} modal={false}>
       <DialogTrigger asChild>
-        <Button size={"lg"} variant="outline">
-          Create observation
+        <Button size={"lg"} variant="ghost">
+          {observation.name}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] lg:max-w-[850px] lg:max-h-[700px]">
         <DialogHeader>
-          <DialogTitle>New Observation</DialogTitle>
-          <DialogDescription>
-            Enter the basic {`observation's`} info to create a new observation.
-          </DialogDescription>
+          <DialogTitle>Edit Observation</DialogTitle>
+          <DialogDescription>Modify your observation</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -148,8 +138,9 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                   <FormItem>
                     <FormLabel>Observatory</FormLabel>
                     <Select
+                      disabled
                       onValueChange={field.onChange}
-                      defaultValue={field.value.toString()}
+                      defaultValue="1"
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -189,34 +180,6 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="targets"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Targets
-                  </FormLabel>
-                  <FormControl>
-                    <TargetModal {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="tags"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Tags
-                  </FormLabel>
-                  <FormControl>
-                    <TagOptions {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}

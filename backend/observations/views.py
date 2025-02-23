@@ -6,13 +6,14 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import Comments
-from helpers.paginator import Pagination
-from observations.lulin import LulinScheduler
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from helpers.models import Comments
+from helpers.paginator import Pagination
+from observations.lulin import LulinScheduler
 from system.models import User
 from system.permissions import IsActivated
 from targets.views import get_targets_altaz
@@ -130,6 +131,7 @@ class ObservationDetailView(APIView):
         return Response({'message': f'{observation.name} deleted successfully'}, status=200)
 
     def put(self, request, pk):
+        print(pk, request)
         if pk is None:
             return Response(status=400)
         try:
@@ -201,7 +203,7 @@ class LulinDetailView(APIView):
             return get_object_or_404(LulinRun, pk=pk)
         return get_object_or_404(LulinRun, pk=pk, observation__user=user)
 
-    @ extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
+    @extend_schema(responses=LulinGetSerializer, operation_id='Get Single Lulin by id')
     def get(self, request, pk):
         lulin = self._get_lulin_run(pk, request.user)
         serializer = LulinGetSerializer(lulin)
@@ -221,9 +223,9 @@ class LulinDetailView(APIView):
         return Response(status=204)
 
 
-@ permission_classes((IsAuthenticated, IsActivated))
+@permission_classes((IsAuthenticated, IsActivated))
 class LulinCodeView(APIView):
-    @ extend_schema(operation_id='Get or gen code for Lulin observation')
+    @extend_schema(operation_id='Get or gen code for Lulin observation')
     def get(self, request, pk):
         service = LulinScheduler()
         try:
@@ -258,16 +260,16 @@ def get_lulin_compiled_codes(request):
         start_date, end_date), content_type='text/plain')
 
 
-@ api_view(['GET'])
-@ permission_classes((AllowAny, ))
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
 def get_observation_stats(request):
     serializer = ObservationStatsSerializer(
         Observation, context={'request': request})
     return Response(serializer.data, status=200)
 
 
-@ api_view(['POST'])
-@ permission_classes((IsAuthenticated, IsActivated))
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, IsActivated))
 def get_observation_altaz(request, pk):
     if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
         observation = Observation.objects.get(id=pk, user=request.user)
@@ -284,6 +286,44 @@ def get_observation_altaz(request, pk):
         targets, observation.start_date, observation.end_date)
 
     return JsonResponse(data, safe=False)
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, IsActivated))
+def duplicate_observation(request, pk):
+    if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
+        observation = Observation.objects.get(id=pk, user=request.user)
+    else:
+        observation = Observation.objects.get(id=pk)
+
+    original_observation = observation
+    observation = Observation.objects.create(
+        name=f'Copy of {original_observation.name}',
+        user=request.user,
+        observatory=original_observation.observatory,
+        start_date=original_observation.start_date,
+        end_date=original_observation.end_date,
+        priority=original_observation.priority,
+        status=Observation.statuses.PREP,
+    )
+
+    observation.tags.set(original_observation.tags.all())
+    observation.targets.set(original_observation.targets.all())
+
+    lulin_runs = LulinRun.objects.filter(observation=original_observation)
+    for run in lulin_runs:
+        LulinRun.objects.create(
+            observation=observation,
+            target=run.target,
+            priority=run.priority,
+            filter=run.filter,
+            binning=run.binning,
+            frames=run.frames,
+            instrument=run.instrument,
+            exposure_time=run.exposure_time
+        )
+
+    return Response(ObservationGetSerializer(observation).data, status=201)
 
 
 @permission_classes((IsAuthenticated, IsActivated))

@@ -13,7 +13,7 @@ import { toZonedTime } from "date-fns-tz";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface Observation {
   id: number;

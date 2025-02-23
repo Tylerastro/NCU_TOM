@@ -1,8 +1,10 @@
 "use client";
 
+import { duplicateObservation } from "@/apis/observations/duplitcateObservation";
 import LocalTimeTooltip from "@/components/LocalTimeTooltip";
 import StatusBadge from "@/components/Status";
 import { badgeVariants } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Observatory, Status } from "@/models/enums";
 import { Tag, User } from "@/models/helpers";
@@ -168,6 +170,14 @@ export const columns: ColumnDef<Observation>[] = [
     filterFn: (row, id, value) => {
       const rowValue: number = row.getValue(id);
       return value.some((filter: string) => rowValue === parseInt(filter, 10));
+    },
+  },
+  {
+    accessorKey: "duplicate",
+    header: "Duplicate",
+    cell(props) {
+      const id: number = props.row.getValue("id");
+      return <Button onClick={() => duplicateObservation(id)} />;
     },
   },
 ];

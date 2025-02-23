@@ -7,7 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+
 import Lulin from "./lulin";
 
 function LoadingSkeleton() {

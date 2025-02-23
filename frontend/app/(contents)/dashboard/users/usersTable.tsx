@@ -20,7 +20,7 @@ import { getUserList } from "@/apis/system/getUserList";
 import { UserRole } from "@/models/enums";
 import { UserProfile } from "@/models/users";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const activeLight = (
   <div className="flex items-center justify-center">

@@ -4,7 +4,7 @@ import { ObservationUpdate } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export default function CodeBlock({
   observation_id,

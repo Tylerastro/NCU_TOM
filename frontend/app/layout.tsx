@@ -1,13 +1,12 @@
 import { NavBar } from "@/components/Navbar";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { cn } from "@/components/utils";
 import type { Metadata } from "next";
 import { Gowun_Batang } from "next/font/google";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import NextAuthProvider from "./SessionProvider";
 import "./globals.css";
-import { cn } from "@/components/utils";
 
 const gowunBatang = Gowun_Batang({
   subsets: ["latin"],
@@ -18,6 +17,9 @@ const gowunBatang = Gowun_Batang({
 export const metadata: Metadata = {
   title: "NCU Tom",
   description: "Targets and Obersvation Manager developed by NCU",
+  referrer: "origin-when-cross-origin",
+  keywords: ["TOM", "NCU", "Observation", "Astronomy"],
+  authors: [{ name: "Tyler" }],
 };
 
 export default function RootLayout({
@@ -34,7 +36,6 @@ export default function RootLayout({
             gowunBatang.variable
           )}
         >
-          <ToastContainer />
           <NextAuthProvider>
             <ThemeProvider
               attribute="class"
@@ -42,6 +43,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <Toaster richColors />
               <NavBar />
               {children}
             </ThemeProvider>

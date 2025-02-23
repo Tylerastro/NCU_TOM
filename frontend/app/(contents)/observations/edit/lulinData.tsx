@@ -1,3 +1,4 @@
+import { createLulin } from "@/apis/observations/createLulin";
 import {
   Table,
   TableBody,
@@ -7,17 +8,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { LulinRunUpdate, LulinRuns } from "@/models/observations";
-import { createLulin } from "@/apis/observations/createLulin";
-import { Files, CircleX } from "lucide-react";
 import gsap from "gsap";
+import { CircleX, Files } from "lucide-react";
 import * as React from "react";
-import { toast } from "react-toastify";
-import { useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
+
 import { deleteLulin } from "@/apis/observations/deleteLulinRun";
-import InputCell from "./InputTableCell";
-import { LulinFilter, LulinInstrument } from "@/models/enums";
-import SelectCell from "./SelectTableCell";
 import { putLulinRun } from "@/apis/observations/putLulin";
+import { LulinFilter, LulinInstrument } from "@/models/enums";
+import { useEffect, useMemo, useRef } from "react";
+import InputCell from "./InputTableCell";
+import SelectCell from "./SelectTableCell";
 interface LulinDataProps {
   observation_id: number;
   data: LulinRuns[];
@@ -93,7 +94,7 @@ export default function LulinData(props: LulinDataProps) {
     putLulinRun(updatedData.id, updatePayload)
       .then(() => {
         setCodeUpdate(true);
-        toast.success("Data updated successfully", { autoClose: 1500 });
+        toast.success("Data updated successfully");
         props.refetch();
       })
       .catch((error) => {

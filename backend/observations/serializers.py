@@ -1,10 +1,11 @@
 from django.db import transaction
 from django.db.models import Count
 from django.utils import timezone
+from rest_framework import serializers
+
 from helpers.models import Comments, Tags
 from helpers.serializers import (CommentsGetSerializer, TagsSerializer,
                                  UserSerializer)
-from rest_framework import serializers
 from targets.serializers import TargetGetSerializer
 
 from .models import (LulinRun, Observation, Observatories, Priorities,
@@ -103,6 +104,8 @@ class ObservationPutSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
+        targets = validated_data.pop('targets', None)
+
         if 'status' in validated_data and validated_data['status'] != instance.status:
             if instance.user != self.context['request'].user:
                 status = instance.statuses(validated_data['status']).label
@@ -112,8 +115,13 @@ class ObservationPutSerializer(serializers.ModelSerializer):
                 )
                 instance.comments.add(comment)
 
+        # Update regular fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
+        # Update many-to-many field properly
+        if targets is not None:
+            instance.targets.set(targets)
 
         instance.save()
         return instance

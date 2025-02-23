@@ -5,6 +5,7 @@ from typing import List
 import astropy.units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
+
 from observations.lulin_models import Filters
 from observations.models import LulinRun, Observation
 from targets.models import Target
@@ -118,7 +119,7 @@ class LulinScheduler:
 #INTERVAL {exposure_times}
 #FILTER {filters}
 
-{target.name}    {self.convert_ra(target.ra)}    {self.convert_dec(target.dec)}
+{target.name}\t{self.convert_ra(target.ra)}\t{self.convert_dec(target.dec)}
 #WAITFOR 1
             """
             code += tmp

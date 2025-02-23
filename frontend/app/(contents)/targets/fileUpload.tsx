@@ -1,6 +1,6 @@
 import { bulkCreate } from "@/apis/targets/bulkTargetCreate";
 import React, { useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 function FileUpload({
   setOpen,

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ObservationUpdate } from "@/models/observations";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export function SendCheck({
   observation_id,

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { lazy, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import { putTarget } from "@/apis/targets/putTarget";
 import { PutTarget, Target } from "@/models/targets";

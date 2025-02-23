@@ -12,7 +12,6 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { LulinFilter, LulinInstrument } from "@/models/enums";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -27,13 +26,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/components/utils";
-import { Priority } from "@/models/enums";
+import { LulinFilter, LulinInstrument, Priority } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+
 import { z } from "zod";
 
 const formSchema = z.object({

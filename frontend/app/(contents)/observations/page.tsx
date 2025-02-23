@@ -20,7 +20,7 @@ import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { columns } from "./columns";
 import { NewObservationFrom } from "./createObservation";
 import { DataTable } from "./dataTable";

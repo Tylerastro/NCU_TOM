@@ -14,10 +14,11 @@ import { AxiosError } from "axios";
 import { AuthError } from "next-auth";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { z } from "zod";
+import { toast } from "sonner";
+
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { z } from "zod";
 
 function onSubmit(values: z.infer<typeof formSchema>) {
   const { username, password } = values;

@@ -19,23 +19,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { z } from "zod";
-import FileUpload from "./fileUpload";
+import { toast } from "sonner";
+
 import {
   convertHourAngleToDegrees,
   convertSexagesimalDegreesToDecimal,
 } from "@/utils/coordFormatter";
+import { z } from "zod";
+import FileUpload from "./fileUpload";
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);

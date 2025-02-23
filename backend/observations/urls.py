@@ -1,9 +1,11 @@
-import observations.views as views
 from django.urls import path
+
+import observations.views as views
 
 urlpatterns = [
     path('observations/', views.ObservationsView.as_view()),
     path('observations/<int:pk>/', views.ObservationDetailView.as_view()),
+    path('observations/<int:pk>/duplicate/', views.duplicate_observation),
     path('observations/<int:pk>/messages/',
          views.ObservationMessagesView.as_view()),
     path('observations/<int:pk>/altaz/', views.get_observation_altaz),

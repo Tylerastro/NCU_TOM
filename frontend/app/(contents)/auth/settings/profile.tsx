@@ -12,10 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { unstable_update } from "@/auth";
+import { toast } from "sonner";
 import { z } from "zod";
-import { updateSession } from "@/apis/auth/updateSession";
 
 const formSchema = z.object({
   username: z.string().min(2, {

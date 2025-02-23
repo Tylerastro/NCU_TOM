@@ -20,7 +20,9 @@ import { LulinRuns, Observation } from "@/models/observations";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+import { EditObservationFrom } from "./editObservationForm";
+
 import CodeBlock from "./codeblock";
 import DatePickerBadges from "./DatePickerBadge";
 import LulinData from "./lulinData";
@@ -64,10 +66,12 @@ const getTitleSize = (times: number) => {
 
 export default function LulinPage(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isDateExpired, setIsDateExpired] = useState(false);
   const [ignoretimes, setIgnoreTimes] = useState(0);
   const router = useRouter();
 
+  // fetch data
   const { data: observation, isFetching: observationIsFetching } = useQuery({
     queryKey: ["getObservation", props.observation_id],
     queryFn: () =>
@@ -174,7 +178,10 @@ export default function LulinPage(props: { observation_id: number }) {
           ) : (
             <div className="flex items-center pt-3 space-x-2 gap-2">
               <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
-                {observation?.name}
+                <EditObservationFrom
+                  pk={observation?.id}
+                  observation={observation}
+                />
               </span>
               <DatePickerBadges
                 observation={{

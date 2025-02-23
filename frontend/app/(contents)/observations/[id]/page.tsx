@@ -11,9 +11,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Status } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import PageContent from "./pageContent";
+import { toast } from "sonner";
+
 import { getObservation } from "@/apis/observations/getObservation";
+import PageContent from "./pageContent";
 
 function LoadingSkeleton() {
   return (

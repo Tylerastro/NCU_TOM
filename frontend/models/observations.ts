@@ -70,7 +70,7 @@ export interface LulinRunUpdate {
 
 export interface ObservationUpdate {
   name?: string;
-  observatory?: string;
+  observatory?: number;
   priority?: number;
   status?: number;
   start_date?: Date;
