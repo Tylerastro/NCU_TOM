@@ -12,6 +12,7 @@ import { Observation } from "@/models/observations";
 import { ColumnDef } from "@tanstack/react-table";
 import { parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
+import { BookCopy } from "lucide-react";
 
 import Link from "next/link";
 
@@ -177,7 +178,11 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Duplicate",
     cell(props) {
       const id: number = props.row.getValue("id");
-      return <Button onClick={() => duplicateObservation(id)} />;
+      return (
+        <Button onClick={() => duplicateObservation(id)} variant="ghost">
+          <BookCopy className="h-4 w-4" />
+        </Button>
+      );
     },
   },
 ];
