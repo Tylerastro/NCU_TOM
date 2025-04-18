@@ -29,7 +29,7 @@ import { AnimatedButton } from "./AnimatedButton";
 import Logo from "./Logo";
 import NavTooltip from "./NavTooltip";
 
-function NavBar() {
+export default function NavBar() {
   return (
     <div className="w-full h-16 px-2 sm:px-6 lg:px-8 static">
       <div className="flex items-center justify-between">
@@ -59,5 +59,3 @@ function NavBar() {
     </div>
   );
 }
-
-export { NavBar };

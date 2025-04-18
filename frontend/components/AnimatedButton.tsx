@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -21,11 +20,8 @@ export function AnimatedButton({
       className={`
         relative group no-underline
         ${className}
-        // Desktop styles
         md:text-xl md:px-3
-        // Mobile styles
         text-lg w-full md:w-auto
-        // Common styles
         transition-colors duration-200
       `}
       variant="link"

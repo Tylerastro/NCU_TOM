@@ -182,7 +182,18 @@ const PhotometryCard: React.FC<PhotometryCardProps> = ({ simbadData }) => {
 };
 
 function SimbadCard({ data }: { data?: TargetSimbad }) {
-  return data ? <PhotometryCard simbadData={data} /> : null;
+  return data ? (
+    <PhotometryCard simbadData={data} />
+  ) : (
+    <Card className="col-span-1">
+      <CardHeader className="bg-primary/10 pb-2">
+        <CardTitle className="text-primary-foreground">Photometry</CardTitle>
+      </CardHeader>
+      <CardContent className="flex items-center justify-center p-4">
+        <p className="text-muted-foreground">No data found</p>
+      </CardContent>
+    </Card>
+  );
 }
 
 export { CoordCard, ExternalLinksCard, SimbadCard };
