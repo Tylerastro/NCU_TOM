@@ -75,8 +75,7 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
                     subject=f'{instance.user.username} submitted observation {instance.name}',
                     body=html_message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    # to=[os.getenv('LULIN_MAIL', None)],
-                    to=['w39398898@gmail.com'],
+                    to=[os.getenv('LULIN_MAIL', None)],
                     cc=['w39398898@gmail.com', instance.user.email],
                 )
 
