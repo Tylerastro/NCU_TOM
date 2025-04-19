@@ -1,12 +1,9 @@
-
 from datetime import datetime
 from typing import List
 
 import astropy.units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
-
-from observations.lulin_models import Filters
 from observations.models import LulinRun, Observation
 from targets.models import Target
 from targets.visibility import Visibility
@@ -26,7 +23,7 @@ class LulinScheduler:
         )
 
         self.airmass_threshold = 15
-        self.alt_threshold = 20
+        self.alt_threshold = 20  # Minimum altitude for observation in degrees
 
     def get_filter_full_name(self, filter):
         mapping = {
@@ -76,11 +73,50 @@ class LulinScheduler:
 
         return schedule
 
-    def gen_code(self, observation_id):
-        observations = LulinRun.objects.filter(observation=observation_id)
+    def get_earliest_suitable_time(self, target_altaz):
+        """
+        Determine the earliest time a target reaches a suitable altitude for observation.
+        Returns the time index and ISO time string.
+        """
+        for i, alt in enumerate(target_altaz.altaz.alt):
+            if alt > self.alt_threshold:
+                return i, target_altaz.altaz.time[i]
+        return float('inf'), None  # Target never reaches suitable altitude
 
+    def gen_code(self, observation_id):
+        # Get the observation to retrieve time range
+        observation = Observation.objects.get(id=observation_id)
+        observations_runs = LulinRun.objects.filter(observation=observation_id)
+
+        # Extract unique targets
+        targets = [obs.target for obs in observations_runs]
+        unique_targets = []
+        for target in targets:
+            if target.name not in [t.name for t in unique_targets]:
+                unique_targets.append(target)
+
+        # Get alt/az data for each target
+        start_time = Time(observation.start_date)
+        end_time = Time(observation.end_date)
+        targets_altaz = self.visibility.get_targets_altaz(
+            targets=unique_targets,
+            start_time=start_time,
+            end_time=end_time
+        )
+
+        # Sort targets by the earliest time they reach a suitable altitude
+        targets_with_times = []
+        for target_altaz in targets_altaz:
+            idx, earliest_time = self.get_earliest_suitable_time(target_altaz)
+            targets_with_times.append((target_altaz.name, idx, earliest_time))
+
+        # Sort by time index (earlier is better)
+        sorted_target_names = [t[0] for t in sorted(
+            targets_with_times, key=lambda x: x[1])]
+
+        # Create dictionary of target data, preserving original observation parameters
         targets_dict = {}
-        for obs in observations:
+        for obs in observations_runs:
             target_name = obs.target.name
             if target_name not in targets_dict:
                 targets_dict[target_name] = {
@@ -99,9 +135,37 @@ class LulinScheduler:
             targets_dict[target_name]['filters'].append(
                 obs.get_filter_display())
 
-        # Generate the code with consolidated blocks
+        # Generate the code with consolidated blocks, in order of target appearance
         code = ""
-        for target_name, target_data in targets_dict.items():
+        for target_name in sorted_target_names:
+            if target_name in targets_dict:
+                target_data = targets_dict[target_name]
+                target = target_data['target']
+
+                # Join values with commas
+                binning = ", ".join(sorted(target_data['binning']))
+                frames = ", ".join(target_data['frames'])
+                exposure_times = ", ".join(target_data['exposure_times'])
+                filters = ", ".join(self.get_filter_full_name(f)
+                                    for f in target_data['filters'])
+
+                # Create single block for target
+                tmp = f"""
+#REPEAT 1
+#BINNING {binning}
+#COUNT {frames}
+#INTERVAL {exposure_times}
+#FILTER {filters}
+
+{target.name}\t{self.convert_ra(target.ra)}\t{self.convert_dec(target.dec)}
+#WAITFOR 1
+                """
+                code += tmp
+
+        # Add any remaining targets that didn't have altitude data
+        remaining_targets = set(targets_dict.keys()) - set(sorted_target_names)
+        for target_name in remaining_targets:
+            target_data = targets_dict[target_name]
             target = target_data['target']
 
             # Join values with commas
