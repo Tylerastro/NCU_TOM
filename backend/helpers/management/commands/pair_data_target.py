@@ -43,7 +43,7 @@ class Command(BaseCommand):
     @staticmethod
     def find_target_by_name(name):
         try:
-            return Target.objects.get(name=name)
+            return Target.objects.get(name=name, deleted_at__isnull=True)
         except Target.DoesNotExist:
             return None
 
