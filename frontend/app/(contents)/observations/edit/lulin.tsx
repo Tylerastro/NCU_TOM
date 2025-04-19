@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { EditObservationFrom } from "./editObservationForm";
 
 import CodeBlock from "./codeblock";
+import CommentsList from "./commentsList";
 import DatePickerBadges from "./DatePickerBadge";
 import LulinData from "./lulinData";
 import { NewLulinRun } from "./newlulinForm";
@@ -66,7 +67,6 @@ const getTitleSize = (times: number) => {
 
 export default function LulinPage(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [isDateExpired, setIsDateExpired] = useState(false);
   const [ignoretimes, setIgnoreTimes] = useState(0);
   const router = useRouter();
@@ -226,6 +226,13 @@ export default function LulinPage(props: { observation_id: number }) {
           codeUpdate={codeUpdate}
           setCodeUpdate={setCodeUpdate}
         />
+
+        <div className="mt-10 mb-12">
+          <CommentsList
+            comments={observation?.comments}
+            observationId={props.observation_id}
+          />
+        </div>
       </div>
     </>
   );

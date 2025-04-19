@@ -26,10 +26,12 @@ export interface NewTag {
 
 // Interface for the Comments model
 export interface Comments {
+  id?: number;
   user?: User;
   context: string;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
 
 export interface Announcements {

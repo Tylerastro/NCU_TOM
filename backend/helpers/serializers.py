@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from system.models import User
+from system.serializers import UserBaseSerializer
 
 from .models import Announcement, Comments, Tags
 
@@ -57,7 +58,7 @@ class TagsGetSerializer(serializers.ModelSerializer):
 
 
 class CommentsGetSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserBaseSerializer()
 
     class Meta:
         model = Comments
@@ -93,3 +94,11 @@ class AnnouncementsPostSerializer(serializers.ModelSerializer):
         target = Announcement.objects.create(**validated_data, user=user)
 
         return target
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    user = UserBaseSerializer(read_only=True)
+
+    class Meta:
+        model = Comments
+        fields = '__all__'

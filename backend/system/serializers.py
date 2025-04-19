@@ -11,7 +11,13 @@ from rest_framework import serializers
 from system.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'is_active')
+
+
+class UserSerializer(UserBaseSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'institute', 'first_name', 'last_name',

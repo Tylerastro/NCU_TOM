@@ -34,6 +34,27 @@
         padding: 15px;
         margin: 20px 0;
       }
+      .comments {
+        background-color: #f9f9f9;
+        border-left: 4px solid #6cbc35;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .comment {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      .comment:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      .comment-meta {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 5px;
+      }
       .footer {
         margin-top: 20px;
         text-align: center;
@@ -70,8 +91,24 @@
           <p><strong>Number of Targets:</strong> {{ target_count }}</p>
           <p><strong>Start Date:</strong> {{ start_date }}</p>
           <p><strong>Priority:</strong> {{ priority }}</p>
-          <span>See attachment for more a complete observation script</span>
+          <p><strong>Submitted by:</strong> {{ user_name }}</p>
+          <span>See attachment for a complete observation script</span>
         </div>
+
+        {% if comments %}
+        <div class="comments">
+          <h3>Comments:</h3>
+          {% for comment in comments %}
+          <div class="comment">
+            <p>{{ comment.context }}</p>
+            <div class="comment-meta">
+              <span>By: {{ comment.user.username }}</span> 
+              {% comment %} <span>Posted: {{ comment.created_at|date:"Y-m-d H:i" }}</span> {% endcomment %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
       <div class="footer">
         <p>&copy; {{ current_year }} NCU TOM Observation Management System</p>

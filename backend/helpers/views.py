@@ -10,9 +10,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from system.models import User
 
-from .models import Announcement, Tags
+from .models import Announcement, Comments, Tags
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
-                          TagsGetSerializer, TagsSerializer)
+                          CommentsSerializer, TagsGetSerializer,
+                          TagsSerializer)
 
 
 class TagsView(APIView):
@@ -80,4 +81,26 @@ class AnnouncementsDetailView(APIView):
             return Response({"detail": "You're not authorized to perform this action"}, status=403)
         announcement_instance = get_object_or_404(Announcement, pk=pk)
         announcement_instance.deleted_at = datetime.now()
+        return Response(status=204)
+
+
+class CommentsView(APIView):
+    def get(self, request, observation_id):
+        comments = Comments.objects.filter(observation_id=observation_id)
+        serializer = CommentsSerializer(comments, many=True)
+        return Response(serializer.data, status=200)
+
+    def put(self, request, pk):
+        comment_instance = get_object_or_404(Comments, pk=pk)
+        serializer = CommentsSerializer(
+            comment_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        comment_instance = get_object_or_404(Comments, pk=pk)
+        comment_instance.deleted_at = datetime.now()
+        comment_instance.save()
         return Response(status=204)

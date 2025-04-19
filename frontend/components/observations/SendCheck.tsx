@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 
-export function SendCheck({
+export default function SendCheck({
   observation_id,
   codeBlock,
 }: {

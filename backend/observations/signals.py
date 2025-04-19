@@ -9,14 +9,13 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
-
 from observations.models import Observation
 
 taipei_tz = pytz.timezone('Asia/Taipei')
 
 
 @receiver(post_save, sender=Observation)
-def send_in_progress_html_email(sender, instance, **kwargs):
+def send_in_progress_html_email(sender, instance: Observation, **kwargs):
     """
     A post_save signal handler that sends HTML emails when an Observation is saved with IN_PROGRESS status.
 
@@ -34,6 +33,7 @@ def send_in_progress_html_email(sender, instance, **kwargs):
     - Observatory
     - Start date
     - Priority level
+    - Comments (if any)
     - Observation code (as attachment)
 
     Recipients:
@@ -52,7 +52,8 @@ def send_in_progress_html_email(sender, instance, **kwargs):
                 'observatory': instance.get_observatory_display(),
                 'start_date': taipei_time.strftime('%Y-%m-%d %H:%M'),
                 'priority': instance.get_priority_display(),
-                'current_year': timezone.now().year
+                'current_year': timezone.now().year,
+                'comments': instance.comments.all().order_by('created_at')
             }
 
             # Render HTML email template
@@ -74,7 +75,8 @@ def send_in_progress_html_email(sender, instance, **kwargs):
                     subject=f'{instance.user.username} submitted observation {instance.name}',
                     body=html_message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[os.getenv('LULIN_MAIL', None)],
+                    # to=[os.getenv('LULIN_MAIL', None)],
+                    to=['w39398898@gmail.com'],
                     cc=['w39398898@gmail.com', instance.user.email],
                 )
 

@@ -71,6 +71,13 @@ body {
 
 
 
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+
 .loader {
   width: 24px;
   height: 24px;
