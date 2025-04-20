@@ -57,6 +57,7 @@ export default function ObservationsTable() {
   } = useQuery({
     queryKey: [
       "observations",
+      page,
       debounceSearch,
       searchTags,
       searchUsers,
@@ -217,7 +218,12 @@ export default function ObservationsTable() {
               <Button
                 variant={"ghost"}
                 onClick={() => setPage(page - 1)}
-                disabled={!data?.previous}
+                disabled={page === 1 || !data?.previous}
+                aria-label="Previous Page"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setPage(page - 1);
+                }}
               >
                 Previous
               </Button>
@@ -230,6 +236,11 @@ export default function ObservationsTable() {
                 variant={"ghost"}
                 onClick={() => setPage(page + 1)}
                 disabled={!data?.next}
+                aria-label="Next Page"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setPage(page + 1);
+                }}
               >
                 Next
               </Button>
