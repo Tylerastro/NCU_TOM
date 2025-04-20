@@ -195,7 +195,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'helpers.paginator.Pagination',
-    'PAGE_SIZE': 20,
+    'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -330,7 +330,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'system.authentication': {  
+        'system.authentication': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
