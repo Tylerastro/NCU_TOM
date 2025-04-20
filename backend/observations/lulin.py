@@ -95,24 +95,9 @@ class LulinScheduler:
             if target.name not in [t.name for t in unique_targets]:
                 unique_targets.append(target)
 
-        # Get alt/az data for each target
-        start_time = Time(observation.start_date)
-        end_time = Time(observation.end_date)
-        targets_altaz = self.visibility.get_targets_altaz(
-            targets=unique_targets,
-            start_time=start_time,
-            end_time=end_time
-        )
-
-        # Sort targets by the earliest time they reach a suitable altitude
-        targets_with_times = []
-        for target_altaz in targets_altaz:
-            idx, earliest_time = self.get_earliest_suitable_time(target_altaz)
-            targets_with_times.append((target_altaz.name, idx, earliest_time))
-
-        # Sort by time index (earlier is better)
-        sorted_target_names = [t[0] for t in sorted(
-            targets_with_times, key=lambda x: x[1])]
+        # Sort unique targets by RA
+        sorted_targets_by_ra = sorted(unique_targets, key=lambda t: t.ra)
+        sorted_target_names = [t.name for t in sorted_targets_by_ra]
 
         # Create dictionary of target data, preserving original observation parameters
         targets_dict = {}
@@ -135,7 +120,7 @@ class LulinScheduler:
             targets_dict[target_name]['filters'].append(
                 obs.get_filter_display())
 
-        # Generate the code with consolidated blocks, in order of target appearance
+        # Generate the code with consolidated blocks, in order of target RA
         code = ""
         for target_name in sorted_target_names:
             if target_name in targets_dict:
@@ -162,7 +147,7 @@ class LulinScheduler:
                 """
                 code += tmp
 
-        # Add any remaining targets that didn't have altitude data
+        # Add any remaining targets that didn't have RA data (shouldn't happen, but for safety)
         remaining_targets = set(targets_dict.keys()) - set(sorted_target_names)
         for target_name in remaining_targets:
             target_data = targets_dict[target_name]
