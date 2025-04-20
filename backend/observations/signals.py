@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 from datetime import datetime
 
@@ -61,13 +62,15 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
 
             # Create a temporary file with the code
             temp_file_path = None
+            attachment_filename = None
             if instance.code:
                 cleaned_code_lines = [
                     line.strip() for line in instance.code.splitlines()]
-
-                with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as temp_file:
+                attachment_filename = sanitize_filename(instance.name)
+                temp_dir = tempfile.gettempdir()
+                temp_file_path = os.path.join(temp_dir, attachment_filename)
+                with open(temp_file_path, 'w') as temp_file:
                     temp_file.write('\n'.join(cleaned_code_lines))
-                    temp_file_path = temp_file.name
 
             try:
                 # Create EmailMessage object
@@ -83,8 +86,10 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
                 email.content_subtype = 'html'
 
                 # Attach the file if it exists
-                if temp_file_path and os.path.exists(temp_file_path):
-                    email.attach_file(temp_file_path, mimetype='text/plain')
+                if temp_file_path and os.path.exists(temp_file_path) and attachment_filename:
+                    with open(temp_file_path, 'rb') as f:
+                        email.attach(attachment_filename,
+                                     f.read(), 'text/plain')
 
                 # Send the email
                 email.send(fail_silently=False)
@@ -97,3 +102,17 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
     except Observation.DoesNotExist:
         # This is a new instance being created
         pass
+
+
+def sanitize_filename(name: str) -> str:
+    """
+    Sanitize the observation name to create a safe filename.
+    - Lowercase
+    - Replace spaces with underscores
+    - Remove non-alphanumeric, non-underscore, non-dash
+    - Limit length to 50 chars
+    - Add .txt extension
+    """
+    name = name.lower().replace(' ', '_')
+    name = re.sub(r'[^a-z0-9_-]', '', name)
+    return name[:50] + '.txt'
