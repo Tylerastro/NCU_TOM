@@ -145,9 +145,9 @@ class LulinScheduler:
                                     for f in filters_sorted)
 
                 # Join values with commas
-                binning = ", ".join(sorted(target_data['binning']))
-                frames = ", ".join(target_data['frames'])
-                exposure_times = ", ".join(target_data['exposure_times'])
+                binning = ",".join(sorted(target_data['binning']))
+                frames = ",".join(target_data['frames'])
+                exposure_times = ",".join(target_data['exposure_times'])
 
                 # Create single block for target
                 tmp = f"""
@@ -173,9 +173,9 @@ class LulinScheduler:
             filters = ", ".join(self.get_filter_full_name(f)
                                 for f in filters_sorted)
 
-            binning = ", ".join(sorted(target_data['binning']))
-            frames = ", ".join(target_data['frames'])
-            exposure_times = ", ".join(target_data['exposure_times'])
+            binning = ",".join(sorted(target_data['binning']))
+            frames = ",".join(target_data['frames'])
+            exposure_times = ",".join(target_data['exposure_times'])
 
             tmp = f"""
 #REPEAT 1
