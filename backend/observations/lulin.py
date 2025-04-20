@@ -141,8 +141,8 @@ class LulinScheduler:
                 # Remove duplicates and sort by filter_order
                 filters_sorted = [
                     f for f in filter_order if f in filters_short]
-                filters = ", ".join(self.get_filter_full_name(f)
-                                    for f in filters_sorted)
+                filters = ",".join(self.get_filter_full_name(f)
+                                   for f in filters_sorted)
 
                 # Join values with commas
                 binning = ",".join(sorted(target_data['binning']))
@@ -170,8 +170,8 @@ class LulinScheduler:
 
             filters_short = target_data['filters']
             filters_sorted = [f for f in filter_order if f in filters_short]
-            filters = ", ".join(self.get_filter_full_name(f)
-                                for f in filters_sorted)
+            filters = ",".join(self.get_filter_full_name(f)
+                               for f in filters_sorted)
 
             binning = ",".join(sorted(target_data['binning']))
             frames = ",".join(target_data['frames'])
