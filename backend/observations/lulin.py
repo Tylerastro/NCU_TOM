@@ -122,17 +122,32 @@ class LulinScheduler:
 
         # Generate the code with consolidated blocks, in order of target RA
         code = ""
+        filter_order = ['u', 'g', 'r', 'i', 'z']
+        filter_full_name_map = {
+            'u': 'up_Astrodon_2019',
+            'g': 'gp_Astrodon_2019',
+            'r': 'rp_Astrodon_2019',
+            'i': 'ip_Astrodon_2019',
+            'z': 'zp_Astrodon_2019'
+        }
         for target_name in sorted_target_names:
             if target_name in targets_dict:
                 target_data = targets_dict[target_name]
                 target = target_data['target']
 
+                # Map filter display names back to short codes if needed
+                # Assuming obs.get_filter_display() returns short code ('u', 'g', etc.)
+                filters_short = target_data['filters']
+                # Remove duplicates and sort by filter_order
+                filters_sorted = [
+                    f for f in filter_order if f in filters_short]
+                filters = ", ".join(self.get_filter_full_name(f)
+                                    for f in filters_sorted)
+
                 # Join values with commas
                 binning = ", ".join(sorted(target_data['binning']))
                 frames = ", ".join(target_data['frames'])
                 exposure_times = ", ".join(target_data['exposure_times'])
-                filters = ", ".join(self.get_filter_full_name(f)
-                                    for f in target_data['filters'])
 
                 # Create single block for target
                 tmp = f"""
@@ -153,14 +168,15 @@ class LulinScheduler:
             target_data = targets_dict[target_name]
             target = target_data['target']
 
-            # Join values with commas
+            filters_short = target_data['filters']
+            filters_sorted = [f for f in filter_order if f in filters_short]
+            filters = ", ".join(self.get_filter_full_name(f)
+                                for f in filters_sorted)
+
             binning = ", ".join(sorted(target_data['binning']))
             frames = ", ".join(target_data['frames'])
             exposure_times = ", ".join(target_data['exposure_times'])
-            filters = ", ".join(self.get_filter_full_name(f)
-                                for f in target_data['filters'])
 
-            # Create single block for target
             tmp = f"""
 #REPEAT 1
 #BINNING {binning}
