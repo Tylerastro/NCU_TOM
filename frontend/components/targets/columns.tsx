@@ -10,6 +10,7 @@ export const columns: ColumnDef<Target>[] = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
+        className="rounded-none"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
@@ -20,6 +21,7 @@ export const columns: ColumnDef<Target>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
+        className="rounded-none"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"

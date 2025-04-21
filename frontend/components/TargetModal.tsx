@@ -139,7 +139,9 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
                   .map((target, index) => (
                     <div
                       key={target.id}
-                      ref={(el) => (targetRefs.current[index] = el)}
+                      ref={el => {
+                        (targetRefs.current[index] = el);
+                      }}
                       className="flex items-center justify-between py-2 px-2 hover:bg-gray-700 rounded cursor-pointer opacity-0"
                       onClick={() => handleTargetToggle(target?.id)}
                     >

@@ -17,9 +17,9 @@ import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { columns } from "./columns";
-import { NewTargetFrom } from "./createTargets";
-import { DataTable } from "./dataTable";
+import { columns } from "@/components/targets/columns";
+import { NewTargetFrom } from "@/components/targets/createTargets";
+import { DataTable } from "@/components/targets/dataTable";
 
 function LoadingSkeleton() {
   return (

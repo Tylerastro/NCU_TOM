@@ -153,7 +153,9 @@ export default function LulinData(props: LulinDataProps) {
         {sortedData.map((data, index) => (
           <TableRow
             key={data.id}
-            ref={(el) => (rowRefs.current[index] = el)}
+            ref={el => {
+              (rowRefs.current[index] = el);
+            }}
             style={{ opacity: 0 }}
           >
             <TableCell className="text-center items-center justify-center">

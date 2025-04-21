@@ -1,8 +1,13 @@
-import axios from "axios";
-import { getSession } from "next-auth/react";
+import axios, {
+  AxiosInstance,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { getSession, signOut } from "next-auth/react";
 
 // Create an axios instance with common configuration
-const api = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -12,27 +17,28 @@ const api = axios.create({
 
 // Add a request interceptor to handle session tokens
 api.interceptors.request.use(
-  async (config) => {
+  async (config: InternalAxiosRequestConfig) => {
     const session = await getSession();
 
     if (session?.user?.accessToken) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `JWT ${session.user.accessToken}`;
     }
 
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     return response;
   },
-  (error) => {
-    // Handle specific response errors here, like logging out on 401, etc.
+  async (error: AxiosError) => {
     if (error.response?.status === 401) {
+      await signOut({ callbackUrl: "/auth/signin" });
     }
     return Promise.reject(error);
   }
