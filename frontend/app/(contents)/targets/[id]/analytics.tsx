@@ -16,7 +16,7 @@ import { formatMJD, formatUTC } from "@/utils/timeFormatter";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { addDays, format, subDays } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
 import {
   Legend,
@@ -58,40 +58,20 @@ export default function Analytics({ targetId }: { targetId: number }) {
   });
 
   const { processedData, uniqueFilters, dateExtent } = useMemo(() => {
-    if (isFetching || !rawData)
+    if (isFetching || !rawData || rawData.length === 0)
       return {
         processedData: [],
         uniqueFilters: [] as number[],
-        dateExtent: { min: new Date(), max: new Date() },
+        dateExtent: undefined, // Return undefined initially
       };
 
     // Get unique filters
     const filters = Array.from(new Set(rawData.map((obs) => obs.filter)));
 
-    // Initialize filter visibility state if not set
-    if (Object.keys(visibleFilters).length === 0) {
-      const initialFilters: Record<number, boolean> = {};
-      filters.forEach((filter) => {
-        initialFilters[filter] = true;
-      });
-      setVisibleFilters(initialFilters);
-    }
-
     // Get date range of data
     const dates = rawData.map((obs) => new Date(obs.obs_date));
     const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
-
-    // Initialize date range if not set
-    if (!dateRange?.from && !dateRange?.to) {
-      // Default to show the past 30 days of data or all data if less than 30 days
-      const thirtyDaysAgo = subDays(maxDate, 30);
-      const defaultFrom = minDate > thirtyDaysAgo ? minDate : thirtyDaysAgo;
-      setDateRange({
-        from: defaultFrom,
-        to: maxDate,
-      });
-    }
 
     const processed = rawData.map((obs) => ({
       ...obs,
@@ -104,7 +84,34 @@ export default function Analytics({ targetId }: { targetId: number }) {
       uniqueFilters: filters,
       dateExtent: { min: minDate, max: maxDate },
     };
-  }, [rawData, visibleFilters, dateRange]);
+    // Remove visibleFilters and dateRange from dependencies as they are not directly used for calculation here
+  }, [rawData, isFetching]);
+
+  // Effect to initialize filters when uniqueFilters are determined
+  useEffect(() => {
+    if (uniqueFilters.length > 0 && Object.keys(visibleFilters).length === 0) {
+      const initialFilters: Record<number, boolean> = {};
+      uniqueFilters.forEach((filter) => {
+        initialFilters[filter] = true;
+      });
+      setVisibleFilters(initialFilters);
+    }
+  }, [uniqueFilters, visibleFilters]); // Add visibleFilters to dependency to ensure it only runs when empty
+
+  // Effect to initialize date range when dateExtent is determined
+  useEffect(() => {
+    if (dateExtent && !dateRange?.from && !dateRange?.to) {
+      // Default to show the past 30 days of data or all data if less than 30 days
+      const thirtyDaysAgo = subDays(dateExtent.max, 30);
+      const defaultFrom =
+        dateExtent.min > thirtyDaysAgo ? dateExtent.min : thirtyDaysAgo;
+      setDateRange({
+        from: defaultFrom,
+        to: dateExtent.max,
+      });
+    }
+    // Only depend on dateExtent, as dateRange check prevents re-running if already set
+  }, [dateExtent]);
 
   // Handle filter checkbox change
   const handleFilterChange = (filter: number) => {
@@ -126,6 +133,9 @@ export default function Analytics({ targetId }: { targetId: number }) {
 
   // Filter data based on visibility selections and date range
   const filteredData = processedData.filter((obs) => {
+    // Early return if filters aren't initialized yet
+    if (Object.keys(visibleFilters).length === 0) return false;
+
     const obsDate = new Date(obs.obs_date);
     const isFilterVisible = visibleFilters[obs.filter];
     const isInDateRange =
@@ -149,6 +159,17 @@ export default function Analytics({ targetId }: { targetId: number }) {
     }
     return ["auto", "auto"];
   };
+
+  // Add loading state check
+  if (isFetching || !dateExtent || Object.keys(visibleFilters).length === 0) {
+    return (
+      <TabsContent value="analytics">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading analytics data...</p> {/* Or a spinner component */}
+        </div>
+      </TabsContent>
+    );
+  }
 
   return (
     <TabsContent value="analytics">
@@ -191,6 +212,7 @@ export default function Analytics({ targetId }: { targetId: number }) {
                       selected={dateRange}
                       onSelect={setDateRange}
                       numberOfMonths={2}
+                      disabled={!dateExtent} // Disable calendar if dateExtent not ready
                     />
                   </PopoverContent>
                 </Popover>
@@ -201,12 +223,14 @@ export default function Analytics({ targetId }: { targetId: number }) {
                     className="flex-1"
                     onClick={() => {
                       if (dateExtent) {
+                        // Check if dateExtent is available
                         setDateRange({
                           from: subDays(dateExtent.max, 7),
                           to: dateExtent.max,
                         });
                       }
                     }}
+                    disabled={!dateExtent} // Disable button if dateExtent not ready
                   >
                     Last 7 days
                   </Button>
@@ -216,12 +240,14 @@ export default function Analytics({ targetId }: { targetId: number }) {
                     className="flex-1"
                     onClick={() => {
                       if (dateExtent) {
+                        // Check if dateExtent is available
                         setDateRange({
                           from: subDays(dateExtent.max, 30),
                           to: dateExtent.max,
                         });
                       }
                     }}
+                    disabled={!dateExtent} // Disable button if dateExtent not ready
                   >
                     Last 30 days
                   </Button>
@@ -231,12 +257,14 @@ export default function Analytics({ targetId }: { targetId: number }) {
                   size="sm"
                   onClick={() => {
                     if (dateExtent) {
+                      // Check if dateExtent is available
                       setDateRange({
                         from: dateExtent.min,
                         to: dateExtent.max,
                       });
                     }
                   }}
+                  disabled={!dateExtent} // Disable button if dateExtent not ready
                 >
                   All time
                 </Button>
@@ -254,6 +282,7 @@ export default function Analytics({ targetId }: { targetId: number }) {
                       checked={visibleFilters[filter]}
                       onCheckedChange={() => handleFilterChange(filter)}
                       className="border-gray-400"
+                      disabled={isFetching} // Optional: disable while fetching
                     />
                     <div
                       className="w-4 h-4 rounded-full"
@@ -347,6 +376,7 @@ export default function Analytics({ targetId }: { targetId: number }) {
                       name={getFilterName(filter)}
                       data={filteredData.filter((obs) => obs.filter === filter)}
                       fill={FILTER_COLORS[filter] || "#000000"}
+                      shape="circle" // Ensure a shape is specified
                     />
                   ))}
               </ScatterChart>
