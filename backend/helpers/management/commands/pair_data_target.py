@@ -54,6 +54,24 @@ class Command(BaseCommand):
         return target
 
     def handle(self, *args, **options):
+        # First, check for datasets with deleted targets and remove the foreign key
+        data_sets_with_deleted_targets = LulinDataProduct.objects.filter(
+            target__deleted_at__isnull=False
+        )
+
+        deleted_count = data_sets_with_deleted_targets.count()
+        if deleted_count > 0:
+            self.stdout.write(self.style.WARNING(
+                f'Found {deleted_count} data sets with deleted targets'
+            ))
+            for data_set in data_sets_with_deleted_targets:
+                data_set.target = None
+                data_set.save()
+            self.stdout.write(self.style.SUCCESS(
+                f'Removed target reference from {deleted_count} data sets'
+            ))
+
+        # Now process data sets without targets
         data_sets = LulinDataProduct.objects.filter(target__isnull=True)
 
         total = data_sets.count()
@@ -66,7 +84,7 @@ class Command(BaseCommand):
                 ))
             target = self.find_target(
                 data_set.name, data_set.source_ra, data_set.source_dec)
-            if target:
+            if target and target.deleted_at is None:
                 data_set.target = target
                 data_set.save()
                 found_count += 1
