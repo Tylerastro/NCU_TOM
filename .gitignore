@@ -251,3 +251,5 @@ resetDB.sh
 *.db
 *.txt
 tags
+
+CLAUDE.md

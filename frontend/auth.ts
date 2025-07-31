@@ -216,6 +216,14 @@ const config = {
     },
 
     async jwt({ token, user, account, profile, trigger }) {
+      console.log("JWT Callback Debug:", {
+        trigger,
+        provider: account?.provider,
+        hasAccessToken: !!token.accessToken,
+        hasRefreshToken: !!token.refreshToken,
+        tokenExpired: token.ref && getCurrentEpochTime() > token.ref
+      });
+
       if (user && profile && account && account.provider !== "credentials") {
         token.accessToken = profile.access as string;
         token.refreshToken = profile.refresh as string;
@@ -229,23 +237,29 @@ const config = {
       }
       if (token.ref && getCurrentEpochTime() > token.ref) {
         if (!token.refreshToken) {
-          return null;
-        }
-        const newToken = await refreshToken(token.refreshToken);
-        if (newToken) {
-          token.accessToken = newToken.access;
-          token.ref = new Date(newToken.access_expiration).getTime() / 1000;
+          console.warn("No refresh token, keeping current session");
         } else {
-          return null;
+          try {
+            const newToken = await refreshToken(token.refreshToken);
+            if (newToken) {
+              token.accessToken = newToken.access;
+              token.ref = new Date(newToken.access_expiration).getTime() / 1000;
+            }
+          } catch (error) {
+            console.error("Token refresh failed:", error);
+          }
         }
       }
 
       if (trigger !== "signIn") {
-        const user_data = await getUser(token.accessToken as string);
-        if (!user_data) {
-          return null;
+        try {
+          const user_data = await getUser(token.accessToken as string);
+          if (user_data) {
+            user = user_data;
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
         }
-        user = user_data;
       }
 
       return {
@@ -255,9 +269,14 @@ const config = {
     },
 
     async session({ session, token, user }) {
-      if (!token?.accessToken) return { expires: session.expires };
-      session.user = token as any;
-
+      // Always return complete session data
+      session.user = {
+        ...token,
+        // Ensure we have the required fields
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+      } as any;
+      
       return session;
     },
   },
