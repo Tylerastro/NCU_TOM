@@ -15,24 +15,22 @@ export const getTargets = async ({
   tags,
 }: GetTargetsOptions): Promise<Paginator> => {
   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/targets/`);
-    const params = new URLSearchParams();
+    const params: Record<string, string> = {};
 
     if (page) {
-      params.append("page", page.toString());
+      params.page = page.toString();
     }
     if (name) {
-      params.append("name", name);
+      params.name = name;
     }
     if (tags && tags.length > 0) {
-      params.append("tags", tags.join(","));
+      params.tags = tags.join(",");
     }
     if (pageSize) {
-      params.append("page_size", pageSize.toString());
+      params.page_size = pageSize.toString();
     }
 
-    url.search = params.toString();
-    const response = await api.get(url.toString());
+    const response = await api.get("/api/targets/", { params });
     return response.data;
   } catch (error) {
     throw error;

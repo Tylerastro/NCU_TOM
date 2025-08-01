@@ -1,13 +1,8 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_API_HOST,
-  withCredentials: true,
-});
+import authApi from "@/apis/auth-axios";
 
 export async function getUser(access_token: string) {
   try {
-    const response = await api.get("/api/user/", {
+    const response = await authApi.get("/api/user/", {
       headers: {
         Authorization: `JWT ${access_token}`,
       },

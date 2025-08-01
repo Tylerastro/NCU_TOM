@@ -2,11 +2,11 @@ import api from "@/apis/axios";
 
 export const getLulinCode = async (id: number, refresh: boolean = false) => {
   try {
-    const url = new URL(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/observations/${id}/lulin/code/`
-    );
-    url.searchParams.append("refresh", refresh ? "true" : "false");
-    const response = await api.get(url.toString());
+    const response = await api.get(`/api/observations/${id}/lulin/code/`, {
+      params: {
+        refresh: refresh ? "true" : "false"
+      }
+    });
     return response.data;
   } catch (error) {
     console.error(error);

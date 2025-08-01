@@ -1,9 +1,4 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_API_HOST,
-  withCredentials: true,
-});
+import authApi from "@/apis/auth-axios";
 
 interface TokenResponse {
   refresh: string;
@@ -15,7 +10,7 @@ export async function getToken(
   password: string
 ): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/login/", {
+    const response = await authApi.post("/api/login/", {
       username: username,
       password: password,
     });

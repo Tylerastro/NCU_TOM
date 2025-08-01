@@ -1,10 +1,4 @@
-import axios from "axios";
-import { access } from "fs";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_API_HOST,
-  withCredentials: true,
-});
+import authApi from "@/apis/auth-axios";
 
 interface TokenResponse {
   refresh: string;
@@ -15,7 +9,7 @@ export async function loginWithGoogle(
   id_token: string
 ): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/oauth/google/", {
+    const response = await authApi.post("/api/oauth/google/", {
       access_token: id_token,
     });
     return response.data;
@@ -27,7 +21,7 @@ export async function loginWithGoogle(
 
 export async function loginWithGithub(code: string): Promise<TokenResponse> {
   try {
-    const response = await api.post("/api/oauth/github/", {
+    const response = await authApi.post("/api/oauth/github/", {
       access_token: code,
     });
     return response.data;

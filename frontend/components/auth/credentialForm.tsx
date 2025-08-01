@@ -10,8 +10,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
-import { AuthError } from "next-auth";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,24 +20,11 @@ import { z } from "zod";
 
 function onSubmit(values: z.infer<typeof formSchema>) {
   const { username, password } = values;
-  try {
-    signIn("credentials", {
-      username,
-      password,
-      callbackUrl: "/",
-    });
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      toast.error("Unknown error, please try again");
-    } else if (error instanceof AuthError)
-      switch (error.type) {
-        case "CredentialsSignin":
-          toast.error("Invalid username or password");
-      }
-    else {
-      toast.error("Error signing in");
-    }
-  }
+  signIn("credentials", {
+    username,
+    password,
+    callbackUrl: "/",
+  });
 }
 
 const formSchema = z.object({
@@ -60,6 +45,7 @@ export default function CredentialForm() {
   });
 
   useEffect(() => {
+    console.log("fired");
     const error = searchParams.get("error");
     if (error === "CredentialsSignin") {
       toast.error("Invalid username or password");

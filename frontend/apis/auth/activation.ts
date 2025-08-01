@@ -1,13 +1,8 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
-});
+import authApi from "@/apis/auth-axios";
 
 export async function activateAccount(uid: string, token: string) {
   try {
-    const response = await api.post("/api/users/activation/", {
+    const response = await authApi.post("/api/users/activation/", {
       uid: uid,
       token: token,
     });

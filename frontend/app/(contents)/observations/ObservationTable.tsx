@@ -1,7 +1,9 @@
 "use client";
+import { deleteObservation } from "@/apis/observations/deleteObservation";
+import { getObservationStats } from "@/apis/observations/getObservationStats";
+import { getObservations } from "@/apis/observations/getObservations";
+import { getUserList } from "@/apis/system/getUserList";
 import { getTags } from "@/apis/tags/getTags";
-import { deleteTargets } from "@/apis/targets/deleteTargets";
-import { getTargets } from "@/apis/targets/getTargets";
 import useDebounce from "@/components/Debounce";
 import PaginationItems from "@/components/Paginator";
 import SearchFilter from "@/components/SearchFilter";
@@ -20,14 +22,16 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Target } from "@/models/targets";
+import { UserRole } from "@/models/enums";
+import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { columns } from "@/components/targets/columns";
-import { NewTargetFrom } from "@/components/targets/createTargets";
-import { DataTable } from "@/components/targets/dataTable";
+import { toast } from "sonner";
 import { Search, Filter, Trash2 } from "lucide-react";
+import { columns } from "./columns";
+import { NewObservationFrom } from "./createObservation";
+import { DataTable } from "./dataTable";
 
 function LoadingSkeleton() {
   return (
@@ -42,6 +46,7 @@ function LoadingSkeleton() {
             <Skeleton className="h-10 flex-1" />
             <Skeleton className="h-10 w-40" />
             <Skeleton className="h-10 w-40" />
+            <Skeleton className="h-10 w-40" />
           </div>
         </CardContent>
       </Card>
@@ -54,21 +59,40 @@ function LoadingSkeleton() {
   );
 }
 
-export default function TargetTable() {
+export default function ObservationTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const debounceSearch = useDebounce(search, 300);
   const [searchTags, setSearchTags] = useState<number[]>([]);
+  const [searchUsers, setSearchUsers] = useState<number[]>([]);
+  const [searchStatus, setSearchStatus] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ["targets", page, debounceSearch, searchTags],
+  const session = useSession();
+  const isAdmin = session?.data?.user?.role === UserRole.Admin;
+
+  const {
+    data,
+    refetch,
+    isFetching: isFetchingData,
+  } = useQuery({
+    queryKey: [
+      "observations",
+      page,
+      debounceSearch,
+      searchTags,
+      searchUsers,
+      searchStatus,
+    ],
     queryFn: async () => {
       try {
-        const response = await getTargets({
+        const response = await getObservations({
           page,
-          name: search,
+          name: debounceSearch,
           tags: searchTags,
+          users: searchUsers,
+          status: searchStatus,
         });
         return response;
       } catch (error: any) {
@@ -79,41 +103,79 @@ export default function TargetTable() {
         throw error;
       }
     },
-    refetchOnWindowFocus: false,
   });
 
-  const { data: tagData } = useQuery({
+  const { data: tagData, isFetching: tagIsFetching } = useQuery({
     queryKey: ["tags"],
     queryFn: () => getTags(),
     refetchOnWindowFocus: false,
+    enabled: !!session && !!session.data,
   });
+
+  const { data: userData, isFetching: userIsFetching } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => getUserList(),
+    refetchOnWindowFocus: false,
+    enabled: isAdmin,
+  });
+
+  const { data: observationStats, isFetching: observationStatIsFetching } =
+    useQuery({
+      queryKey: ["observationStats"],
+      queryFn: () => getObservationStats(),
+      refetchOnWindowFocus: false,
+      enabled: !!session && !!session.data,
+    });
 
   const handleDelete = async (ids: number[]) => {
     try {
-      const response = await deleteTargets(ids);
+      const response = await deleteObservation(ids);
       await refetch();
-      toast.success(response.message || "Targets deleted successfully");
+      toast.success(response.message || "Observations deleted successfully");
     } catch (error) {
       console.error("Error deleting data:", error);
     }
   };
-  const targets = data?.results as Target[];
+
+  const observations = data?.results as Observation[];
 
   const TagFilterData =
     tagData
-      ?.filter((tag) => tag.targets.length > 0)
-      .map((tag) => ({
-        label: tag.name,
-        value: tag.targets.length,
-        id: tag.id || 0,
-      })) || [];
+      ?.filter((tag) => tag.observations.length > 0)
+      ?.map((tag) => {
+        return {
+          label: tag.name,
+          value: tag.observations.length,
+          id: tag.id || 0,
+        };
+      }) || [];
+
+  const StatusFilterData =
+    observationStats?.status_counts.map((status) => {
+      return {
+        label: status.name,
+        value: status.count,
+        id: status.id,
+      };
+    }) || [];
+
+  const UserFilterData = isAdmin
+    ? userData?.map((user) => ({
+        label: user.username,
+        value: user.observations?.length || 0,
+        id: user.id || 0,
+      })) || []
+    : [];
+
+  useEffect(() => {
+    setIsLoading(isFetchingData || userIsFetching || observationStatIsFetching);
+  }, [isFetchingData, userIsFetching, observationStatIsFetching]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, searchTags]);
+  }, [search, searchTags, searchUsers, searchStatus]);
 
-  if (isFetching || !targets) {
-    // if (true) {
+  if (isLoading || !observations) {
     return <LoadingSkeleton />;
   }
 
@@ -126,29 +188,43 @@ export default function TargetTable() {
             Filters & Search
           </CardTitle>
           <CardDescription>
-            Filter and search through your {data?.count || 0} targets
+            Filter and search through your {data?.count || 0} observations
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Search targets, coordinates, or notes..."
+                  placeholder="Search observations, targets, or notes..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
             </div>
-            <SearchFilter
-              title="Tags"
-              data={TagFilterData}
-              setData={setSearchTags}
-            />
+            <div className="flex flex-wrap gap-2">
+              <SearchFilter
+                title="Tags"
+                data={TagFilterData}
+                setData={setSearchTags}
+              />
+              {isAdmin && (
+                <SearchFilter
+                  title="Users"
+                  data={UserFilterData}
+                  setData={setSearchUsers}
+                />
+              )}
+              <SearchFilter
+                title="Status"
+                data={StatusFilterData}
+                setData={setSearchStatus}
+              />
+            </div>
             <div className="flex gap-2">
-              <NewTargetFrom refetch={refetch} />
+              <NewObservationFrom refetch={refetch} />
               <Button
                 variant="destructive"
                 size="default"
@@ -165,21 +241,24 @@ export default function TargetTable() {
       </Card>
 
       <Card>
-        <CardContent>
+        <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={targets}
+            data={observations}
             setSelectedIds={setSelectedIds}
           />
-          {targets.length === 0 && (
+          {observations.length === 0 && (
             <div className="text-center py-12">
               <div className="text-muted-foreground">
-                {search || searchTags.length > 0
-                  ? "No targets match your current filters"
-                  : "No targets added yet"}
+                {search ||
+                searchTags.length > 0 ||
+                searchUsers.length > 0 ||
+                searchStatus.length > 0
+                  ? "No observations match your current filters"
+                  : "No observations added yet"}
               </div>
               <div className="mt-4">
-                <NewTargetFrom refetch={refetch} />
+                <NewObservationFrom refetch={refetch} />
               </div>
             </div>
           )}
@@ -193,7 +272,12 @@ export default function TargetTable() {
               <Button
                 variant="ghost"
                 onClick={() => setPage(page - 1)}
-                disabled={!data?.previous}
+                disabled={page === 1 || !data?.previous}
+                aria-label="Previous Page"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setPage(page - 1);
+                }}
               >
                 Previous
               </Button>
@@ -206,6 +290,11 @@ export default function TargetTable() {
                 variant="ghost"
                 onClick={() => setPage(page + 1)}
                 disabled={!data?.next}
+                aria-label="Next Page"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setPage(page + 1);
+                }}
               >
                 Next
               </Button>

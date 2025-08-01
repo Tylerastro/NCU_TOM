@@ -31,7 +31,7 @@ import NavTooltip from "./NavTooltip";
 
 export default function NavBar() {
   return (
-    <div className="w-full h-16 px-2 py-2 sm:px-6 lg:px-8 static">
+    <div className="w-full h-16 px-2 py-2 sm:px-6 lg:px-8 fixed top-0 left-0 z-50  backdrop-blur-md border-b border-border/20">
       <div className="flex items-center justify-between">
         <div className="flex-shrink-0">
           <Logo />

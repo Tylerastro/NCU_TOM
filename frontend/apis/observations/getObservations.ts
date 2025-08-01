@@ -20,31 +20,28 @@ export const getObservations = async ({
   status,
 }: GetObservationsOptions): Promise<Paginator> => {
   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/observations/`);
-    const params = new URLSearchParams();
+    const params: Record<string, string> = {};
 
     if (name) {
-      params.append("name", name);
+      params.name = name;
     }
     if (page !== undefined) {
-      params.append("page", page.toString());
+      params.page = page.toString();
     }
     if (pageSize !== undefined) {
-      params.append("page_size", pageSize.toString());
+      params.page_size = pageSize.toString();
     }
     if (tags && tags.length > 0) {
-      params.append("tags", tags.join(","));
+      params.tags = tags.join(",");
     }
     if (users && users.length > 0) {
-      params.append("users", users.join(","));
+      params.users = users.join(",");
     }
     if (status && status.length > 0) {
-      params.append("status", status.join(","));
+      params.status = status.join(",");
     }
 
-    url.search = params.toString();
-
-    const response = await api.get(url.toString());
+    const response = await api.get("/api/observations/", { params });
     return response.data;
   } catch (error) {
     console.error(error);
