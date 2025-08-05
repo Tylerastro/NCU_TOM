@@ -21,8 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useSession } from "next-auth/react";
-import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,16 +34,12 @@ export function DataTable<TData, TValue>({
   data,
   setSelectedIds,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [rowSelection, setRowSelection] = useState({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const { data: session } = useSession();
 
-  const memoData = React.useMemo(() => data, []);
-
   const table = useReactTable({
-    data: memoData,
+    data,
     columns,
     initialState: {
       columnVisibility: {
@@ -63,6 +58,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     enableRowSelection: true,
+    manualPagination: true,
     onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -82,6 +78,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      <div className="pb-4 flex flex-col gap-4"></div>
       <div className="rounded-md border ">
         <Table>
           <TableHeader>
