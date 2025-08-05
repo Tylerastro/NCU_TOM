@@ -139,28 +139,28 @@ export const columns: ColumnDef<Observation>[] = [
       );
     },
   },
-  {
-    accessorKey: "tags",
-    header: "Tags",
-    cell(props) {
-      const tags: Tag[] = props.row.getValue("tags");
-      return tags.map((tag) => (
-        <Link
-          key={tag.id}
-          href={`/targets/tags/${tag.id}`}
-          className={badgeVariants({ variant: "badge" })}
-        >
-          {tag.name}
-        </Link>
-      ));
-    },
-    filterFn: (row, id, value) => {
-      const tags: Tag[] = row.original.tags;
-      return value.some((filter: number) =>
-        tags.some((tag) => tag.id === filter)
-      );
-    },
-  },
+  // {
+  //   accessorKey: "tags",
+  //   header: "Tags",
+  //   cell(props) {
+  //     const tags: Tag[] = props.row.getValue("tags");
+  //     return tags.map((tag) => (
+  //       <Link
+  //         key={tag.id}
+  //         href={`/targets/tags/${tag.id}`}
+  //         className={badgeVariants({ variant: "badge" })}
+  //       >
+  //         {tag.name}
+  //       </Link>
+  //     ));
+  //   },
+  //   filterFn: (row, id, value) => {
+  //     const tags: Tag[] = row.original.tags;
+  //     return value.some((filter: number) =>
+  //       tags.some((tag) => tag.id === filter)
+  //     );
+  //   },
+  // },
   {
     accessorKey: "status",
     header: "Status",
