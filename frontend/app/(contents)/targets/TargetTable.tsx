@@ -3,56 +3,13 @@ import { getTags } from "@/apis/tags/getTags";
 import { deleteTargets } from "@/apis/targets/deleteTargets";
 import { getTargets } from "@/apis/targets/getTargets";
 import useDebounce from "@/components/Debounce";
-import PaginationItems from "@/components/Paginator";
-import SearchFilter from "@/components/SearchFilter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+import { createDataHash } from "@/components/utils";
 import { Target } from "@/models/targets";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
-import { columns } from "@/components/targets/columns";
-import { NewTargetFrom } from "@/components/targets/createTargets";
-import { DataTable } from "@/components/targets/dataTable";
-import { Search, Filter, Trash2 } from "lucide-react";
-
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-60" />
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <Skeleton className="h-10 flex-1" />
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-40" />
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="p-0">
-          <Skeleton className="h-[400px] w-full" />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+import TargetFilter from "./TargetFilter";
+import TargetTableView from "./TargetTableView";
 
 export default function TargetTable() {
   const [page, setPage] = useState(1);
@@ -60,6 +17,23 @@ export default function TargetTable() {
   const debounceSearch = useDebounce(search, 300);
   const [searchTags, setSearchTags] = useState<number[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  // Stable callbacks to prevent unnecessary re-renders
+  const handleSetSearch = useCallback((newSearch: string) => {
+    setSearch(newSearch);
+  }, []);
+
+  const handleSetSearchTags = useCallback((newTags: number[]) => {
+    setSearchTags(newTags);
+  }, []);
+
+  const handleSetSelectedIds = useCallback((value: React.SetStateAction<number[]>) => {
+    setSelectedIds(value);
+  }, []);
+
+  const handleSetPage = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ["targets", page, debounceSearch, searchTags],
@@ -88,131 +62,71 @@ export default function TargetTable() {
     refetchOnWindowFocus: false,
   });
 
-  const handleDelete = async (ids: number[]) => {
-    try {
-      const response = await deleteTargets(ids);
-      await refetch();
-      toast.success(response.message || "Targets deleted successfully");
-    } catch (error) {
-      console.error("Error deleting data:", error);
-    }
-  };
-  const targets = data?.results as Target[];
+  const handleDelete = useCallback(
+    async (ids: number[]) => {
+      try {
+        const response = await deleteTargets(ids);
+        await refetch();
+        toast.success(response.message || "Targets deleted successfully");
+      } catch (error) {
+        console.error("Error deleting data:", error);
+      }
+    },
+    [refetch]
+  );
 
-  const TagFilterData =
-    tagData
-      ?.filter((tag) => tag.targets.length > 0)
-      .map((tag) => ({
-        label: tag.name,
-        value: tag.targets.length,
-        id: tag.id || 0,
-      })) || [];
+  const tagFilterData = useMemo(
+    () =>
+      tagData
+        ?.filter((tag) => tag.targets.length > 0)
+        .map((tag) => ({
+          label: tag.name,
+          value: tag.targets.length,
+          id: tag.id || 0,
+        })) || [],
+    [tagData]
+  );
 
   useEffect(() => {
     setPage(1);
   }, [search, searchTags]);
 
-  if (isFetching || !targets) {
-    // if (true) {
-    return <LoadingSkeleton />;
-  }
+  const targets = data?.results as Target[];
+
+  // Create a hash key for triggering re-renders when data changes
+  const dataKey = useMemo(() => {
+    return createDataHash(targets, page, data?.count);
+  }, [targets, page, data?.count]);
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filters & Search
-          </CardTitle>
-          <CardDescription>
-            Filter and search through your {data?.count || 0} targets
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search targets, coordinates, or notes..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <SearchFilter
-              title="Tags"
-              data={TagFilterData}
-              setData={setSearchTags}
-            />
-            <div className="flex gap-2">
-              <NewTargetFrom refetch={refetch} />
-              <Button
-                variant="destructive"
-                size="default"
-                disabled={selectedIds.length === 0}
-                onClick={() => handleDelete(selectedIds.map((id) => id))}
-                className="gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete ({selectedIds.length})
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <TargetFilter
+        search={search}
+        setSearch={handleSetSearch}
+        searchTags={searchTags}
+        setSearchTags={handleSetSearchTags}
+        selectedIds={selectedIds}
+        tagFilterData={tagFilterData}
+        targetsCount={data?.count || 0}
+        refetch={refetch}
+        onDelete={handleDelete}
+      />
 
-      <Card>
-        <CardContent>
-          <DataTable
-            columns={columns}
-            data={targets}
-            setSelectedIds={setSelectedIds}
-          />
-          {targets.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-muted-foreground">
-                {search || searchTags.length > 0
-                  ? "No targets match your current filters"
-                  : "No targets added yet"}
-              </div>
-              <div className="mt-4">
-                <NewTargetFrom refetch={refetch} />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="flex items-center justify-end space-x-2">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <Button
-                variant="ghost"
-                onClick={() => setPage(page - 1)}
-                disabled={!data?.previous}
-              >
-                Previous
-              </Button>
-            </PaginationItem>
-
-            {PaginationItems(page, data?.total || 1, setPage, page)}
-
-            <PaginationItem>
-              <Button
-                variant="ghost"
-                onClick={() => setPage(page + 1)}
-                disabled={!data?.next}
-              >
-                Next
-              </Button>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      {targets && (
+        <TargetTableView
+          key={dataKey}
+          targets={targets}
+          page={page}
+          setPage={handleSetPage}
+          setSelectedIds={handleSetSelectedIds}
+          hasNext={!!data?.next}
+          hasPrevious={!!data?.previous}
+          totalPages={data?.total || 1}
+          search={search}
+          searchTags={searchTags}
+          refetch={refetch}
+        />
+      )}
     </div>
   );
 }

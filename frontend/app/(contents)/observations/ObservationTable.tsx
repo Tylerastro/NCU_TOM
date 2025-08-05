@@ -5,59 +5,15 @@ import { getObservations } from "@/apis/observations/getObservations";
 import { getUserList } from "@/apis/system/getUserList";
 import { getTags } from "@/apis/tags/getTags";
 import useDebounce from "@/components/Debounce";
-import PaginationItems from "@/components/Paginator";
-import SearchFilter from "@/components/SearchFilter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+import { createDataHash } from "@/components/utils";
 import { UserRole } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
-import { Search, Filter, Trash2 } from "lucide-react";
-import { columns } from "./columns";
-import { NewObservationFrom } from "./createObservation";
-import { DataTable } from "./dataTable";
-
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-60" />
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <Skeleton className="h-10 flex-1" />
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-40" />
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="p-0">
-          <Skeleton className="h-[400px] w-full" />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+import ObservationFilter from "./ObservationFilter";
+import ObservationTableView from "./ObservationTableView";
 
 export default function ObservationTable() {
   const [page, setPage] = useState(1);
@@ -66,17 +22,37 @@ export default function ObservationTable() {
   const [searchTags, setSearchTags] = useState<number[]>([]);
   const [searchUsers, setSearchUsers] = useState<number[]>([]);
   const [searchStatus, setSearchStatus] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const session = useSession();
   const isAdmin = session?.data?.user?.role === UserRole.Admin;
 
-  const {
-    data,
-    refetch,
-    isFetching: isFetchingData,
-  } = useQuery({
+  // Stable callbacks to prevent unnecessary re-renders
+  const handleSetSearch = useCallback((newSearch: string) => {
+    setSearch(newSearch);
+  }, []);
+
+  const handleSetSearchTags = useCallback((newTags: number[]) => {
+    setSearchTags(newTags);
+  }, []);
+
+  const handleSetSearchUsers = useCallback((newUsers: number[]) => {
+    setSearchUsers(newUsers);
+  }, []);
+
+  const handleSetSearchStatus = useCallback((newStatus: number[]) => {
+    setSearchStatus(newStatus);
+  }, []);
+
+  const handleSetSelectedIds = useCallback((value: React.SetStateAction<number[]>) => {
+    setSelectedIds(value);
+  }, []);
+
+  const handleSetPage = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const { data, refetch } = useQuery({
     queryKey: [
       "observations",
       page,
@@ -103,205 +79,124 @@ export default function ObservationTable() {
         throw error;
       }
     },
+    refetchOnWindowFocus: false,
   });
 
-  const { data: tagData, isFetching: tagIsFetching } = useQuery({
+  const { data: tagData } = useQuery({
     queryKey: ["tags"],
     queryFn: () => getTags(),
     refetchOnWindowFocus: false,
-    enabled: !!session && !!session.data,
   });
 
-  const { data: userData, isFetching: userIsFetching } = useQuery({
+  const { data: userData } = useQuery({
     queryKey: ["users"],
     queryFn: () => getUserList(),
     refetchOnWindowFocus: false,
     enabled: isAdmin,
   });
 
-  const { data: observationStats, isFetching: observationStatIsFetching } =
-    useQuery({
-      queryKey: ["observationStats"],
-      queryFn: () => getObservationStats(),
-      refetchOnWindowFocus: false,
-      enabled: !!session && !!session.data,
-    });
+  const { data: observationStats } = useQuery({
+    queryKey: ["observationStats"],
+    queryFn: () => getObservationStats(),
+    refetchOnWindowFocus: false,
+  });
 
-  const handleDelete = async (ids: number[]) => {
-    try {
-      const response = await deleteObservation(ids);
-      await refetch();
-      toast.success(response.message || "Observations deleted successfully");
-    } catch (error) {
-      console.error("Error deleting data:", error);
-    }
-  };
+  const handleDelete = useCallback(
+    async (ids: number[]) => {
+      try {
+        const response = await deleteObservation(ids);
+        await refetch();
+        toast.success(response.message || "Observations deleted successfully");
+      } catch (error) {
+        console.error("Error deleting data:", error);
+      }
+    },
+    [refetch]
+  );
 
-  const observations = data?.results as Observation[];
-
-  const TagFilterData =
-    tagData
-      ?.filter((tag) => tag.observations.length > 0)
-      ?.map((tag) => {
-        return {
+  const tagFilterData = useMemo(
+    () =>
+      tagData
+        ?.filter((tag) => tag.observations.length > 0)
+        .map((tag) => ({
           label: tag.name,
           value: tag.observations.length,
           id: tag.id || 0,
-        };
-      }) || [];
+        })) || [],
+    [tagData]
+  );
 
-  const StatusFilterData =
-    observationStats?.status_counts.map((status) => {
-      return {
+  const statusFilterData = useMemo(
+    () =>
+      observationStats?.status_counts.map((status) => ({
         label: status.name,
         value: status.count,
         id: status.id,
-      };
-    }) || [];
+      })) || [],
+    [observationStats]
+  );
 
-  const UserFilterData = isAdmin
-    ? userData?.map((user) => ({
-        label: user.username,
-        value: user.observations?.length || 0,
-        id: user.id || 0,
-      })) || []
-    : [];
-
-  useEffect(() => {
-    setIsLoading(isFetchingData || userIsFetching || observationStatIsFetching);
-  }, [isFetchingData, userIsFetching, observationStatIsFetching]);
+  const userFilterData = useMemo(
+    () =>
+      isAdmin
+        ? userData?.map((user) => ({
+            label: user.username,
+            value: user.observations?.length || 0,
+            id: user.id || 0,
+          })) || []
+        : [],
+    [userData, isAdmin]
+  );
 
   useEffect(() => {
     setPage(1);
   }, [search, searchTags, searchUsers, searchStatus]);
 
-  if (isLoading || !observations) {
-    return <LoadingSkeleton />;
-  }
+  const observations = data?.results as Observation[];
+
+  // Create a hash key for triggering re-renders when data changes
+  const dataKey = useMemo(() => {
+    return createDataHash(observations, page, data?.count);
+  }, [observations, page, data?.count]);
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filters & Search
-          </CardTitle>
-          <CardDescription>
-            Filter and search through your {data?.count || 0} observations
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search observations, targets, or notes..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <SearchFilter
-                title="Tags"
-                data={TagFilterData}
-                setData={setSearchTags}
-              />
-              {isAdmin && (
-                <SearchFilter
-                  title="Users"
-                  data={UserFilterData}
-                  setData={setSearchUsers}
-                />
-              )}
-              <SearchFilter
-                title="Status"
-                data={StatusFilterData}
-                setData={setSearchStatus}
-              />
-            </div>
-            <div className="flex gap-2">
-              <NewObservationFrom refetch={refetch} />
-              <Button
-                variant="destructive"
-                size="default"
-                disabled={selectedIds.length === 0}
-                onClick={() => handleDelete(selectedIds.map((id) => id))}
-                className="gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete ({selectedIds.length})
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <ObservationFilter
+        search={search}
+        setSearch={handleSetSearch}
+        searchTags={searchTags}
+        setSearchTags={handleSetSearchTags}
+        searchUsers={searchUsers}
+        setSearchUsers={handleSetSearchUsers}
+        searchStatus={searchStatus}
+        setSearchStatus={handleSetSearchStatus}
+        selectedIds={selectedIds}
+        tagFilterData={tagFilterData}
+        userFilterData={userFilterData}
+        statusFilterData={statusFilterData}
+        observationsCount={data?.count || 0}
+        isAdmin={isAdmin}
+        refetch={refetch}
+        onDelete={handleDelete}
+      />
 
-      <Card>
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={observations}
-            setSelectedIds={setSelectedIds}
-          />
-          {observations.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-muted-foreground">
-                {search ||
-                searchTags.length > 0 ||
-                searchUsers.length > 0 ||
-                searchStatus.length > 0
-                  ? "No observations match your current filters"
-                  : "No observations added yet"}
-              </div>
-              <div className="mt-4">
-                <NewObservationFrom refetch={refetch} />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="flex items-center justify-end space-x-2">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <Button
-                variant="ghost"
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1 || !data?.previous}
-                aria-label="Previous Page"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") setPage(page - 1);
-                }}
-              >
-                Previous
-              </Button>
-            </PaginationItem>
-
-            {PaginationItems(page, data?.total || 1, setPage, page)}
-
-            <PaginationItem>
-              <Button
-                variant="ghost"
-                onClick={() => setPage(page + 1)}
-                disabled={!data?.next}
-                aria-label="Next Page"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") setPage(page + 1);
-                }}
-              >
-                Next
-              </Button>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      {observations && (
+        <ObservationTableView
+          key={dataKey}
+          observations={observations}
+          page={page}
+          setPage={handleSetPage}
+          setSelectedIds={handleSetSelectedIds}
+          hasNext={!!data?.next}
+          hasPrevious={!!data?.previous}
+          totalPages={data?.total || 1}
+          search={search}
+          searchTags={searchTags}
+          searchUsers={searchUsers}
+          searchStatus={searchStatus}
+          refetch={refetch}
+        />
+      )}
     </div>
   );
 }
