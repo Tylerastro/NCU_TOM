@@ -53,4 +53,4 @@ class FullUserSerializer(serializers.ModelSerializer):
         return [target.id for target in user.targets.all()]
 
     def get_observations(self, user):
-        return [observation.id for observation in user.observations.all()]
+        return [observation.id for observation in user.observations.filter(deleted_at__isnull=True)]

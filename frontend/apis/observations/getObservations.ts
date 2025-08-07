@@ -6,7 +6,6 @@ interface GetObservationsOptions {
   name?: string;
   page?: number;
   pageSize?: number;
-  tags?: number[];
   users?: number[];
   status?: number[];
 }
@@ -15,7 +14,6 @@ export const getObservations = async ({
   name,
   page,
   pageSize,
-  tags,
   users,
   status,
 }: GetObservationsOptions): Promise<Paginator> => {
@@ -30,9 +28,6 @@ export const getObservations = async ({
     }
     if (pageSize !== undefined) {
       params.page_size = pageSize.toString();
-    }
-    if (tags && tags.length > 0) {
-      params.tags = tags.join(",");
     }
     if (users && users.length > 0) {
       params.users = users.join(",");

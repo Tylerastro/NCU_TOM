@@ -3,19 +3,23 @@ import AstronomicalObservations from "@/components/data-products/DataOverview";
 
 export default function DataProducts() {
   return (
-    <main>
-      <div className="flex space-between justify-between">
-        <header className=" px-4 py-3 sm:px-6">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
-              Datasets
-            </h1>
-          </div>
-        </header>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Data Products
+          </h1>
+          <p className="text-muted-foreground">
+            Explore astronomical datasets and observational results
+          </p>
+        </div>
       </div>
-      <Events />
-      <AstronomicalObservations />
-      {/* <EarthAnimation /> */}
-    </main>
+
+      <div className="space-y-6">
+        <Events />
+        <AstronomicalObservations />
+        {/* <EarthAnimation /> */}
+      </div>
+    </div>
   );
 }

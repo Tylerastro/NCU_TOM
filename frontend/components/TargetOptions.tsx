@@ -53,7 +53,7 @@ export const TargetOptions: React.FC<TargetOptionsProps> = forwardRef(
     const { data, refetch } = useQuery({
       queryKey: ["targets", 1, search],
       queryFn: () =>
-        getTargets({ page: 1, name: search, tags: [], pageSize: 100 }),
+        getTargets({ page: 1, name: search, pageSize: 100 }),
       select: (data) =>
         data.results
           .filter((target) => target.user?.username === session?.user.username)

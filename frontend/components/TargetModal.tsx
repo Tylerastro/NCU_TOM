@@ -41,7 +41,6 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
         while (hasMore) {
           const response = await getTargets({
             page: currentPage,
-            tags: [],
             pageSize: 100,
           });
 

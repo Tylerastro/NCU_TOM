@@ -1,5 +1,4 @@
 "use client";
-import { getTags } from "@/apis/tags/getTags";
 import { deleteTargets } from "@/apis/targets/deleteTargets";
 import { getTargets } from "@/apis/targets/getTargets";
 import useDebounce from "@/components/Debounce";
@@ -15,7 +14,6 @@ export default function TargetTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const debounceSearch = useDebounce(search, 300);
-  const [searchTags, setSearchTags] = useState<number[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Stable callbacks to prevent unnecessary re-renders
@@ -23,9 +21,6 @@ export default function TargetTable() {
     setSearch(newSearch);
   }, []);
 
-  const handleSetSearchTags = useCallback((newTags: number[]) => {
-    setSearchTags(newTags);
-  }, []);
 
   const handleSetSelectedIds = useCallback((value: React.SetStateAction<number[]>) => {
     setSelectedIds(value);
@@ -36,13 +31,12 @@ export default function TargetTable() {
   }, []);
 
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ["targets", page, debounceSearch, searchTags],
+    queryKey: ["targets", page, debounceSearch],
     queryFn: async () => {
       try {
         const response = await getTargets({
           page,
           name: search,
-          tags: searchTags,
         });
         return response;
       } catch (error: any) {
@@ -56,11 +50,6 @@ export default function TargetTable() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: tagData } = useQuery({
-    queryKey: ["tags"],
-    queryFn: () => getTags(),
-    refetchOnWindowFocus: false,
-  });
 
   const handleDelete = useCallback(
     async (ids: number[]) => {
@@ -75,21 +64,10 @@ export default function TargetTable() {
     [refetch]
   );
 
-  const tagFilterData = useMemo(
-    () =>
-      tagData
-        ?.filter((tag) => tag.targets.length > 0)
-        .map((tag) => ({
-          label: tag.name,
-          value: tag.targets.length,
-          id: tag.id || 0,
-        })) || [],
-    [tagData]
-  );
 
   useEffect(() => {
     setPage(1);
-  }, [search, searchTags]);
+  }, [search]);
 
   const targets = data?.results as Target[];
 
@@ -103,10 +81,7 @@ export default function TargetTable() {
       <TargetFilter
         search={search}
         setSearch={handleSetSearch}
-        searchTags={searchTags}
-        setSearchTags={handleSetSearchTags}
         selectedIds={selectedIds}
-        tagFilterData={tagFilterData}
         targetsCount={data?.count || 0}
         refetch={refetch}
         onDelete={handleDelete}
@@ -123,7 +98,6 @@ export default function TargetTable() {
           hasPrevious={!!data?.previous}
           totalPages={data?.total || 1}
           search={search}
-          searchTags={searchTags}
           refetch={refetch}
         />
       )}

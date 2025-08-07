@@ -8,7 +8,7 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { Observation } from "@/models/observations";
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 import { NewObservationFrom } from "./createObservation";
 import { DataTable } from "./dataTable";
 
@@ -21,7 +21,6 @@ interface ObservationTableViewProps {
   hasPrevious: boolean;
   totalPages: number;
   search: string;
-  searchTags: number[];
   searchUsers: number[];
   searchStatus: number[];
   refetch: () => void;
@@ -36,19 +35,18 @@ export default function ObservationTableView({
   hasPrevious,
   totalPages,
   search,
-  searchTags,
   searchUsers,
   searchStatus,
   refetch,
 }: ObservationTableViewProps) {
-  const hasFilters = search || searchTags.length > 0 || searchUsers.length > 0 || searchStatus.length > 0;
+  const hasFilters = search || searchUsers.length > 0 || searchStatus.length > 0;
 
   return (
     <div className="animate-in fade-in-0 duration-300">
       <Card>
         <CardContent>
           <DataTable
-            columns={columns}
+            columns={getColumns(refetch)}
             data={observations}
             setSelectedIds={setSelectedIds}
           />

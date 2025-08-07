@@ -13,10 +13,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { BookCopy } from "lucide-react";
+import { toast } from "sonner";
 
 import Link from "next/link";
 
-export const columns: ColumnDef<Observation>[] = [
+export const getColumns = (refetch: () => void): ColumnDef<Observation>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -178,8 +179,20 @@ export const columns: ColumnDef<Observation>[] = [
     header: "Duplicate",
     cell(props) {
       const id: number = props.row.getValue("id");
+      
+      const handleDuplicate = async () => {
+        try {
+          const response = await duplicateObservation(id);
+          await refetch();
+          toast.success(response.message || "Observation duplicated successfully");
+        } catch (error) {
+          console.error("Error duplicating observation:", error);
+          toast.error("Failed to duplicate observation");
+        }
+      };
+
       return (
-        <Button onClick={() => duplicateObservation(id)} variant="ghost">
+        <Button onClick={handleDuplicate} variant="ghost">
           <BookCopy className="h-4 w-4" />
         </Button>
       );

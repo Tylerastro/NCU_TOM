@@ -7,7 +7,6 @@ import { putTarget } from "@/apis/targets/putTarget";
 import { PutTarget, Target } from "@/models/targets";
 import { CoordCard, ExternalLinksCard, SimbadCard } from "./cards";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -233,26 +232,6 @@ export default function Overview({
           </Card>
         )}
 
-        {isLoading ? (
-          <TagsCardSkeleton />
-        ) : (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="font-medium">Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {target?.tags && target?.tags?.length > 0 ? (
-                target?.tags?.map((tag) => (
-                  <Badge key={tag.id} className="mr-1">
-                    {tag.name}
-                  </Badge>
-                ))
-              ) : (
-                <div className="font-medium">No tags found</div>
-              )}
-            </CardContent>
-          </Card>
-        )}
 
         {isLoading ? (
           <CoordCardSkeleton />

@@ -1,5 +1,4 @@
 "use client";
-import SearchFilter from "@/components/SearchFilter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,10 +14,7 @@ import { Search, Filter, Trash2 } from "lucide-react";
 interface TargetFilterProps {
   search: string;
   setSearch: (search: string) => void;
-  searchTags: number[];
-  setSearchTags: (tags: number[]) => void;
   selectedIds: number[];
-  tagFilterData: Array<{ label: string; value: number; id: number }>;
   targetsCount: number;
   refetch: () => void;
   onDelete: (ids: number[]) => void;
@@ -27,10 +23,7 @@ interface TargetFilterProps {
 export default function TargetFilter({
   search,
   setSearch,
-  searchTags,
-  setSearchTags,
   selectedIds,
-  tagFilterData,
   targetsCount,
   refetch,
   onDelete,
@@ -59,11 +52,6 @@ export default function TargetFilter({
               />
             </div>
           </div>
-          <SearchFilter
-            title="Tags"
-            data={tagFilterData}
-            setData={setSearchTags}
-          />
           <div className="flex gap-2">
             <NewTargetFrom refetch={refetch} />
             <Button

@@ -5,14 +5,12 @@ interface GetTargetsOptions {
   page?: number;
   pageSize?: number;
   name?: string;
-  tags?: number[];
 }
 
 export const getTargets = async ({
   page,
   pageSize,
   name,
-  tags,
 }: GetTargetsOptions): Promise<Paginator> => {
   try {
     const params: Record<string, string> = {};
@@ -22,9 +20,6 @@ export const getTargets = async ({
     }
     if (name) {
       params.name = name;
-    }
-    if (tags && tags.length > 0) {
-      params.tags = tags.join(",");
     }
     if (pageSize) {
       params.page_size = pageSize.toString();

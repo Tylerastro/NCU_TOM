@@ -1,5 +1,4 @@
 import { createObservation } from "@/apis/observations/createObservation";
-import { TagOptions } from "@/components/TagOptions";
 import TargetModal from "@/components/TargetModal";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -44,9 +43,6 @@ import { z } from "zod";
 
 export function NewObservationFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = React.useState(false);
-  const [selectedTags, setSelectedTags] = React.useState<
-    z.infer<typeof formSchema>["tags"]
-  >([]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // * UI is using observatory local time,
@@ -80,13 +76,6 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
     targets: z.array(z.number()).min(1, { message: "Please select targets" }),
     start_date: z.date(),
     end_date: z.date(),
-    tags: z.array(
-      z.object({
-        name: z.string(),
-        targets: z.array(z.number()),
-        observations: z.array(z.number()),
-      })
-    ),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -98,7 +87,6 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
       targets: [],
       start_date: new Date(),
       end_date: addDays(new Date(), 1),
-      tags: selectedTags,
     },
   });
 
@@ -199,20 +187,6 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                   </FormLabel>
                   <FormControl>
                     <TargetModal {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="tags"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Tags
-                  </FormLabel>
-                  <FormControl>
-                    <TagOptions {...field} />
                   </FormControl>
                 </FormItem>
               )}

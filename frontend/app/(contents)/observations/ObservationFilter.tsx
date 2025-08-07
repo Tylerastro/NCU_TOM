@@ -15,14 +15,11 @@ import { Search, Filter, Trash2 } from "lucide-react";
 interface ObservationFilterProps {
   search: string;
   setSearch: (search: string) => void;
-  searchTags: number[];
-  setSearchTags: (tags: number[]) => void;
   searchUsers: number[];
   setSearchUsers: (users: number[]) => void;
   searchStatus: number[];
   setSearchStatus: (status: number[]) => void;
   selectedIds: number[];
-  tagFilterData: Array<{ label: string; value: number; id: number }>;
   userFilterData: Array<{ label: string; value: number; id: number }>;
   statusFilterData: Array<{ label: string; value: number; id: number }>;
   observationsCount: number;
@@ -34,14 +31,11 @@ interface ObservationFilterProps {
 export default function ObservationFilter({
   search,
   setSearch,
-  searchTags,
-  setSearchTags,
   searchUsers,
   setSearchUsers,
   searchStatus,
   setSearchStatus,
   selectedIds,
-  tagFilterData,
   userFilterData,
   statusFilterData,
   observationsCount,
@@ -74,11 +68,6 @@ export default function ObservationFilter({
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <SearchFilter
-              title="Tags"
-              data={tagFilterData}
-              setData={setSearchTags}
-            />
             {isAdmin && (
               <SearchFilter
                 title="Users"

@@ -3,7 +3,6 @@ import { deleteObservation } from "@/apis/observations/deleteObservation";
 import { getObservationStats } from "@/apis/observations/getObservationStats";
 import { getObservations } from "@/apis/observations/getObservations";
 import { getUserList } from "@/apis/system/getUserList";
-import { getTags } from "@/apis/tags/getTags";
 import useDebounce from "@/components/Debounce";
 import { createDataHash } from "@/components/utils";
 import { UserRole } from "@/models/enums";
@@ -19,7 +18,6 @@ export default function ObservationTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const debounceSearch = useDebounce(search, 300);
-  const [searchTags, setSearchTags] = useState<number[]>([]);
   const [searchUsers, setSearchUsers] = useState<number[]>([]);
   const [searchStatus, setSearchStatus] = useState<number[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -32,9 +30,6 @@ export default function ObservationTable() {
     setSearch(newSearch);
   }, []);
 
-  const handleSetSearchTags = useCallback((newTags: number[]) => {
-    setSearchTags(newTags);
-  }, []);
 
   const handleSetSearchUsers = useCallback((newUsers: number[]) => {
     setSearchUsers(newUsers);
@@ -57,7 +52,6 @@ export default function ObservationTable() {
       "observations",
       page,
       debounceSearch,
-      searchTags,
       searchUsers,
       searchStatus,
     ],
@@ -66,7 +60,6 @@ export default function ObservationTable() {
         const response = await getObservations({
           page,
           name: debounceSearch,
-          tags: searchTags,
           users: searchUsers,
           status: searchStatus,
         });
@@ -82,11 +75,6 @@ export default function ObservationTable() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: tagData } = useQuery({
-    queryKey: ["tags"],
-    queryFn: () => getTags(),
-    refetchOnWindowFocus: false,
-  });
 
   const { data: userData } = useQuery({
     queryKey: ["users"],
@@ -114,17 +102,6 @@ export default function ObservationTable() {
     [refetch]
   );
 
-  const tagFilterData = useMemo(
-    () =>
-      tagData
-        ?.filter((tag) => tag.observations.length > 0)
-        .map((tag) => ({
-          label: tag.name,
-          value: tag.observations.length,
-          id: tag.id || 0,
-        })) || [],
-    [tagData]
-  );
 
   const statusFilterData = useMemo(
     () =>
@@ -150,7 +127,7 @@ export default function ObservationTable() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, searchTags, searchUsers, searchStatus]);
+  }, [search, searchUsers, searchStatus]);
 
   const observations = data?.results as Observation[];
 
@@ -164,14 +141,11 @@ export default function ObservationTable() {
       <ObservationFilter
         search={search}
         setSearch={handleSetSearch}
-        searchTags={searchTags}
-        setSearchTags={handleSetSearchTags}
         searchUsers={searchUsers}
         setSearchUsers={handleSetSearchUsers}
         searchStatus={searchStatus}
         setSearchStatus={handleSetSearchStatus}
         selectedIds={selectedIds}
-        tagFilterData={tagFilterData}
         userFilterData={userFilterData}
         statusFilterData={statusFilterData}
         observationsCount={data?.count || 0}
@@ -191,7 +165,6 @@ export default function ObservationTable() {
           hasPrevious={!!data?.previous}
           totalPages={data?.total || 1}
           search={search}
-          searchTags={searchTags}
           searchUsers={searchUsers}
           searchStatus={searchStatus}
           refetch={refetch}

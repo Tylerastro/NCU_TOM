@@ -1,5 +1,5 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
-import { Comments, Tag, User } from "./helpers";
+import { Comments, User } from "./helpers";
 import { LulinTarget, SimpleTarget, Target } from "./targets";
 export interface Observation {
   id: number;
@@ -12,7 +12,6 @@ export interface Observation {
   end_date: Date;
   created_at?: Date;
   updated_at?: Date;
-  tags: Tag[];
   comments: Comments[];
   targets?: Target[];
   code?: string;
@@ -25,7 +24,6 @@ export interface NewObservation {
   status?: number;
   start_date: Date;
   end_date: Date;
-  tags: Tag[];
   targets?: number[];
   code?: string;
 }
@@ -77,7 +75,6 @@ export interface ObservationUpdate {
   end_date?: Date;
   created_at?: Date;
   updated_at?: Date;
-  tags?: Tag[];
   targets?: number[];
   code?: string;
 }

@@ -1,5 +1,4 @@
 import { putObservation } from "@/apis/observations/putObservation";
-import { TagOptions } from "@/components/TagOptions";
 import TargetModal from "@/components/TargetModal";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";

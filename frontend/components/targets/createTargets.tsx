@@ -1,6 +1,5 @@
 "use client";
 import { createTarget } from "@/apis/targets/createTarget";
-import { TagOptions } from "@/components/TagOptions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -40,9 +39,6 @@ import FileUpload from "./fileUpload";
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<
-    z.infer<typeof formSchema>["tags"]
-  >([]);
 
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof formSchema>) => {
@@ -79,20 +75,12 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
         .min(-90)
         .max(90)
     ),
-    tags: z.array(
-      z.object({
-        name: z.string(),
-        targets: z.array(z.number()),
-        observations: z.array(z.number()),
-      })
-    ),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      tags: selectedTags,
     },
   });
 
@@ -237,20 +225,6 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="tags"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary-foreground">
-                    Tags
-                  </FormLabel>
-                  <FormControl>
-                    <TagOptions {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
             <div className="text-center w-full">
               <Button
                 className="w-full text-primary-foreground bg-primary"

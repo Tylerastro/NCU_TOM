@@ -21,7 +21,6 @@ interface TargetTableViewProps {
   hasPrevious: boolean;
   totalPages: number;
   search: string;
-  searchTags: number[];
   refetch: () => void;
 }
 
@@ -34,7 +33,6 @@ export default function TargetTableView({
   hasPrevious,
   totalPages,
   search,
-  searchTags,
   refetch,
 }: TargetTableViewProps) {
   return (
@@ -49,7 +47,7 @@ export default function TargetTableView({
           {targets.length === 0 && (
             <div className="text-center py-12">
               <div className="text-muted-foreground">
-                {search || searchTags.length > 0
+                {search
                   ? "No targets match your current filters"
                   : "No targets added yet"}
               </div>

@@ -206,16 +206,16 @@ class ObservationStatsSerializer(serializers.Serializer):
     status_counts = serializers.ListField(child=serializers.DictField())
 
     def get_total_observations(self):
-        return Observation.objects.count()
+        return Observation.objects.filter(deleted_at__isnull=True).count()
 
     def get_total_targets(self):
-        return Observation.objects.values('targets').distinct().count()
+        return Observation.objects.filter(deleted_at__isnull=True).values('targets').distinct().count()
 
     def get_total_users(self):
-        return Observation.objects.values('user').distinct().count()
+        return Observation.objects.filter(deleted_at__isnull=True).values('user').distinct().count()
 
     def get_observatory_counts(self):
-        counts = Observation.objects.values(
+        counts = Observation.objects.filter(deleted_at__isnull=True).values(
             'observatory').annotate(count=Count('observatory'))
         return [
             {
@@ -226,7 +226,7 @@ class ObservationStatsSerializer(serializers.Serializer):
         ]
 
     def get_priority_counts(self):
-        counts = Observation.objects.values(
+        counts = Observation.objects.filter(deleted_at__isnull=True).values(
             'priority').annotate(count=Count('priority'))
 
         priority_map = dict(Priorities.choices)
@@ -240,7 +240,7 @@ class ObservationStatsSerializer(serializers.Serializer):
         ]
 
     def get_status_counts(self):
-        counts = Observation.objects.values(
+        counts = Observation.objects.filter(deleted_at__isnull=True).values(
             'status').annotate(count=Count('status'))
         status_map = dict(Observation.statuses.choices)
         return [

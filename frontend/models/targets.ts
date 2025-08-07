@@ -1,5 +1,5 @@
 // models.ts or apiTypes.ts (choose a suitable location for your types)
-import { Tag, User } from "./helpers";
+import { User } from "./helpers";
 import { Observation } from "./observations";
 
 export interface SimpleTarget {
@@ -21,7 +21,6 @@ export interface Target {
   redshift?: number;
   created_at?: Date;
   updated_at?: Date;
-  tags: Tag[];
   observations?: Observation[];
   notes?: string;
 }
@@ -36,7 +35,6 @@ export interface LulinTarget {
   redshift?: number;
   created_at?: Date;
   updated_at?: Date;
-  tags: Tag[];
   observations?: Observation[];
   notes?: string;
 }
@@ -44,7 +42,6 @@ export interface LulinTarget {
 export interface PutTarget {
   ra: number;
   dec: number;
-  tags: Tag[];
 }
 interface AltAzData {
   time: string;

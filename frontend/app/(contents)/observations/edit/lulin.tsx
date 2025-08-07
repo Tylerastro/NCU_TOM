@@ -17,10 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinRuns, Observation } from "@/models/observations";
+import { Comments } from "@/models/helpers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { EditObservationFrom } from "./editObservationForm";
 
 import CodeBlock from "./codeblock";
@@ -28,6 +30,7 @@ import CommentsList from "./commentsList";
 import DatePickerBadges from "./DatePickerBadge";
 import LulinData from "./lulinData";
 import { NewLulinRun } from "./newlulinForm";
+import SubmitSection from "./submitSection";
 
 function LoadingSkeleton() {
   return (
@@ -69,7 +72,9 @@ export default function LulinPage(props: { observation_id: number }) {
   const [codeUpdate, setCodeUpdate] = useState(false);
   const [isDateExpired, setIsDateExpired] = useState(false);
   const [ignoretimes, setIgnoreTimes] = useState(0);
+  const [localComments, setLocalComments] = useState<Comments[]>([]);
   const router = useRouter();
+  const { data: session } = useSession();
 
   // fetch data
   const { data: observation, isFetching: observationIsFetching } = useQuery({
@@ -97,6 +102,48 @@ export default function LulinPage(props: { observation_id: number }) {
   const queryClient = useQueryClient();
   const refreshAllData = () => {
     queryClient.invalidateQueries({ queryKey: ["getVisibilityData"] });
+  };
+
+  const refreshObservationData = () => {
+    queryClient.invalidateQueries({ queryKey: ["getObservation", props.observation_id] });
+  };
+
+  // Sync local comments with observation data
+  useEffect(() => {
+    if (observation?.comments) {
+      setLocalComments(observation.comments);
+    }
+  }, [observation?.comments]);
+
+  // Background sync - refresh observation data every 30 seconds to keep data consistent
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ 
+        queryKey: ["getObservation", props.observation_id],
+        refetchType: 'none' // Don't refetch immediately, just mark as stale
+      });
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [queryClient, props.observation_id]);
+
+  // Function to add comment optimistically
+  const addCommentOptimistically = (commentText: string) => {
+    const currentUser = session?.user;
+    const newComment: Comments = {
+      id: Date.now(), // Temporary ID
+      context: commentText,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      user: {
+        id: currentUser?.id || 0,
+        username: currentUser?.username || "Anonymous",
+        institute: currentUser?.institute || "",
+        title: 0, // Default value as UserProfile doesn't have title
+        role: currentUser?.role || 0,
+      },
+    };
+    setLocalComments(prev => [...prev, newComment]);
   };
 
   useEffect(() => {
@@ -168,70 +215,119 @@ export default function LulinPage(props: { observation_id: number }) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="container mx-auto px-4 h-200 max-h-200 w-full">
-        <div className="py-6">
-          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
-            Edit your observation
-          </h1>
-          {observationIsFetching ? (
-            <LoadingSkeleton />
-          ) : (
-            <div className="flex items-center pt-3 space-x-2 gap-2">
-              <span className="text-2xl font-bold tracking-tight lg:text-2xl text-primary-foreground">
-                <EditObservationFrom
-                  pk={observation?.id}
-                  observation={observation}
+      <div className="container mx-auto px-4 max-w-7xl">
+        {/* Header Section - Improved visual hierarchy */}
+        <div className="py-6 border-b border-border/40">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground mb-2">
+                Edit Observation
+              </h1>
+              {observationIsFetching ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="flex flex-wrap items-center gap-3">
+                  <EditObservationFrom
+                    pk={observation?.id}
+                    observation={observation}
+                  />
+                  <DatePickerBadges
+                    observation={{
+                      id: observation?.id,
+                      start_date: observation?.start_date,
+                      end_date: observation?.end_date,
+                    }}
+                    onDateChange={refreshAllData}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 py-6">
+          {/* Left Column - Primary content */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Visibility Chart Section */}
+            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
+              <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
+                Visibility Chart
+              </h2>
+              {isFetching ? (
+                <LoadingSkeleton />
+              ) : (
+                <VisibilityChart
+                  observation_id={props.observation_id}
+                  airmass={true}
                 />
-              </span>
-              <DatePickerBadges
-                observation={{
-                  id: observation?.id,
-                  start_date: observation?.start_date,
-                  end_date: observation?.end_date,
-                }}
-                onDateChange={refreshAllData}
+              )}
+            </div>
+
+            {/* Observation Runs Section */}
+            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-primary-foreground">
+                  Observation Runs
+                </h2>
+                <Sheet modal={true}>
+                  <SheetTrigger asChild>
+                    <Button size="sm" className="gap-2">
+                      <span className="text-lg">+</span> Add Run
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <NewLulinRun observation={observation} refetch={refetch} />
+                  </SheetContent>
+                </Sheet>
+              </div>
+              <LulinData
+                observation_id={props.observation_id}
+                data={lulinObservations}
+                setCodeUpdate={setCodeUpdate}
+                refetch={refetch}
               />
             </div>
-          )}
-        </div>
 
-        {isFetching ? (
-          <LoadingSkeleton />
-        ) : (
-          <VisibilityChart
-            observation_id={props.observation_id}
-            airmass={true}
-          />
-        )}
+            {/* Code Block Section */}
+            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
+              <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
+                Generated Code
+              </h2>
+              <CodeBlock
+                observation_id={props.observation_id}
+                codeUpdate={codeUpdate}
+                setCodeUpdate={setCodeUpdate}
+              />
+            </div>
+          </div>
 
-        <div className="flex flex-col items-center py-4">
-          <LulinData
-            observation_id={props.observation_id}
-            data={lulinObservations}
-            setCodeUpdate={setCodeUpdate}
-            refetch={refetch}
-          />
-          <Sheet modal={true}>
-            <SheetTrigger asChild className="w-full">
-              <Button className="w-full"> + </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <NewLulinRun observation={observation} refetch={refetch} />
-            </SheetContent>
-          </Sheet>
-        </div>
+          {/* Right Column - Secondary content */}
+          <div className="xl:col-span-1 space-y-6">
+            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
+              <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
+                Comments & Notes
+              </h2>
+              <CommentsList
+                comments={localComments}
+                observationId={props.observation_id}
+              />
+            </div>
 
-        <CodeBlock
-          observation_id={props.observation_id}
-          codeUpdate={codeUpdate}
-          setCodeUpdate={setCodeUpdate}
-        />
-
-        <div className="mt-10 mb-12">
-          <CommentsList
-            comments={observation?.comments}
-            observationId={props.observation_id}
-          />
+            {/* Submit Section - Moved closer to comments */}
+            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
+              <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
+                Submit & Finalize
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Review your observation data and submit when ready.
+              </p>
+              <SubmitSection 
+                observation_id={props.observation_id} 
+                onCommentAdded={addCommentOptimistically}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>
