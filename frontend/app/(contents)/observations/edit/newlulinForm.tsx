@@ -33,6 +33,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { handleApiError } from "@/utils/errorHandler";
 
 import { z } from "zod";
 
@@ -84,9 +85,7 @@ export function NewLulinRun({
         refetch();
       })
       .catch((error) => {
-        for (const key in error.data) {
-          toast.error(`${key}: ${error.data[key][0]}`);
-        }
+        handleApiError(error);
       });
   }
 

@@ -57,7 +57,7 @@ export function TextareaForm({ observationId }: { observationId: number }) {
                 <FormControl>
                   <Textarea
                     placeholder="Leave a comment on this observation"
-                    className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                    className="w-full border border-gray-300 px-4 py-2 focus:outline-hidden focus:ring-2 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                     {...field}
                   />
                 </FormControl>

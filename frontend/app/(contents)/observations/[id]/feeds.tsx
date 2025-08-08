@@ -41,7 +41,7 @@ export default function Feeds(props: { observation_id: number }) {
                 height={40}
               />
             </span>
-            <div className="items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex dark:bg-gray-700 dark:border-gray-600">
+            <div className="items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-xs sm:flex dark:bg-gray-700 dark:border-gray-600">
               <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">
                 {comment.updated_at}
               </time>

@@ -1,8 +1,65 @@
 from rest_framework import serializers
+from rest_framework.response import Response
+from django.core.exceptions import ValidationError as DjangoValidationError
 from system.models import User
 from system.serializers import UserBaseSerializer
 
 from .models import Announcement, Comments, Tags
+
+
+class StandardErrorSerializer:
+    """Utility class for consistent error response formatting"""
+    
+    @staticmethod
+    def format_validation_errors(serializer_errors):
+        """Convert DRF serializer errors to standard format"""
+        return serializer_errors
+    
+    @staticmethod
+    def format_custom_error(message, code=None, field=None):
+        """Format custom error messages consistently"""
+        if field:
+            return {field: [message]}
+        return {"non_field_errors": [message]}
+    
+    @staticmethod
+    def format_permission_error(message="You're not authorized to perform this action"):
+        """Standard permission error format"""
+        return {"detail": message}
+    
+    @staticmethod
+    def format_not_found_error(resource="Resource"):
+        """Standard not found error format"""
+        return {"detail": f"{resource} not found"}
+
+
+class ErrorResponseMixin:
+    """Mixin for consistent error responses across all views"""
+    
+    def error_response(self, errors, status_code=400):
+        """Return standardized error response"""
+        if isinstance(errors, str):
+            data = StandardErrorSerializer.format_custom_error(errors)
+        else:
+            data = errors
+        return Response(data, status=status_code)
+    
+    def validation_error_response(self, serializer):
+        """Return validation error response from serializer"""
+        return Response(
+            StandardErrorSerializer.format_validation_errors(serializer.errors),
+            status=400
+        )
+    
+    def permission_error_response(self, message=None):
+        """Return permission denied response"""
+        error_data = StandardErrorSerializer.format_permission_error(message)
+        return Response(error_data, status=403)
+    
+    def not_found_error_response(self, resource="Resource"):
+        """Return not found response"""
+        error_data = StandardErrorSerializer.format_not_found_error(resource)
+        return Response(error_data, status=404)
 
 
 class UserSerializer(serializers.ModelSerializer):

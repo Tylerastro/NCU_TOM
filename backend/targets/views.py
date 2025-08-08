@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from helpers.paginator import Pagination
+from helpers.serializers import ErrorResponseMixin
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -27,7 +28,7 @@ from .vizier import VizierService
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class TargetsView(APIView):
+class TargetsView(APIView, ErrorResponseMixin):
     serializer_class = TargetPostSerializer
     paginator = Pagination()
 
@@ -82,13 +83,13 @@ class TargetsView(APIView):
                     {'error': 'Database integrity error occurred.'},
                     status=400
                 )
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
     @extend_schema(request=DeleteTargetSerializer,)
     def delete(self, request):
         serializer = DeleteTargetSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
+            return self.validation_error_response(serializer)
         try:
             target_ids = serializer.validated_data['target_ids']
 
@@ -106,7 +107,7 @@ class TargetsView(APIView):
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class TargetDetailView(APIView):
+class TargetDetailView(APIView, ErrorResponseMixin):
     @extend_schema(operation_id='Get Single Target')
     def get(self, request, pk):
         if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
@@ -137,7 +138,7 @@ class TargetDetailView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
 @api_view(['POST'])
@@ -191,7 +192,7 @@ def get_moon_altaz(request):
     if serializer.is_valid():
         return Response(serializer.validated_data)
     else:
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
 def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
@@ -210,7 +211,7 @@ def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
     if serializer.is_valid():
         return serializer.data
     else:
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
 @extend_schema(request=None, responses=TargetSimbadDataSerializer)
@@ -229,9 +230,9 @@ def get_target_simbad(request, pk: int):
         if serializer.is_valid():
             return Response(serializer.data)
         else:
-            return Response(serializer.errors, status=400)
+            return self.validation_error_response(serializer)
     else:
-        return Response({"error": "Target not found."}, status=404)
+        return self.not_found_error_response("Target")
 
 
 @extend_schema(request=None, responses=TargetSEDSerializer)
@@ -248,4 +249,4 @@ def get_target_SED(request, pk: int):
     if serializer.is_valid():
         return Response(serializer.data, status=200)
     else:
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)

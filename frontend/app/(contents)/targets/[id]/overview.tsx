@@ -2,6 +2,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { lazy, useEffect, useState, Suspense } from "react";
 import { toast } from "sonner";
+import { handleApiError } from "@/utils/errorHandler";
 
 import { putTarget } from "@/apis/targets/putTarget";
 import { PutTarget, Target } from "@/models/targets";
@@ -140,21 +141,7 @@ export default function Overview({
       setIsEditing(false);
     },
     onError: (error: any) => {
-      if (error.response) {
-        toast.error(
-          error.response.data.detail ||
-            "An error occurred while updating the target"
-        );
-      } else {
-        toast.error(
-          error.message || "An error occurred while updating the target"
-        );
-      }
-      if (error.response && error.response.data) {
-        for (const key in error.response.data) {
-          toast.error(`${key}: ${error.response.data[key][0]}`);
-        }
-      }
+      handleApiError(error, "An error occurred while updating the target");
     },
   });
 

@@ -13,7 +13,19 @@ export interface PaginatedResponse<T = any> {
   results: T[];
 }
 
+// Standardized error interfaces matching DRF format
+export interface ValidationErrors {
+  [fieldName: string]: string[] | ValidationErrors;
+  non_field_errors?: string[];
+}
+
 export interface ApiError {
+  detail?: ValidationErrors | string;
+  code?: string;
+}
+
+// Legacy interface for gradual migration
+export interface LegacyApiError {
   message: string;
   code?: string;
   details?: Record<string, any>;

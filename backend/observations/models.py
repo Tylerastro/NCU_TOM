@@ -77,8 +77,6 @@ class Observation(models.Model):
             if self.start_date >= self.end_date:
                 raise ValidationError("Start date must be before end date.")
 
-        if self.start_date and self.start_date < timezone.now():
-            raise ValidationError("Start date cannot be in the past.")
 
     def save(self, *args, **kwargs):
         if not self.name:

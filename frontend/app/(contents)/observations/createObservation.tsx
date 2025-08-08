@@ -203,7 +203,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                         <FormControl>
                           <Button
                             type="button"
-                            variant={"outline"}
+                            variant={"outline-solid"}
                             className={cn(
                               "w-[240px] pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
@@ -242,7 +242,7 @@ export function NewObservationFrom({ refetch }: { refetch: () => void }) {
                         <FormControl>
                           <Button
                             type="button"
-                            variant={"outline"}
+                            variant={"outline-solid"}
                             className={cn(
                               "w-[240px] pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"

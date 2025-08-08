@@ -46,8 +46,8 @@ export default function page() {
   return (
     <main>
       <section className="h-90vh" id="Developers">
-        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
-          <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
+        <div className="py-8 px-4 mx-auto max-w-(--breakpoint-xl) text-center lg:py-16 lg:px-6">
+          <div className="mx-auto mb-8 max-w-(--breakpoint-sm) lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
               Our team
             </h2>
@@ -81,8 +81,8 @@ export default function page() {
         </div>
       </section>
       <section className="h-90vh" id="Contributors">
-        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
-          <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
+        <div className="py-8 px-4 mx-auto max-w-(--breakpoint-xl) text-center lg:py-16 lg:px-6">
+          <div className="mx-auto mb-8 max-w-(--breakpoint-sm) lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
               Contributors
             </h2>
@@ -109,8 +109,8 @@ export default function page() {
         </div>
       </section>
       <section className="h-screen" id="Bugs">
-        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-6">
-          <div className="mx-auto mb-8 max-w-screen-sm lg:mb-16">
+        <div className="py-8 px-4 mx-auto max-w-(--breakpoint-xl) text-center lg:py-16 lg:px-6">
+          <div className="mx-auto mb-8 max-w-(--breakpoint-sm) lg:mb-16">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-primary-foreground">
               Found a bug? Report it!
             </h2>

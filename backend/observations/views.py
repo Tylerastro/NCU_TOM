@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 
 from helpers.models import Comments
 from helpers.paginator import Pagination
+from helpers.serializers import ErrorResponseMixin, StandardErrorSerializer
 from observations.lulin import LulinScheduler
 from system.models import User
 from system.permissions import IsActivated
@@ -27,7 +28,7 @@ from .serializers import (DeleteObservationSerializer, LulinGetSerializer,
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class ObservationsView(APIView):
+class ObservationsView(APIView, ErrorResponseMixin):
     serializer_class = ObservationGetSerializer
     paginator = Pagination()
 
@@ -82,12 +83,12 @@ class ObservationsView(APIView):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
     def delete(self, request):
         serializer = DeleteObservationSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
+            return self.validation_error_response(serializer)
         try:
             observation_ids = serializer.validated_data['observation_ids']
 
@@ -106,7 +107,7 @@ class ObservationsView(APIView):
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class ObservationDetailView(APIView):
+class ObservationDetailView(APIView, ErrorResponseMixin):
     serializer_class = ObservationGetSerializer
 
     @extend_schema(responses=ObservationGetSerializer, operation_id='Get Single Observation')
@@ -142,13 +143,13 @@ class ObservationDetailView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=200)
-            return Response(serializer.errors, status=400)
+            return self.validation_error_response(serializer)
         except ValidationError as e:
             return Response(e, status=400)
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class LulinView(APIView):
+class LulinView(APIView, ErrorResponseMixin):
     serializer_class = LulinGetSerializer
 
     @extend_schema(responses=LulinGetSerializer, operation_id='Get Lulin by observation')
@@ -193,11 +194,11 @@ class LulinView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class LulinDetailView(APIView):
+class LulinDetailView(APIView, ErrorResponseMixin):
     def _get_lulin_run(self, pk, user):
         if user.role in (User.roles.ADMIN, User.roles.FACULTY):
             return get_object_or_404(LulinRun, pk=pk)
@@ -215,7 +216,7 @@ class LulinDetailView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
     def delete(self, request, pk):
         lulin = self._get_lulin_run(pk, request.user)
@@ -224,7 +225,7 @@ class LulinDetailView(APIView):
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class LulinCodeView(APIView):
+class LulinCodeView(APIView, ErrorResponseMixin):
     @extend_schema(operation_id='Get or gen code for Lulin observation')
     def get(self, request, pk):
         service = LulinScheduler()
@@ -234,7 +235,7 @@ class LulinCodeView(APIView):
             else:
                 lulin = Observation.objects.get(pk=pk, user=request.user)
         except Observation.DoesNotExist:
-            return Response({"detail": "Observation not found"}, status=404)
+            return self.not_found_error_response("Observation")
 
         refresh = request.query_params.get('refresh')
         if refresh == 'true' or not lulin.code:
@@ -248,13 +249,13 @@ class LulinCodeView(APIView):
 @permission_classes((IsAuthenticated, IsActivated))
 def get_lulin_compiled_codes(request):
     if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
-        return Response({"detail": "Unauthorized"}, status=401)
+        return Response(StandardErrorSerializer.format_permission_error("Unauthorized"), status=403)
 
     service = LulinScheduler()
     start_date = request.query_params.get('start_date')
     end_date = request.query_params.get('end_date')
     if all([not start_date, not end_date]):
-        return Response({"detail": "start_date and end_date are required"}, status=400)
+        return Response(StandardErrorSerializer.format_custom_error("start_date and end_date are required"), status=400)
 
     return HttpResponse(service.get_codes(
         start_date, end_date), content_type='text/plain')
@@ -327,7 +328,7 @@ def duplicate_observation(request, pk):
 
 
 @permission_classes((IsAuthenticated, IsActivated))
-class ObservationMessagesView(APIView):
+class ObservationMessagesView(APIView, ErrorResponseMixin):
     serializer_class = ObservationGetSerializer
 
     def get(self, request, pk):
@@ -352,4 +353,4 @@ class ObservationMessagesView(APIView):
             serializer = ObservationGetSerializer(observation)
             return Response(serializer.data, status=200)
 
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)

@@ -1,7 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
+@config '../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 @layer base {
   :root {
@@ -61,154 +78,148 @@
 }
 
 
-body {
-  scroll-behavior: smooth;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-
-
-textarea:focus {
-  outline: none;
-  box-shadow: none;
-  border-color: transparent;
-}
-
-
-.loader {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-  border: 3px solid;
-  border-color: #FFF #FFF transparent;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
-}
-
-.loader2 {
-  position: relative;
-}
-
-.loader2:before,
-.loader2:after {
-  content: '';
-  width: 10px;
-  height: 10px;
-  display: block;
-  position: relative;
-  border-radius: 50%;
-  background: #fff;
-  animation: left 1s infinite ease-in-out;
-}
-
-.loader2:after {
-  background: #FF3D00;
-  animation: right 1s infinite ease-in-out;
-}
-
-
-@keyframes right {
-
-  0%,
-  100% {
-    transform: translate(-15px)
+@layer utilities {
+  body {
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
-  50% {
-    transform: translate(15px)
-  }
-}
-
-@keyframes left {
-
-  0%,
-  100% {
-    transform: translate(15px)
+  textarea:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
   }
 
-  50% {
-    transform: translate(-15px)
-  }
-}
-
-
-html {
-  scroll-behavior: smooth;
-}
-
-
-.loader::after {
-  content: '';
-  box-sizing: border-box;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  border: 3px solid;
-  border-color: transparent #FF3D00 #FF3D00;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  animation: rotationBack 0.5s linear infinite;
-  transform-origin: center center;
-}
-
-.CollapsibleContent {
-  overflow: hidden;
-}
-
-.CollapsibleContent[data-state='open'] {
-  animation: slideDown 300ms ease-out;
-}
-
-.CollapsibleContent[data-state='closed'] {
-  animation: slideUp 300ms ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    height: 0;
+  .loader {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    border: 3px solid;
+    border-color: #fff #fff transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
   }
 
-  to {
-    height: var(--radix-collapsible-content-height);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    height: var(--radix-collapsible-content-height);
+  .loader2 {
+    position: relative;
   }
 
-  to {
-    height: 0;
-  }
-}
-
-@keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rotationBack {
-  0% {
-    transform: rotate(0deg);
+  .loader2:before,
+  .loader2:after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    display: block;
+    position: relative;
+    border-radius: 50%;
+    background: #fff;
+    animation: left 1s infinite ease-in-out;
   }
 
-  100% {
-    transform: rotate(-360deg);
+  .loader2:after {
+    background: #ff3d00;
+    animation: right 1s infinite ease-in-out;
+  }
+
+  @keyframes right {
+    0%,
+    100% {
+      transform: translate(-15px);
+    }
+
+    50% {
+      transform: translate(15px);
+    }
+  }
+
+  @keyframes left {
+    0%,
+    100% {
+      transform: translate(15px);
+    }
+
+    50% {
+      transform: translate(-15px);
+    }
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .loader::after {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border: 3px solid;
+    border-color: transparent #ff3d00 #ff3d00;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: rotationBack 0.5s linear infinite;
+    transform-origin: center center;
+  }
+
+  .CollapsibleContent {
+    overflow: hidden;
+  }
+
+  .CollapsibleContent[data-state='open'] {
+    animation: slideDown 300ms ease-out;
+  }
+
+  .CollapsibleContent[data-state='closed'] {
+    animation: slideUp 300ms ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-collapsible-content-height);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: var(--radix-collapsible-content-height);
+    }
+
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes rotationBack {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(-360deg);
+    }
   }
 }
 

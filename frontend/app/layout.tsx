@@ -32,7 +32,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body
           className={cn(
-            "font-sans antialiased bg-gradient-to-b from-background to-secondary",
+            "font-sans antialiased bg-linear-to-b from-background to-secondary",
             gowunBatang.variable
           )}
         >

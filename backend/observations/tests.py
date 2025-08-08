@@ -69,19 +69,6 @@ class TestObservationModel(TestCase):
         self.assertTrue(
             'Start date must be before end date.' in str(context.exception))
 
-    def test_observation_creation_with_start_date_in_past(self):
-        start_date = timezone.now() - timedelta(hours=1)
-        end_date = start_date + timedelta(hours=5)
-
-        with self.assertRaises(ValidationError) as context:
-            Observation.objects.create(
-                user=self.user,
-                start_date=start_date,
-                end_date=end_date
-            )
-
-        self.assertTrue(
-            'Start date cannot be in the past.' in str(context.exception))
 
     def test_observation_str_method(self):
         observation = Observation.objects.create(

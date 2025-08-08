@@ -16,7 +16,7 @@ export default async function Component() {
 
   return (
     <div className="flex  flex-col min-h-90vh ">
-      <header className="px-4 pt-7 shadow-sm sm:px-6">
+      <header className="px-4 pt-7 shadow-xs sm:px-6">
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center justify-center">
             <div className="text-lg font-semibold">
@@ -34,7 +34,7 @@ export default async function Component() {
           <Collapsible>
             <CollapsibleTrigger
               disabled
-              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium  hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
+              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium  hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
             >
               Change Password
               <ChevronRightIcon className="h-5 w-5 transition-all" />
@@ -56,7 +56,7 @@ export default async function Component() {
             </CollapsibleContent>
           </Collapsible>
           <Collapsible className="rounded-lg border">
-            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
+            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
               Update Profile
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>
@@ -73,7 +73,7 @@ export default async function Component() {
           <Collapsible className="rounded-lg border">
             <CollapsibleTrigger
               disabled
-              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
+              className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90"
             >
               Notification Preferences
               <ChevronRightIcon className="h-5 w-5 transition-all" />
@@ -94,7 +94,7 @@ export default async function Component() {
             </CollapsibleContent>
           </Collapsible>
           <Collapsible className="rounded-lg border w-[350px] space-y-2">
-            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
+            <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 border-b bg-background p-4 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90">
               Delete Account
               <ChevronRightIcon className="h-5 w-5 transition-all" />
             </CollapsibleTrigger>

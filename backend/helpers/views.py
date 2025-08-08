@@ -13,10 +13,10 @@ from system.models import User
 from .models import Announcement, Comments, Tags
 from .serializers import (AnnouncementsPostSerializer, AnnouncementsSerializer,
                           CommentsSerializer, TagsGetSerializer,
-                          TagsSerializer)
+                          TagsSerializer, ErrorResponseMixin)
 
 
-class TagsView(APIView):
+class TagsView(APIView, ErrorResponseMixin):
 
     def get(self, request) -> List[Tags]:
         tags = Tags.objects.filter(user=request.user)
@@ -29,10 +29,10 @@ class TagsView(APIView):
             instance = serializer.save(user=request.user)
             response = TagsGetSerializer(instance)
             return Response(response.data, status=201)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
-class TagsDetailView(APIView):
+class TagsDetailView(APIView, ErrorResponseMixin):
     @extend_schema(operation_id='Get Single Tag')
     def get(self, request, pk) -> Tags:
         try:
@@ -40,11 +40,11 @@ class TagsDetailView(APIView):
             serializer = TagsGetSerializer(tag)
             return Response(serializer.data)
         except Tags.DoesNotExist:
-            return Response({"detail": "Tag not found"}, status=status.HTTP_404_NOT_FOUND)
+            return self.not_found_error_response("Tag")
 
 
 @permission_classes((AllowAny,))
-class AnnouncementsView(APIView):
+class AnnouncementsView(APIView, ErrorResponseMixin):
     @extend_schema(request=None, responses=AnnouncementsSerializer)
     def get(self, request) -> List[Announcement]:
         announcements = Announcement.objects.all()
@@ -54,37 +54,37 @@ class AnnouncementsView(APIView):
     @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def post(self, request):
         if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
-            return Response({"detail": "You're not authorized to perform this action"}, status=403)
+            return self.permission_error_response()
         serializer = AnnouncementsPostSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
 
-class AnnouncementsDetailView(APIView):
+class AnnouncementsDetailView(APIView, ErrorResponseMixin):
     @extend_schema(request=AnnouncementsPostSerializer, responses=AnnouncementsSerializer)
     def put(self, request, pk):
         if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
-            return Response({"detail": "You're not authorized to perform this action"}, status=403)
+            return self.permission_error_response()
         announcement_instance = get_object_or_404(Announcement, pk=pk)
         serializer = AnnouncementsPostSerializer(
             announcement_instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
     def delete(self, request, pk):
         if request.user.role not in (User.roles.ADMIN, User.roles.FACULTY):
-            return Response({"detail": "You're not authorized to perform this action"}, status=403)
+            return self.permission_error_response()
         announcement_instance = get_object_or_404(Announcement, pk=pk)
         announcement_instance.deleted_at = datetime.now()
         return Response(status=204)
 
 
-class CommentsView(APIView):
+class CommentsView(APIView, ErrorResponseMixin):
     def get(self, request, observation_id):
         comments = Comments.objects.filter(observation_id=observation_id)
         serializer = CommentsSerializer(comments, many=True)
@@ -97,7 +97,7 @@ class CommentsView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
+        return self.validation_error_response(serializer)
 
     def delete(self, request, pk):
         comment_instance = get_object_or_404(Comments, pk=pk)

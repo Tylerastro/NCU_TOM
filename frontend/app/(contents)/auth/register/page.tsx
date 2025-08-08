@@ -22,9 +22,8 @@ import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import SubmitLoader from "./submitLoader";
-interface ErrorResponse {
-  [key: string]: string[];
-}
+import { handleApiError } from "@/utils/errorHandler";
+import { ValidationErrors } from "@/types/api";
 
 const validDomains = ["gmail.com", "astro.ncu.edu.tw", "edu.tw", "edu"];
 
@@ -42,19 +41,9 @@ export default function SignUp() {
       router.push("/auth/signin");
       toast.success("User created successfully");
     },
-    onError: (error: AxiosError<ErrorResponse>) => {
-      const responseData = error.response?.data;
-      if (responseData) {
-        Object.keys(responseData).forEach((key) => {
-          responseData[key].forEach((message: string) => {
-            toast.error(message);
-          });
-        });
-      } else {
-        toast.error("Error creating user");
-      }
+    onError: (error: AxiosError<ValidationErrors>) => {
+      handleApiError(error, "Error creating user");
       setIsSubmitting(false);
-      console.error(responseData);
     },
   });
 

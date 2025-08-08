@@ -34,7 +34,7 @@ export default function IntroCard({ title, context, price }: Props) {
 
       <button
         type="button"
-        className="mt-4 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 w-full text-center"
+        className="mt-4 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-hidden focus:ring-indigo-500 dark:focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 w-full text-center"
       >
         Quick start
       </button>
