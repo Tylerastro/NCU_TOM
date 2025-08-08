@@ -2,7 +2,7 @@ import { Gowun_Batang } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,tsx,jsx}",
     "./components/**/*.{js,ts,tsx,jsx}",
@@ -11,11 +11,6 @@ const config = {
     "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
-  variants: {
-    extend: {
-      transitionDuration: ["hover", "focus"],
-    },
-  },
   theme: {
     container: {
       center: true,

@@ -16,7 +16,6 @@ export interface PaginatedResponse<T = any> {
 // Standardized error interfaces matching DRF format
 export interface ValidationErrors {
   [fieldName: string]: string[] | ValidationErrors;
-  non_field_errors?: string[];
 }
 
 export interface ApiError {

@@ -12,7 +12,7 @@ export class ErrorHandler {
     }
 
     // Handle DRF validation errors
-    if (this.isValidationError(error)) {
+    if (this.hasValidationErrors(error)) {
       this.handleValidationErrors(error);
       return;
     }
@@ -37,7 +37,7 @@ export class ErrorHandler {
   /**
    * Check if error contains validation errors
    */
-  private static isValidationError(error: any): boolean {
+  private static hasValidationErrors(error: any): boolean {
     return (
       error?.response?.data &&
       typeof error.response.data === 'object' &&
