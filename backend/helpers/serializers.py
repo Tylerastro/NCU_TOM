@@ -96,6 +96,16 @@ class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = ('name', 'id')
+    
+    def validate_name(self, value):
+        """Check if tag name is unique for the user"""
+        user = self.context['request'].user
+        queryset = Tags.objects.filter(user=user, name=value)
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise serializers.ValidationError("Tag with this name already exists.")
+        return value
 
 
 class TagsGetSerializer(serializers.ModelSerializer):

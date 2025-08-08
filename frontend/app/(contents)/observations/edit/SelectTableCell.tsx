@@ -41,7 +41,7 @@ export default function SelectCell<
 
   if (isEditing) {
     return (
-      <div className="cursor-pointer flex items-center justify-center">
+      <div className="relative cursor-pointer flex items-center justify-center">
         <Select
           defaultValue={value.toLocaleString()}
           onValueChange={(newValue) => {
@@ -49,7 +49,7 @@ export default function SelectCell<
           }}
           open={isEditing}
         >
-          <SelectTrigger className="w-24 h-8">
+          <SelectTrigger className="w-full h-8 absolute inset-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

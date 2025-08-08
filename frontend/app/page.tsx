@@ -10,7 +10,7 @@ export default async function Home() {
       }}
     >
       {/* Content can be added here */}
-      <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-30">
+      <div className="flex items-center justify-center min-h-screen">
         {/* Optional overlay for better text readability */}
       </div>
     </main>

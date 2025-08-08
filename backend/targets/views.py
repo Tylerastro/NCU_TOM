@@ -9,7 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from helpers.paginator import Pagination
-from helpers.serializers import ErrorResponseMixin
+from helpers.serializers import ErrorResponseMixin, StandardErrorSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -70,8 +70,9 @@ class TargetsView(APIView, ErrorResponseMixin):
             data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
-                serializer.save()
-                return JsonResponse(serializer.data, status=201)
+                instance = serializer.save()
+                response_serializer = TargetGetSerializer(instance)
+                return Response(response_serializer.data, status=201)
             except IntegrityError as e:
                 if 'unique_target_name_per_user' in str(e):
                     return Response(
@@ -192,7 +193,10 @@ def get_moon_altaz(request):
     if serializer.is_valid():
         return Response(serializer.validated_data)
     else:
-        return self.validation_error_response(serializer)
+        return Response(
+            StandardErrorSerializer.format_validation_errors(serializer.errors),
+            status=400
+        )
 
 
 def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
@@ -211,7 +215,7 @@ def get_targets_altaz(targets: List[Target], start_time: str, end_time: str):
     if serializer.is_valid():
         return serializer.data
     else:
-        return self.validation_error_response(serializer)
+        raise ValueError(f"Serializer validation failed: {serializer.errors}")
 
 
 @extend_schema(request=None, responses=TargetSimbadDataSerializer)
@@ -230,9 +234,15 @@ def get_target_simbad(request, pk: int):
         if serializer.is_valid():
             return Response(serializer.data)
         else:
-            return self.validation_error_response(serializer)
+            return Response(
+                StandardErrorSerializer.format_validation_errors(serializer.errors),
+                status=400
+            )
     else:
-        return self.not_found_error_response("Target")
+        return Response(
+            StandardErrorSerializer.format_not_found_error("Target"),
+            status=404
+        )
 
 
 @extend_schema(request=None, responses=TargetSEDSerializer)
@@ -249,4 +259,7 @@ def get_target_SED(request, pk: int):
     if serializer.is_valid():
         return Response(serializer.data, status=200)
     else:
-        return self.validation_error_response(serializer)
+        return Response(
+            StandardErrorSerializer.format_validation_errors(serializer.errors),
+            status=400
+        )
