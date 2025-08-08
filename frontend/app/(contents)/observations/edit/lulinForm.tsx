@@ -249,7 +249,7 @@ export function TargetLulinForm({
                     <Button
                       disabled
                       type="button"
-                      variant={"outline-solid"}
+                      variant={"outline"}
                       className={cn(
                         "w-[240px] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
@@ -291,7 +291,7 @@ export function TargetLulinForm({
                     <Button
                       disabled
                       type="button"
-                      variant={"outline-solid"}
+                      variant={"outline"}
                       className={cn(
                         "w-[240px] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
