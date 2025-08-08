@@ -48,12 +48,15 @@ export default function Page({ params }: { params: { id: number } }) {
   });
 
   return (
-    <>
-      <div className="flex space-between justify-between pb-10">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl text-primary-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">
             {isFetching ? <span className="loader"></span> : observation.name}
           </h1>
+          <p className="text-muted-foreground">
+            View and manage observation details
+          </p>
         </div>
         <div className="flex gap-2">
           {isFetching ? (
@@ -82,7 +85,8 @@ export default function Page({ params }: { params: { id: number } }) {
           )}
         </div>
       </div>
+
       {isFetching ? <></> : <PageContent observation={observation} />}
-    </>
+    </div>
   );
 }
