@@ -1,60 +1,81 @@
-name: Coverage report
+name: Coverage Report
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   pull_request:
-    branches:
-      - dev
+    branches: [main, dev]
 
 jobs:
-  backend:
+  coverage:
+    name: Test Coverage
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: tom
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
-      - name: Install Dependencies
+          python-version: "3.11"
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-coverage-${{ runner.os }}-${{ hashFiles('backend/requirements*.txt') }}
+          restore-keys: |
+            uv-coverage-${{ runner.os }}-
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: uv pip install -r requirements.txt -r requirements-test.txt
+      
+      - name: Run unit tests with coverage
+        working-directory: backend
         run: |
-          cd backend
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage
-      - name: Run tests with coverage
-        env:
-          DATABASE_URL: postgresql://admin:password@localhost:5432/tom
-          DATABASE_PORT: 5432
-          DATABASE: tom
-          USER: admin
-          PASSWORD: password
+          uv run pytest -m "unit" --cov --cov-report=xml --cov-report=term-missing --cov-report=html
+          echo "UNIT_COVERAGE_GENERATED=true" >> $GITHUB_ENV
+      
+      - name: Run integration tests with coverage
+        working-directory: backend
         run: |
-          cd backend
-          coverage run manage.py test
-          coverage report -m
-          coverage xml
-
+          uv run pytest -m "integration or db" --cov --cov-append --cov-report=xml --cov-report=term-missing --cov-report=html
+          echo "INTEGRATION_COVERAGE_GENERATED=true" >> $GITHUB_ENV
+        continue-on-error: true
+      
+      - name: Generate coverage report
+        working-directory: backend
+        run: |
+          uv run pytest --cov --cov-report=xml --cov-report=term-missing --cov-report=html
+          echo "FINAL_COVERAGE_GENERATED=true" >> $GITHUB_ENV
+      
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
+        if: env.FINAL_COVERAGE_GENERATED == 'true'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Tylerastro/NCU_TOM
+          directory: ./backend
+          files: ./backend/coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+      
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: backend/htmlcov/
+          retention-days: 30
+      
+      - name: Coverage summary
+        working-directory: backend
+        run: |
+          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY || true

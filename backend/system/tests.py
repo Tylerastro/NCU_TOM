@@ -1,3 +1,2 @@
-from django.test import TestCase
-
-# Create your tests here.
+# Tests will be rewritten using pure pytest structure
+# Run with: uv run pytest

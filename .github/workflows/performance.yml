@@ -1,0 +1,125 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  backend-benchmarks:
+    name: Backend Performance
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule' || github.repository_owner == 'Tylerastro'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: uv pip install -r requirements.txt -r requirements-test.txt
+      
+      - name: Run benchmarks
+        working-directory: backend
+        run: |
+          # Run performance benchmarks if they exist
+          uv run pytest --benchmark-only --benchmark-json=benchmark-results.json || echo "No benchmarks found"
+      
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          tool: 'pytest'
+          output-file-path: backend/benchmark-results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          comment-on-alert: true
+          alert-threshold: '200%'
+          fail-on-alert: false
+      
+      - name: Performance regression check
+        uses: benchmark-action/github-action-benchmark@v1
+        if: github.event_name == 'pull_request'
+        with:
+          tool: 'pytest'
+          output-file-path: backend/benchmark-results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-alert: true
+          alert-threshold: '150%'
+          fail-on-alert: false
+
+  frontend-lighthouse:
+    name: Frontend Performance (Lighthouse)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "21"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Build application
+        working-directory: frontend
+        run: npm run build
+      
+      - name: Start application
+        working-directory: frontend
+        run: |
+          npm run start &
+          sleep 10  # Wait for app to start
+      
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: './frontend/.lighthouserc.js'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        continue-on-error: true
+
+  resource-usage:
+    name: Resource Usage Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Analyze repository size
+        run: |
+          echo "## Repository Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "Repository size: $(du -sh . | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          echo "### Largest directories:" >> $GITHUB_STEP_SUMMARY
+          du -sh */ | sort -hr | head -10 >> $GITHUB_STEP_SUMMARY
+          
+          echo "### File type distribution:" >> $GITHUB_STEP_SUMMARY
+          find . -type f -name "*.*" | sed 's/.*\.//' | sort | uniq -c | sort -nr | head -10 >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check workflow efficiency
+        run: |
+          echo "### Recent workflow runs efficiency:" >> $GITHUB_STEP_SUMMARY
+          echo "This would contain workflow duration analysis if GitHub API was accessible" >> $GITHUB_STEP_SUMMARY

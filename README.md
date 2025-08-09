@@ -29,7 +29,7 @@ NCU TOM 是一個專為天文開發的觀測管理系統，目的協助管理觀
 目前架構採用Next.js + Django與Django REST Framework 來設計
 
 ## 安裝
-> 目前CI流程支援Python 3.9, 3.10, 3.11， node 21+
+> 目前CI流程支援Python 3.11, 3.12， node 21+
 
 
 ### Docker compose
@@ -47,6 +47,33 @@ NCU TOM 是一個專為天文開發的觀測管理系統，目的協助管理觀
 啟動docker container 使用`docker compose -f docker-compose.local.yml --env-file .env.local up --watch` 啟動檔案監聽，在開發時可以即時看到異動。
 
 4. 造訪 [localhost:3000](http://localhost:3000)觀看目前的版本。
+
+## 開發與測試
+
+### 測試框架
+我們使用 **pytest** 進行完整的測試分類：
+
+```bash
+# 快速單元測試（無資料庫）
+uv run pytest -m "unit" 
+
+# 整合測試（含資料庫）
+uv run pytest -m "integration or db"
+
+# 所有測試含覆蓋率
+uv run pytest --cov --cov-report=html
+
+# 特定測試類別
+uv run pytest -m "api"          # API 端點測試
+uv run pytest -m "security"     # 安全測試
+uv run pytest -m "astronomical" # 天文專用測試
+```
+
+### 程式碼品質工具
+- **後端**: Ruff (語法檢查/格式化), mypy (型別檢查), bandit (安全檢查), safety (依賴掃描)
+- **前端**: ESLint, TypeScript 檢查, 依賴分析
+- **效能**: Lighthouse CI 網頁效能監控
+
 
 # 加入開發者行列
 
@@ -68,7 +95,7 @@ NCU TOM is an Observation Management System developed specifically for astronome
 
 ## Installation
 
-> The current CI process supports Python 3.9, 3.10, 3.11, and Node 21+
+> The current CI process supports Python 3.11, 3.12, and Node 21+
 
 ### Docker compose
 
@@ -83,6 +110,28 @@ Use `docker compose -f docker-compose.local.yml --env-file .env.local build` to 
 Use `docker compose -f docker-compose.local.yml --env-file .env.local up --watch` to start the docker container.
 
 4. Visit [localhost:3000](http://localhost:3000) to view the latest online version.
+
+## Development & Testing
+
+### Testing Framework
+We use **pytest** with comprehensive test categories:
+
+```bash
+# Quick unit tests (no database)
+uv run pytest -m "unit" 
+
+# Integration tests (with database)  
+uv run pytest -m "integration or db"
+
+# All tests with coverage
+uv run pytest --cov --cov-report=html
+
+# Specific test categories
+uv run pytest -m "api"          # API endpoint tests
+uv run pytest -m "security"     # Security tests
+uv run pytest -m "astronomical" # Astronomy-specific tests
+```
+
 
 # Join the Development Team
 

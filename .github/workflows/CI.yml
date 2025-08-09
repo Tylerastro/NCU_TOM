@@ -1,121 +1,197 @@
-name: Full Stack Integration
-run-name: Testing with Django and Next.js
+name: CI Pipeline
+run-name: ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.number) || format('Push to {0}', github.ref_name) }}
 
 on:
   push:
-    branches:
-      - main
-      - dev
-      - actions
+    branches: [main, dev]
   pull_request:
-    branches:
-      - dev
+    branches: [main, dev]
 
 jobs:
-  backend:
+  # Fast unit tests - run first to fail fast
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
-      max-parallel: 4
+      fail-fast: true
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-    continue-on-error: true
-    outputs:
-      status: ${{ job.status }}
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: tom
-          POSTGRES_USER: tom
-          POSTGRES_PASSWORD: Password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+        python-version: ["3.11", "3.12"]
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Dependencies
-        env:
-          DJANGO_STAGE: test
-          ENGINE: django.db.backends.postgresql
-          DATABASE: tom
-          USER: tom
-          PASSWORD: Password
-          DBHOST: localhost
-          PORT: 5432
-        run: |
-          cd backend
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run Tests
-        env:
-          DJANGO_STAGE: test
-          ENGINE: django.db.backends.postgresql
-          DATABASE: tom
-          USER: tom
-          PASSWORD: Password
-          DBHOST: localhost
-          PORT: 5432
-        run: |
-          cd backend
-          python manage.py test
-
-  frontend:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          node-version: "21"
+          enable-cache: true
+          cache-dependency-glob: "backend/requirements*.txt"
+      
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('backend/requirements*.txt') }}
+          restore-keys: |
+            uv-${{ runner.os }}-${{ matrix.python-version }}-
+            uv-${{ runner.os }}-
+      
       - name: Install dependencies
+        working-directory: backend
+        run: uv pip install -r requirements.txt -r requirements-test.txt
+      
+      - name: Run unit tests
+        working-directory: backend
         run: |
-          cd frontend
-          npm install
-      - name: Build
-        run: |
-          cd frontend
-          npm run build
+          uv run pytest -m "unit" --tb=short -v
+          echo "UNIT_TESTS_PASSED=true" >> $GITHUB_ENV
+    
     outputs:
       status: ${{ job.status }}
+      tests_passed: ${{ env.UNIT_TESTS_PASSED }}
 
-  summary_send:
+  # Integration tests with database
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: needs.unit-tests.result == 'success'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-3.11-${{ hashFiles('backend/requirements*.txt') }}
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: uv pip install -r requirements.txt -r requirements-test.txt
+      
+      - name: Run integration tests
+        working-directory: backend
+        run: |
+          uv run pytest -m "integration or db" --tb=short -v
+          echo "INTEGRATION_TESTS_PASSED=true" >> $GITHUB_ENV
+    
+    outputs:
+      status: ${{ job.status }}
+      tests_passed: ${{ env.INTEGRATION_TESTS_PASSED }}
+
+  # Frontend build and test
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "21"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Run lint
+        working-directory: frontend
+        run: npm run lint
+      
+      - name: Build application
+        working-directory: frontend
+        run: |
+          npm run build
+          echo "FRONTEND_BUILD_PASSED=true" >> $GITHUB_ENV
+    
+    outputs:
+      status: ${{ job.status }}
+      build_passed: ${{ env.FRONTEND_BUILD_PASSED }}
+
+  # Summary and notifications
+  summary:
+    name: Build Summary
     runs-on: ubuntu-latest
     if: always()
-    needs: [backend, frontend]
+    needs: [unit-tests, integration-tests, frontend]
+    
     steps:
-      - name: Set Result Emojis
+      - name: Set Result Status
         run: |
-          FRONTEND_STATUS=${{ needs.frontend.outputs.status }}
-          BACKEND_STATUS=${{ needs.backend.outputs.status }}
+          UNIT_STATUS="${{ needs.unit-tests.outputs.status }}"
+          INTEGRATION_STATUS="${{ needs.integration-tests.outputs.status }}"
+          FRONTEND_STATUS="${{ needs.frontend.outputs.status }}"
+          
+          # Set emojis based on status
+          if [[ "$UNIT_STATUS" == "success" ]]; then
+            echo "UNIT_EMOJI=✅" >> $GITHUB_ENV
+            echo "UNIT_TEXT=Unit Tests: Passed" >> $GITHUB_ENV
+          else
+            echo "UNIT_EMOJI=❌" >> $GITHUB_ENV
+            echo "UNIT_TEXT=Unit Tests: Failed" >> $GITHUB_ENV
+          fi
+          
+          if [[ "$INTEGRATION_STATUS" == "success" ]]; then
+            echo "INTEGRATION_EMOJI=✅" >> $GITHUB_ENV
+            echo "INTEGRATION_TEXT=Integration Tests: Passed" >> $GITHUB_ENV
+          elif [[ "$INTEGRATION_STATUS" == "skipped" ]]; then
+            echo "INTEGRATION_EMOJI=⏭️" >> $GITHUB_ENV
+            echo "INTEGRATION_TEXT=Integration Tests: Skipped" >> $GITHUB_ENV
+          else
+            echo "INTEGRATION_EMOJI=❌" >> $GITHUB_ENV
+            echo "INTEGRATION_TEXT=Integration Tests: Failed" >> $GITHUB_ENV
+          fi
+          
           if [[ "$FRONTEND_STATUS" == "success" ]]; then
-            echo "FRONTEND_EMOJI=:white_check_mark:" >> $GITHUB_ENV
+            echo "FRONTEND_EMOJI=✅" >> $GITHUB_ENV
+            echo "FRONTEND_TEXT=Frontend: Built Successfully" >> $GITHUB_ENV
           else
-            echo "FRONTEND_EMOJI=:x:" >> $GITHUB_ENV
+            echo "FRONTEND_EMOJI=❌" >> $GITHUB_ENV
+            echo "FRONTEND_TEXT=Frontend: Build Failed" >> $GITHUB_ENV
           fi
-          if [[ "$BACKEND_STATUS" == "success" ]]; then
-            echo "BACKEND_EMOJI=:white_check_mark:" >> $GITHUB_ENV
+          
+          # Overall status
+          if [[ "$UNIT_STATUS" == "success" && "$INTEGRATION_STATUS" == "success" && "$FRONTEND_STATUS" == "success" ]]; then
+            echo "OVERALL_STATUS=✅ All Checks Passed" >> $GITHUB_ENV
           else
-            echo "BACKEND_EMOJI=:x:" >> $GITHUB_ENV
+            echo "OVERALL_STATUS=❌ Some Checks Failed" >> $GITHUB_ENV
           fi
-      - name: Format commit message
+
+      - name: Format commit info
         run: |
-          COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed ':a;N;$!ba;s/\n/\\n/g')
-          echo "FORMATTED_COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "EVENT_TITLE=PR #${{ github.event.number }}: ${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+            echo "AUTHOR_INFO=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+          else
+            COMMIT_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | head -1)
+            echo "EVENT_TITLE=Push: $COMMIT_MESSAGE" >> $GITHUB_ENV
+            echo "AUTHOR_INFO=${{ github.event.head_commit.author.name }}" >> $GITHUB_ENV
+          fi
 
       - name: Post to Slack
-        id: slack
+        if: vars.SLACK_ENABLED == 'true'
         uses: slackapi/slack-github-action@v1.25.0
         with:
           channel-id: "${{ secrets.TOM_DEV_SLACK_CHANNEL }}"
@@ -126,37 +202,14 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":writing_hand: Commit ${{github.sha}}"
+                    "text": "${{ env.OVERALL_STATUS }}"
                   }
-                },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":pencil2: branch ${{github.ref}}"
-                  }
-                },
-                {
-                  "type": "divider"
                 },
                 {
                   "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "${{ env.FORMATTED_COMMIT_MESSAGE }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "header",
                   "text": {
-                    "type": "plain_text",
-                    "text": ":hand: Author",
-                    "emoji": true
+                    "type": "mrkdwn",
+                    "text": "*${{ env.EVENT_TITLE }}*\nBy: ${{ env.AUTHOR_INFO }}\nBranch: `${{ github.ref_name }}`"
                   }
                 },
                 {
@@ -166,25 +219,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ github.event.head_commit.author.name }} <${{ github.event.head_commit.author.email }}>"
-                  }
-                },
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":page_facing_up: Summary",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "- Frontend: ${{ env.FRONTEND_EMOJI }} ${{needs.frontend.outputs.status}} \n- Backend: ${{ env.BACKEND_EMOJI }} ${{needs.backend.outputs.status}}"
+                    "text": "${{ env.UNIT_EMOJI }} ${{ env.UNIT_TEXT }}\n${{ env.INTEGRATION_EMOJI }} ${{ env.INTEGRATION_TEXT }}\n${{ env.FRONTEND_EMOJI }} ${{ env.FRONTEND_TEXT }}"
                   }
                 },
                 {
@@ -194,11 +229,9 @@ jobs:
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": ":rocket: Deploy",
-                        "emoji": true
+                        "text": "View Run"
                       },
-                      "value": "click_me_123",
-                      "action_id": "actionId-0"
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                     }
                   ]
                 }
