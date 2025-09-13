@@ -244,6 +244,22 @@ class LulinCodeView(APIView, ErrorResponseMixin):
         else:
             return HttpResponse(lulin.code, content_type='text/plain')
 
+    @extend_schema(operation_id='Save code for Lulin observation')
+    def put(self, request, pk):
+        try:
+            if request.user.role in (User.roles.ADMIN, User.roles.FACULTY):
+                observation = Observation.objects.get(pk=pk)
+            else:
+                observation = Observation.objects.get(pk=pk, user=request.user)
+        except Observation.DoesNotExist:
+            return self.not_found_error_response("Observation")
+
+        code = request.data.get('code', '')
+        observation.code = code
+        observation.save()
+        
+        return Response({'message': 'Code saved successfully'}, status=200)
+
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, IsActivated))

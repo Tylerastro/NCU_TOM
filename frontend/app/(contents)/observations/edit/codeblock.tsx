@@ -1,5 +1,7 @@
 import { getLulinCode } from "@/apis/observations/getLulinCode";
+import { saveLulinCode } from "@/apis/observations/saveLulinCode";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function CodeBlock({
   observation_id,
@@ -11,6 +13,7 @@ export default function CodeBlock({
   setCodeUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [codeBlock, setCodeBlock] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
     getLulinCode(observation_id)
@@ -38,6 +41,20 @@ export default function CodeBlock({
       });
   };
 
+  const saveCodeBlock = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setIsSaving(true);
+    try {
+      await saveLulinCode(observation_id, codeBlock);
+      toast.success("Script saved successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save script. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
 
   const rows = codeBlock ? countLines(codeBlock) + 2 : 1;
 
@@ -61,13 +78,23 @@ export default function CodeBlock({
           ></textarea>
         </div>
         <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
-          <button
-            onClick={resetCodeBlock}
-            type="submit"
-            className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-[#b538c366] duration-300 transition ease-in-out"
-          >
-            Rebuild Script
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={resetCodeBlock}
+              type="submit"
+              className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-[#b538c366] duration-300 transition ease-in-out"
+            >
+              Rebuild Script
+            </button>
+            <button
+              onClick={saveCodeBlock}
+              disabled={isSaving}
+              type="button"
+              className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-green-700 rounded-lg focus:ring-4 focus:ring-green-200 dark:focus:ring-green-900 hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed duration-300 transition ease-in-out"
+            >
+              {isSaving ? "Saving..." : "Save Script"}
+            </button>
+          </div>
         </div>
       </div>
     </>
