@@ -71,7 +71,7 @@ class Command(BaseCommand):
             success=False
         )
 
-        csv_files = [f for f in os.listdir(FILE_PATH) if f.endswith('.csv')]
+        csv_files = [f for f in os.listdir(FILE_PATH) if f.endswith('psf.csv')]
         if not csv_files:
             error_message = f'No CSV files found in {FILE_PATH}'
             self.stdout.write(self.style.ERROR(error_message))
