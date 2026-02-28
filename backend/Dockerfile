@@ -5,6 +5,8 @@ WORKDIR /app
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+ENV UV_PROJECT_ENVIRONMENT=/app/.venv
+
 # Copy dependency files first for better caching
 COPY pyproject.toml uv.lock ./
 
