@@ -1,4 +1,3 @@
-import { Gowun_Batang } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -21,8 +20,9 @@ const config = {
     },
     extend: {
       fontFamily: {
-        Pacifico: ["Pacifico", "cursive"],
-        gowunBatang: ["var(--font-gowun-batang)"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        heading: ["var(--font-heading)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       transitionDuration: {
         0: "0ms",

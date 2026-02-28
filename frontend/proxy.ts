@@ -1,13 +1,18 @@
-import authConfig from "@/auth.config";
-import NextAuth from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
-const { auth } = NextAuth(authConfig);
+// Routes that don't require authentication
+const publicRoutes = ["/", "/about"];
 
-export default auth(async function middleware(req: NextRequest) {
-  const token = await auth();
-  const isAuthenticated = !!token?.user;
+export default auth(async function proxy(req) {
+  // When using auth() as middleware wrapper, session is available on req.auth
+  const isAuthenticated = !!req.auth?.user;
   const { pathname } = req.nextUrl;
+
+  // Allow access to public routes without authentication
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
 
   // If user is not authenticated and trying to access protected routes
   if (!isAuthenticated) {
@@ -28,8 +33,8 @@ export const config = {
      * - /auth/* (authentication pages)
      * - /api/auth/* (authentication API routes)
      * - /_next/* (Next.js internals)
-     * - /favicon.ico, /robots.txt, etc. (static files)
+     * - Static files (images, fonts, etc.)
      */
-    "/((?!auth|api/auth|_next/static|_next/image|favicon.ico|robots.txt).*)",
+    "/((?!auth|api/auth|_next/static|_next/image|favicon.ico|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.gif$|.*\\.ico$|.*\\.webp$).*)",
   ],
 };

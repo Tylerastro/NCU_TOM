@@ -2,9 +2,7 @@ import Credentials from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
 import "next-auth/jwt";
 import { UserProfile } from "@/models/users";
-import { getToken } from "@/apis/auth/getToken";
-import { getUser } from "@/apis/auth/getUser";
-import { refreshToken } from "@/apis/auth/refreshToken";
+import { getToken, getUser, refreshToken, loginWithGithub, loginWithGoogle } from "@/apis/auth";
 import type { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -13,7 +11,6 @@ import { Account, Profile } from "next-auth";
 import { GitHubProfile } from "next-auth/providers/github";
 import type { Provider } from "next-auth/providers";
 import { z } from "zod";
-import { loginWithGithub, loginWithGoogle } from "./apis/auth/Oauth";
 
 const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60; // 45 minutes
 const BACKEND_REFRESH_TOKEN_LIFETIME = 6 * 24 * 60 * 60; // 6 days
@@ -57,7 +54,7 @@ const SIGN_IN_HANDLERS = {
         console.log("User not found.");
         return false;
       }
-      profile.id = user_data.id;
+      profile.id = String(user_data.id);
       profile.username = user_data.username;
       profile.role = user_data.role;
       profile.created_at = user_data.created_at;
@@ -93,7 +90,7 @@ const SIGN_IN_HANDLERS = {
         console.log("User not found.");
         return false;
       }
-      profile.id = user_data.id;
+      profile.id = String(user_data.id);
       profile.username = user_data.username;
       profile.role = user_data.role;
       profile.created_at = user_data.created_at;
@@ -155,6 +152,7 @@ const providers: Provider[] = [
 
         return {
           ...user,
+          id: String(user.id),
           accessToken: access,
           refreshToken: refresh,
         };
@@ -255,7 +253,7 @@ const config = {
         try {
           const user_data = await getUser(token.accessToken as string);
           if (user_data) {
-            user = user_data;
+            user = user_data as any;
           }
         } catch (error) {
           console.error("Failed to fetch user data:", error);
