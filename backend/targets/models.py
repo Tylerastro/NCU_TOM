@@ -1,12 +1,12 @@
-from datetime import datetime
-
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from helpers.managers import SoftDeleteModel
 
-class Target(models.Model):
+
+class Target(SoftDeleteModel):
 
     class Meta:
         db_table = 'Target'
@@ -28,7 +28,6 @@ class Target(models.Model):
     redshift = models.FloatField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
     sed = models.JSONField(null=True, blank=True)
     hashed_sed = models.CharField(max_length=64, null=True, blank=True)
     simbad = models.JSONField(null=True, blank=True)
@@ -51,11 +50,3 @@ class Target(models.Model):
         ra = c.ra.to_string(unit=u.hour, sep=':')
         dec = c.dec.to_string(unit=u.degree, sep=':')
         return f"{ra} {dec}"
-
-    @property
-    def is_deleted(self):
-        return self.deleted_at is not None
-
-    def delete(self):
-        self.deleted_at = datetime.now()
-        self.save()

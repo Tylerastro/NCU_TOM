@@ -1,10 +1,11 @@
 import uuid
-from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from helpers.managers import SoftDeleteModel
 from helpers.models import Comments
 from observations.lulin_models import Filters, Instruments
 from targets.models import Target
@@ -39,7 +40,7 @@ class Observatories(models.IntegerChoices):
     LULIN = 1
 
 
-class Observation(models.Model):
+class Observation(SoftDeleteModel):
 
     class Meta:
         db_table = 'Observation'
@@ -62,7 +63,6 @@ class Observation(models.Model):
         choices=statuses.choices, default=statuses.PREP)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
     code = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField('helpers.Tags', related_name='observations')
     comments = models.ManyToManyField(
@@ -77,7 +77,6 @@ class Observation(models.Model):
             if self.start_date >= self.end_date:
                 raise ValidationError("Start date must be before end date.")
 
-
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = str(uuid.uuid4())[:8]
@@ -90,10 +89,6 @@ class Observation(models.Model):
                 self.comments.add(comment)
         self.full_clean()
         super().save(*args, **kwargs)
-
-    def delete(self):
-        self.deleted_at = datetime.now()
-        self.save()
 
     @property
     def target_count(self):

@@ -1,9 +1,14 @@
-from django.contrib.auth.models import (AbstractUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils import timezone
+
+from helpers.managers import SoftDeleteQuerySet
 
 
 class UserManager(BaseUserManager):
+    def get_queryset(self):
+        return SoftDeleteQuerySet(self.model, using=self._db).filter(deleted_at__isnull=True)
+
     def create_user(self, email, password=None, **kwargs):
         if not email:
             raise ValueError("Users must have an email address")
@@ -30,12 +35,13 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser, PermissionsMixin):
     objects = UserManager()
+    all_objects = models.Manager()
 
     class Meta:
         ordering = ['id', '-created_at']
         db_table = 'User'
 
-    class roles(models.IntegerChoices):
+    class Roles(models.IntegerChoices):
         ADMIN = 1
         FACULTY = 2
         USER = 3
@@ -45,7 +51,7 @@ class User(AbstractUser, PermissionsMixin):
     last_name = models.CharField(max_length=100)
     institute = models.CharField(max_length=100)
     email = models.EmailField(unique=True, verbose_name='email address')
-    role = models.IntegerField(choices=roles.choices, default=roles.USER)
+    role = models.IntegerField(choices=Roles.choices, default=Roles.USER)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
@@ -58,6 +64,21 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+    def delete(self, *args, **kwargs):
+        """Soft-delete this user."""
+        self.deleted_at = timezone.now()
+        self.is_active = False
+        self.save(update_fields=["deleted_at", "is_active"])
+
+    def hard_delete(self, *args, **kwargs):
+        """Permanently delete this user."""
+        super().delete(*args, **kwargs)
+
+    def restore(self):
+        """Restore a soft-deleted user."""
+        self.deleted_at = None
+        self.save(update_fields=["deleted_at"])
 
 
 class RequestLog(models.Model):

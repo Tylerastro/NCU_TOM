@@ -1,7 +1,7 @@
-from django.conf import settings
 from django.db import models
 from django.db.models import UniqueConstraint
-from system.models import User
+
+from helpers.managers import SoftDeleteModel
 
 
 class Tags(models.Model):
@@ -15,19 +15,18 @@ class Tags(models.Model):
         db_table = 'Tag'
 
 
-class Comments(models.Model):
+class Comments(SoftDeleteModel):
     user = models.ForeignKey(
         'system.User', on_delete=models.CASCADE, null=True)
     context = models.TextField(max_length=500, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'Comment'
 
 
-class Announcement(models.Model):
+class Announcement(SoftDeleteModel):
 
     class Meta:
         ordering = ['-created_at']
@@ -44,6 +43,5 @@ class Announcement(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)
     context = models.TextField(max_length=1000, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(null=True)
     type = models.IntegerField(
         choices=types.choices, null=False, blank=False, default=types.INFO)
