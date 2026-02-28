@@ -1,14 +1,11 @@
-from django.urls import path, re_path
+from django.urls import path
 
-from .views import (AnnouncementsDetailView, AnnouncementsView, CommentsView,
-                    TagsDetailView, TagsView)
+from .views import AnnouncementViewSet, CommentViewSet, TagViewSet
 
 urlpatterns = [
-    path("tags/", TagsView.as_view(), name="tags"),
-    path("tags/<int:pk>/", TagsDetailView.as_view(),),
-    path("announcements/", AnnouncementsView.as_view(), name="announcements"),
-    path("announcements/<int:pk>/",
-         AnnouncementsDetailView.as_view(), name="announcements"),
-    path("comments/<int:pk>/",
-         CommentsView.as_view(), name="comments"),
+    path("tags/", TagViewSet.as_view({'get': 'list', 'post': 'create'}), name="tags"),
+    path("tags/<int:pk>/", TagViewSet.as_view({'get': 'retrieve'})),
+    path("announcements/", AnnouncementViewSet.as_view({'get': 'list', 'post': 'create'}), name="announcements"),
+    path("announcements/<int:pk>/", AnnouncementViewSet.as_view({'put': 'update', 'delete': 'destroy'}), name="announcements_detail"),
+    path("comments/<int:pk>/", CommentViewSet.as_view({'put': 'update', 'delete': 'destroy'}), name="comments"),
 ]

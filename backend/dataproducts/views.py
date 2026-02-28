@@ -1,19 +1,19 @@
-from dataproducts.models import ETLLogs, LulinDataProduct
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from helpers.models import User
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from dataproducts.models import ETLLogs, LulinDataProduct
+from system.models import User
 from targets.models import Target
 
 from .serializers import ETLLogsSerializer, LulinDataProductSerializer
 
 
 @extend_schema(request=None, responses=ETLLogsSerializer)
-@permission_classes((AllowAny,))
 @api_view(['GET'])
+@permission_classes((AllowAny,))
 def get_etl_logs(request):
     etl_logs = ETLLogs.objects.all().order_by('-created_at')[:5]
 
@@ -23,7 +23,8 @@ def get_etl_logs(request):
 
 
 class LulinTargetDataView(APIView):
-    @permission_classes((AllowAny,))
+    permission_classes = [AllowAny]
+
     def get(self, request, pk):
         if pk == 0:
             latest_entry = LulinDataProduct.objects.order_by('-mjd').first()
@@ -38,11 +39,10 @@ class LulinTargetDataView(APIView):
             return Response(serializer.data, status=200)
 
         try:
-            if request.user.role == User.roles.ADMIN:
-                target = Target.objects.get(id=pk, deleted_at__isnull=True)
+            if request.user.is_authenticated and request.user.role == User.Roles.ADMIN:
+                target = Target.objects.get(id=pk)
             else:
-                target = Target.objects.get(
-                    id=pk, deleted_at__isnull=True, user=request.user)
+                target = Target.objects.get(id=pk, user=request.user)
         except Target.DoesNotExist:
             return Response({"detail": "Target not found"}, status=404)
 

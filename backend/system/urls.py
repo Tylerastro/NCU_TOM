@@ -1,21 +1,39 @@
 from allauth.socialaccount.views import ConnectionsView
 from dj_rest_auth.jwt_auth import get_refresh_view
-from dj_rest_auth.views import LoginView, LogoutView
+from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
 from django.urls import path
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenVerifyView
-from system.views import (EditUser, GitHubLogin, GoogleLogin,
-                          TOMUserDetailsView, UserDetailView, UserView)
+
+from system.views import (
+    ActivationView,
+    CustomRegisterView,
+    EditUser,
+    GitHubLogin,
+    GoogleLogin,
+    ResendActivationView,
+    TOMUserDetailsView,
+    UserDetailView,
+    UserView,
+)
 
 urlpatterns = [
     # Authentication Routes
     path("login/", LoginView.as_view(), name="rest_login"),
     path("logout/", LogoutView.as_view(), name="rest_logout"),
+    path("register/", CustomRegisterView.as_view(), name="rest_register"),
 
     # Token Management Routes
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("token/refresh/", get_refresh_view().as_view(), name="token_refresh"),
+
+    # User Activation Routes
+    path("users/activation/", ActivationView.as_view(), name="user_activation"),
+    path("users/resend_activation/", ResendActivationView.as_view(), name="user_resend_activation"),
+
+    # Password Reset Routes
+    path("password/reset/", PasswordResetView.as_view(), name="rest_password_reset"),
+    path("password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
 
     # OAuth Routes
     path("oauth/google/", GoogleLogin.as_view(), name="google_login"),

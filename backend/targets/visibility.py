@@ -43,8 +43,6 @@ class TargetAltAz:
 
 
 class Visibility:
-    LULIN = (23.469444, 120.872639, 2862)
-
     def __init__(self, lat, lon, height, time_offset=8 * u.hour, avoidance_angle=30 * u.deg, time_resolution=15 * u.minute):
         self.observatory_location = EarthLocation(
             lat=lat * u.deg, lon=lon * u.deg, height=height * u.m)

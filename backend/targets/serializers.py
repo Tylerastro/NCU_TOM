@@ -1,13 +1,9 @@
 import math
-from typing import List
 
-from astropy import units as u
 from astropy.constants import c
-from astropy.coordinates import SkyCoord
 from django.db import transaction
 from helpers.models import Tags
-from helpers.serializers import (TagsGetSerializer, TagsSerializer,
-                                 UserSerializer)
+from helpers.serializers import TagsGetSerializer, TagsSerializer, UserSerializer
 from observations.models import Observation
 from rest_framework import serializers
 
@@ -17,8 +13,7 @@ from .models import Target
 class ObservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Observation
-        fields = ('id', 'name', 'observatory',
-                  'start_date', 'end_date', 'status')
+        fields = ('id', 'name', 'observatory', 'start_date', 'end_date', 'status')
 
 
 class TargetSimpleSerializer(serializers.ModelSerializer):
@@ -30,24 +25,18 @@ class TargetSimpleSerializer(serializers.ModelSerializer):
 class TargetGetSerializer(serializers.ModelSerializer):
     tags = TagsGetSerializer(many=True, required=False)
     user = UserSerializer()
-    coordinates = serializers.SerializerMethodField()
+    coordinates = serializers.CharField(read_only=True)
     observations = serializers.SerializerMethodField()
 
     class Meta:
         model = Target
-        fields = ('id', 'name', 'ra', 'dec', 'coordinates', 'observations', 'redshift', 'tags',  'notes',
-                  'user', 'created_at', 'updated_at')
-
-    def get_coordinates(self, instance):
-        c = SkyCoord(ra=instance.ra*u.degree,
-                     dec=instance.dec*u.degree, frame='icrs')
-        ra = c.ra.to_string(unit=u.hour, sep=':')
-        dec = c.dec.to_string(unit=u.degree, sep=':')
-        return f"{ra} {dec}"
+        fields = (
+            'id', 'name', 'ra', 'dec', 'coordinates', 'observations',
+            'redshift', 'tags', 'notes', 'user', 'created_at', 'updated_at'
+        )
 
     def get_observations(self, instance):
-        observations = instance.observation_set.all()
-        return ObservationSerializer(observations, many=True).data
+        return ObservationSerializer(instance.observation_set.all(), many=True).data
 
 
 class TargetPostSerializer(serializers.ModelSerializer):
@@ -79,12 +68,11 @@ class TargetPostSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        self.update_tags(instance, tags_data)
+        self._update_tags(instance, tags_data)
         return instance
 
-    def update_tags(self, target: Target, tags_data: List[Tags]):
-        existing_tag_names = [tag['name'] for tag in tags_data]
-
+    def _update_tags(self, target: Target, tags_data: list[dict]):
+        tag_names = {tag['name'] for tag in tags_data}
         with transaction.atomic():
             for tag_data in tags_data:
                 tag, _ = Tags.objects.get_or_create(
@@ -92,10 +80,20 @@ class TargetPostSerializer(serializers.ModelSerializer):
                     user=target.user
                 )
                 target.tags.add(tag)
+            for tag in target.tags.all():
+                if tag.name not in tag_names:
+                    target.tags.remove(tag)
 
-        for tag in target.tags.all():
-            if tag.name not in existing_tag_names:
-                target.tags.remove(tag)
+
+class QueryURLSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
+
+class ResolvedTargetSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    ra = serializers.FloatField()
+    dec = serializers.FloatField()
+    source = serializers.CharField()
 
 
 class DeleteTargetSerializer(serializers.Serializer):

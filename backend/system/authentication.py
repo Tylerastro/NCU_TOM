@@ -4,8 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import (AuthenticationFailed,
-                                                 InvalidToken)
+from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.models import TokenUser
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import Token

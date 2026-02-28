@@ -1,24 +1,22 @@
 import os
 import re
 import tempfile
-from datetime import datetime
+from pathlib import Path
 
-import pytz
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
-from observations.models import Observation
 
-taipei_tz = pytz.timezone('Asia/Taipei')
+from observations.models import Observation
+from observations.observatory_config import get_observatory_config
 
 
 @receiver(post_save, sender=Observation)
 def send_in_progress_html_email(sender, instance: Observation, **kwargs):
-    """
-    A post_save signal handler that sends HTML emails when an Observation is saved with IN_PROGRESS status.
+    """A post_save signal handler that sends HTML emails when an Observation is saved with IN_PROGRESS status.
 
     1. Triggers after an Observation is saved
     2. Checks if status is IN_PROGRESS
@@ -41,17 +39,22 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
     - Main: LULIN_MAIL environment variable
     - CC: w39398898@gmail.com and user's email
     """
-
     try:
+        # Only send emails in production environment
+        stage = os.getenv("DJANGO_STAGE", "local")
+        if stage == "local" or settings.DEBUG:
+            return
+
         if instance.status == Observation.statuses.IN_PROGRESS:
-            taipei_time = instance.start_date.astimezone(taipei_tz)
+            config = get_observatory_config(instance.observatory)
+            local_time = instance.start_date.astimezone(config.tz)
             # Prepare template context
             context = {
                 'user_name': instance.user.username,
                 'observation_name': instance.name,
                 'target_count': instance.target_count or 0,
                 'observatory': instance.get_observatory_display(),
-                'start_date': taipei_time.strftime('%Y-%m-%d %H:%M'),
+                'start_date': local_time.strftime('%Y-%m-%d %H:%M'),
                 'priority': instance.get_priority_display(),
                 'current_year': timezone.now().year,
                 'comments': instance.comments.all().order_by('created_at')
@@ -67,9 +70,9 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
                 cleaned_code_lines = [
                     line.strip() for line in instance.code.splitlines()]
                 attachment_filename = sanitize_filename(instance.name)
-                temp_dir = tempfile.gettempdir()
-                temp_file_path = os.path.join(temp_dir, attachment_filename)
-                with open(temp_file_path, 'w') as temp_file:
+                temp_dir = Path(tempfile.gettempdir())
+                temp_file_path = temp_dir / attachment_filename
+                with Path(temp_file_path).open('w') as temp_file:
                     temp_file.write('\n'.join(cleaned_code_lines))
 
             try:
@@ -78,16 +81,16 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
                     subject=f'{instance.user.username} submitted observation {instance.name}',
                     body=html_message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[os.getenv('LULIN_MAIL', None)],
-                    cc=['w39398898@gmail.com', instance.user.email],
+                    to=[os.getenv(config.email_recipients_env, None)],
+                    cc=list(config.cc_emails) + [instance.user.email],
                 )
 
                 # Set the email to use HTML
                 email.content_subtype = 'html'
 
                 # Attach the file if it exists
-                if temp_file_path and os.path.exists(temp_file_path) and attachment_filename:
-                    with open(temp_file_path, 'rb') as f:
+                if temp_file_path and Path(temp_file_path).exists() and attachment_filename:
+                    with Path(temp_file_path).open('rb') as f:
                         email.attach(attachment_filename,
                                      f.read(), 'text/plain')
 
@@ -96,8 +99,8 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
 
             finally:
                 # Clean up the temporary file
-                if temp_file_path and os.path.exists(temp_file_path):
-                    os.unlink(temp_file_path)
+                if temp_file_path and Path(temp_file_path).exists():
+                    Path(temp_file_path).unlink()
 
     except Observation.DoesNotExist:
         # This is a new instance being created
@@ -105,8 +108,8 @@ def send_in_progress_html_email(sender, instance: Observation, **kwargs):
 
 
 def sanitize_filename(name: str) -> str:
-    """
-    Sanitize the observation name to create a safe filename.
+    """Sanitize the observation name to create a safe filename.
+
     - Lowercase
     - Replace spaces with underscores
     - Remove non-alphanumeric, non-underscore, non-dash
