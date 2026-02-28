@@ -62,20 +62,8 @@ export interface ObservationFilters extends RequestOptions {
   status?: number[];
 }
 
-// Status enums for better type safety
-export enum ObservationStatus {
-  PENDING = 1,
-  SCHEDULED = 2,
-  COMPLETED = 3,
-  FAILED = 4,
-  CANCELLED = 5
-}
-
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  OBSERVER = 'observer'
-}
+// Note: Status and UserRole enums are defined in ./enums.ts
+// Import from "@/types" or "@/types/enums" for enum values
 
 // API endpoint configuration
 export interface ApiEndpoint {

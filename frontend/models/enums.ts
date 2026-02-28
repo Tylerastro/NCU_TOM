@@ -1,45 +1,7 @@
-enum Priority {
-  HIGH = 1,
-  MEDIUM,
-  LOW,
-  TOO,
-}
-
-enum Status {
-  Prep = 1,
-  Pending,
-  In_progress,
-  Done,
-  Expired,
-  Denied,
-  Postponed,
-}
-
-enum Observatory {
-  Lulin = 1,
-}
-
-enum LulinInstrument {
-  LOT = 1,
-  SLT,
-  TRIPOL,
-}
-
-enum LulinFilter {
-  u = 1,
-  g,
-  r,
-  i,
-  z,
-}
-
-enum UserRole {
-  Admin = 1,
-  Faculty,
-  User,
-  Disabled,
-}
-
+/**
+ * @deprecated Import from "@/types" instead
+ * This file is kept for backward compatibility
+ */
 export {
   Priority,
   Status,
@@ -47,4 +9,4 @@ export {
   UserRole,
   LulinInstrument,
   LulinFilter,
-};
+} from "@/types/enums";
