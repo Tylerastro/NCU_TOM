@@ -1,14 +1,6 @@
 import { AccordionAnnoucemnets } from "./accor";
-import { UserRole } from "@/models/enums";
-import dynamic from "next/dynamic";
 import { auth } from "@/auth";
-
-// Dynamic import with ssr: false to prevent hydration mismatch
-// caused by Radix UI generating different IDs on server vs client
-const NewAnnouncementForm = dynamic(
-  () => import("./createAnnouncement").then((mod) => mod.NewAnnouncementForm),
-  { ssr: false }
-);
+import { AnnouncementActions } from "./AnnouncementActions";
 
 export default async function Announcements() {
   const session = await auth();
@@ -21,12 +13,7 @@ export default async function Announcements() {
             Stay updated with the latest news and information
           </p>
         </div>
-        {session &&
-          [UserRole.Admin, UserRole.Faculty].includes(session.user.role) && (
-            <div className="flex gap-2">
-              <NewAnnouncementForm />
-            </div>
-          )}
+        {session && <AnnouncementActions userRole={session.user.role} />}
       </div>
 
       <AccordionAnnoucemnets />
