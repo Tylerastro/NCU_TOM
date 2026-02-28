@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "next": "^15.0.3",
-    "recharts": "^2.13.0"
-  }
-}

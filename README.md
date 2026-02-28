@@ -28,25 +28,85 @@ NCU TOM is a project based on [Tom's toolkit](https://github.com/TOMToolkit/tom_
 NCU TOM 是一個專為天文開發的觀測管理系統，目的協助管理觀測目標、排程、數據記錄和分析。瀏覽[NCU TOM](https://tom.astro.ncu.edu.tw)查看最新的上線版本。
 目前架構採用Next.js + Django與Django REST Framework 來設計
 
+## 快速開始
+
+```bash
+git clone https://github.com/Tylerastro/NCU_TOM.git
+cd NCU_TOM
+make setup    # 建立 .env.local 設定檔
+make dev      # 啟動開發環境
+```
+
+其他常用指令：
+| 指令 | 說明 |
+|------|------|
+| `make` | 顯示所有可用指令 |
+| `make down` | 停止容器 |
+| `make logs` | 查看日誌 |
+| `make shell-django` | 進入 Django 容器 |
+| `make shell-db` | 開啟 PostgreSQL 控制台 |
+| `make test` | 執行測試 |
+
 ## 安裝
 > 目前CI流程支援Python 3.11, 3.12， node 21+
 
 
-### Docker compose
+### Docker compose（推薦）
 
 1. Clone the Repo
-`git clone https://github.com/Tylerastro/NCU_TOM.git`
+```bash
+git clone https://github.com/Tylerastro/NCU_TOM.git
+cd NCU_TOM
+```
 
-2. Build the docker image
-我們建議使用docker-compose.local.yml在本地端啟動並開發。
+2. 複製環境設定檔（首次設定）
+```bash
+cp .env.example .env.local
+```
 
-建立docker image 使用`docker compose -f docker-compose.local.yml --env-file .env.local build`
+3. 啟動開發環境（含檔案監聽）
+```bash
+docker compose -f docker-compose.local.yml up --watch
+```
 
-3. Start the docker container
+4. 造訪 [localhost:3000](http://localhost:3000) 觀看目前的版本。
 
-啟動docker container 使用`docker compose -f docker-compose.local.yml --env-file .env.local up --watch` 啟動檔案監聽，在開發時可以即時看到異動。
+### 後端開發 (Django)
+```bash
+cd backend
 
-4. 造訪 [localhost:3000](http://localhost:3000)觀看目前的版本。
+# 安裝套件
+uv add [package-name]
+
+# 啟動開發伺服器
+uv run python manage.py runserver
+
+# 執行測試
+uv run pytest
+
+# 執行資料庫遷移
+uv run python manage.py migrate
+
+# 建立本地超級使用者
+uv run python manage.py create_local_superuser
+```
+
+### 前端開發 (Next.js)
+```bash
+cd frontend
+
+# 開發伺服器
+npm run dev
+
+# 建置生產版本
+npm run build
+
+# 程式碼檢查
+npm run lint
+
+# 啟動生產伺服器
+npm start
+```
 
 ## 開發與測試
 
@@ -93,23 +153,85 @@ uv run pytest -m "astronomical" # 天文專用測試
 
 NCU TOM is an Observation Management System developed specifically for astronomers, aimed at assisting in managing observation targets, scheduling, data recording, and analysis. Visit [NCU TOM](https://tom.astro.ncu.edu.tw) to view the latest online version.
 
+## Quick Start
+
+```bash
+git clone https://github.com/Tylerastro/NCU_TOM.git
+cd NCU_TOM
+make setup    # Create .env.local config
+make dev      # Start development environment
+```
+
+Common commands:
+| Command | Description |
+|---------|-------------|
+| `make` | Show all available commands |
+| `make down` | Stop containers |
+| `make logs` | View logs |
+| `make shell-django` | Open Django shell |
+| `make shell-db` | Open PostgreSQL console |
+| `make test` | Run tests |
+
 ## Installation
 
 > The current CI process supports Python 3.11, 3.12, and Node 21+
 
-### Docker compose
+### Docker Compose (Recommended)
 
 1. Clone the Repo
-`git clone https://github.com/Tylerastro/NCU_TOM.git`
+```bash
+git clone https://github.com/Tylerastro/NCU_TOM.git
+cd NCU_TOM
+```
 
-2. Build the docker image
-Use `docker compose -f docker-compose.local.yml --env-file .env.local build` to build the docker image.
+2. Copy environment template (first time only)
+```bash
+cp .env.example .env.local
+```
 
-3. Start the docker container
+3. Start full stack with Docker (includes file watching)
+```bash
+docker compose -f docker-compose.local.yml up --watch
+```
 
-Use `docker compose -f docker-compose.local.yml --env-file .env.local up --watch` to start the docker container.
+4. Visit [localhost:3000](http://localhost:3000) to view the application.
 
-4. Visit [localhost:3000](http://localhost:3000) to view the latest online version.
+### Backend Development (Django)
+```bash
+cd backend
+
+# Install dependencies
+uv add [package-name]
+
+# Run Django development server
+uv run python manage.py runserver
+
+# Run all tests with pytest
+uv run pytest
+
+# Run migrations
+uv run python manage.py migrate
+
+# Create superuser for local development
+uv run python manage.py create_local_superuser
+```
+
+### Frontend Development (Next.js)
+```bash
+cd frontend
+
+# Development server
+npm run dev
+
+# Build production
+npm run build
+
+# Lint code
+npm run lint
+
+# Start production server
+npm start
+```
 
 ## Development & Testing
 
@@ -131,7 +253,6 @@ uv run pytest -m "api"          # API endpoint tests
 uv run pytest -m "security"     # Security tests
 uv run pytest -m "astronomical" # Astronomy-specific tests
 ```
-
 
 # Join the Development Team
 
