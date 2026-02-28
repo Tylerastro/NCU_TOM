@@ -57,9 +57,9 @@ def test_multiple_users(user, admin_user, faculty_user):
     User = get_user_model()
     
     assert User.objects.count() == 3
-    assert user.role == User.roles.USER
-    assert admin_user.role == User.roles.ADMIN
-    assert faculty_user.role == User.roles.FACULTY
+    assert user.role == User.Roles.USER
+    assert admin_user.role == User.Roles.ADMIN
+    assert faculty_user.role == User.Roles.FACULTY
 
 
 # ============================================================================
