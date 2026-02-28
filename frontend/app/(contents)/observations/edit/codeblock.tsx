@@ -1,5 +1,4 @@
-import { getLulinCode } from "@/apis/observations/getLulinCode";
-import { saveLulinCode } from "@/apis/observations/saveLulinCode";
+import { getLulinCode, saveLulinCode } from "@/apis/observations";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 

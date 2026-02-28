@@ -1,4 +1,4 @@
-import { bulkCreate } from "@/apis/targets/bulkTargetCreate";
+import { bulkCreate } from "@/apis/targets";
 import React, { useState } from "react";
 import { toast } from "sonner";
 

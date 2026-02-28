@@ -1,6 +1,4 @@
-import { getLulinCode } from "@/apis/observations/getLulinCode";
-import { putObservation } from "@/apis/observations/putObservation";
-import { postObservationMessages } from "@/apis/observations/putObservationMessage";
+import { getLulinCode, putObservation, postObservationMessages } from "@/apis/observations";
 import {
   AlertDialog,
   AlertDialogAction,

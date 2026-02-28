@@ -3,16 +3,10 @@ import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider"
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cn } from "@/components/utils";
+import { fontVariables } from "@/lib/fonts";
 import type { Metadata } from "next";
-import { Gowun_Batang } from "next/font/google";
 import NextAuthProvider from "./SessionProvider";
 import "./globals.css";
-
-const gowunBatang = Gowun_Batang({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-gowun-batang",
-});
 
 export const metadata: Metadata = {
   title: "NCU Tom",
@@ -33,7 +27,7 @@ export default function RootLayout({
         <body
           className={cn(
             "font-sans antialiased bg-linear-to-b from-background to-secondary",
-            gowunBatang.variable
+            fontVariables
           )}
         >
           <NextAuthProvider>

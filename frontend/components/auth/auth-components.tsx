@@ -15,7 +15,7 @@ export async function GitHubSignIn() {
         disabled
         type="submit"
         variant={"outline"}
-        className=" w-full bg-gray-900"
+        className="w-full bg-gray-800/50 text-gray-300 border-gray-700 hover:bg-gray-700/50 hover:text-gray-100 hover:border-gray-600 transition-all duration-200 disabled:opacity-40"
       >
         <Github className="mr-2 h-4 w-4" />
         Sign in with GitHub
@@ -32,7 +32,12 @@ export async function GoogleSignIn() {
         await signIn("google", { redirectTo: "/" });
       }}
     >
-      <Button type="submit" variant={"outline"} className=" w-full bg-gray-900">
+      <Button
+        type="submit"
+        variant={"outline"}
+        disabled
+        className="w-full bg-gray-800/50 text-gray-300 border-gray-700 hover:bg-gray-700/50 hover:text-gray-100 hover:border-gray-600 transition-all duration-200"
+      >
         <svg
           className="mr-2 h-4 w-4"
           viewBox="0 0 24 24"

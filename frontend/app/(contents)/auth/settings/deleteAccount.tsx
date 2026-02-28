@@ -1,5 +1,5 @@
 "use client";
-import { deleteUser } from "@/apis/auth/deleteUser";
+import { deleteUser } from "@/apis/auth";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";

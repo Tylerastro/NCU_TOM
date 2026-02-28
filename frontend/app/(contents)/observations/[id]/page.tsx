@@ -1,5 +1,6 @@
-"use client";
-import { putObservation } from "@/apis/observations/putObservation";
+"use client";;
+import { use } from "react";
+import { putObservation, getObservation } from "@/apis/observations";
 import {
   Select,
   SelectContent,
@@ -12,8 +13,6 @@ import { Status } from "@/models/enums";
 import { Observation } from "@/models/observations";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { getObservation } from "@/apis/observations/getObservation";
 import PageContent from "./pageContent";
 
 function LoadingSkeleton() {
@@ -28,7 +27,8 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Page({ params }: { params: { id: number } }) {
+export default function Page(props: { params: Promise<{ id: number }> }) {
+  const params = use(props.params);
   const { data: observation, isFetching } = useQuery({
     queryKey: ["observations"],
     queryFn: () =>

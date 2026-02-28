@@ -4,15 +4,12 @@ import { lazy, useEffect, useState, Suspense } from "react";
 import { toast } from "sonner";
 import { handleApiError } from "@/utils/errorHandler";
 
-import { putTarget } from "@/apis/targets/putTarget";
-import { PutTarget, Target } from "@/models/targets";
+import { getTarget, putTarget, getTargetSimbad } from "@/apis/targets";
+import { PutTarget } from "@/models/targets";
 import { CoordCard, ExternalLinksCard, SimbadCard } from "./cards";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-
-import { getTargetSimbad } from "@/apis/targets/getTargetSimbad";
 import { Status } from "@/models/enums";
 import {
   convertHourAngleToDegrees,
@@ -54,28 +51,11 @@ function ObservationCardSkeleton() {
   );
 }
 
-function TagsCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="font-medium">Tags</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-1">
-          <Skeleton className="h-6 w-16" />
-          <Skeleton className="h-6 w-20" />
-          <Skeleton className="h-6 w-12" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function AladinViewerSkeleton() {
   return (
-    <Card className="col-span-3">
+    <Card className="md:col-span-2">
       <CardHeader>
-        <CardTitle>Overview</CardTitle>
+        <CardTitle>Sky View</CardTitle>
       </CardHeader>
       <CardContent className="p-2">
         <Skeleton className="h-[400px] w-full" />
@@ -102,15 +82,13 @@ function SimbadCardSkeleton() {
   );
 }
 
-export default function Overview({
-  targetId,
-  target,
-  refetch,
-}: {
-  targetId: number;
-  target?: Target;
-  refetch: () => void;
-}) {
+export default function Overview({ targetId }: { targetId: number }) {
+  // Fetch target data - React Query deduplicates requests with the same queryKey
+  const { data: target, refetch } = useQuery({
+    queryKey: ["targets", targetId],
+    queryFn: () => getTarget(targetId),
+  });
+
   const { data: simbadData, isLoading: simbadLoading } = useQuery({
     queryKey: ["targets", targetId, "simbad"],
     queryFn: () => getTargetSimbad(targetId),
@@ -179,21 +157,21 @@ export default function Overview({
   const isLoading = !target;
 
   return (
-    <TabsContent value="overview" className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
           <CoordCardSkeleton />
         ) : (
-          CoordCard(
-            isEditing,
-            handleSaveClick,
-            handleEditClick,
-            editedRA,
-            setEditedRA,
-            target,
-            editedDec,
-            setEditedDec
-          )
+          <CoordCard
+            isEditing={isEditing}
+            handleSaveClick={handleSaveClick}
+            handleEditClick={handleEditClick}
+            editedRA={editedRA}
+            setEditedRA={setEditedRA}
+            target={target}
+            editedDec={editedDec}
+            setEditedDec={setEditedDec}
+          />
         )}
 
         {isLoading ? (
@@ -219,7 +197,6 @@ export default function Overview({
           </Card>
         )}
 
-
         {isLoading ? (
           <CoordCardSkeleton />
         ) : (
@@ -228,11 +205,11 @@ export default function Overview({
       </div>
 
       {/* Aladin Viewer with Suspense */}
-      <div className="grid max-xl: gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Suspense fallback={<AladinViewerSkeleton />}>
-          <Card className="col-span-3">
+          <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle>Sky View</CardTitle>
             </CardHeader>
             <CardContent className="p-2">
               <AladinViewer coord={target?.coordinates} fov={0.2} />
@@ -246,6 +223,6 @@ export default function Overview({
           <SimbadCard data={simbadData} />
         )}
       </div>
-    </TabsContent>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { getTargets } from "@/apis/targets/getTargets";
+import { getTargets } from "@/apis/targets";
 import { Button } from "@/components/ui/button";
 import {
   Command,

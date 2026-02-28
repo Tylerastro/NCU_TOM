@@ -1,5 +1,4 @@
-import { getLulinCode } from "@/apis/observations/getLulinCode";
-import { putObservation } from "@/apis/observations/putObservation";
+import { getLulinCode, putObservation } from "@/apis/observations";
 import { ObservationUpdate } from "@/models/observations";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

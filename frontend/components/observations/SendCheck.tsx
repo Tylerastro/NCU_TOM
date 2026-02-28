@@ -1,4 +1,4 @@
-import { putObservation } from "@/apis/observations/putObservation";
+import { putObservation } from "@/apis/observations";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -1,5 +1,5 @@
 "use client";
-import { updateUser } from "@/apis/auth/updateUser";
+import { updateUser } from "@/apis/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,

@@ -207,7 +207,7 @@ export default function PageContent({
         </Card>
       </div>
 
-      <div className="flex justify-center w-full py-5">
+      <div className="w-full py-5">
         <VisibilityChart observation_id={observation.id} airmass={false} />
       </div>
 

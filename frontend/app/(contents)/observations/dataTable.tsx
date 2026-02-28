@@ -77,10 +77,8 @@ export function DataTable<TData, TValue>({
   }, [table, table.getSelectedRowModel()]);
 
   return (
-    <div>
-      <div className="pb-4 flex flex-col gap-4"></div>
-      <div className="rounded-md border ">
-        <Table>
+    <div className="rounded-md border">
+      <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -132,7 +130,6 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
     </div>
   );
 }

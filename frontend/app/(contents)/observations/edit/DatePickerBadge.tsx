@@ -1,5 +1,5 @@
 "use client";
-import { putObservation } from "@/apis/observations/putObservation";
+import { putObservation } from "@/apis/observations";
 import { LocalTimeTooltip } from "@/components/LocalTimeTooltip";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";

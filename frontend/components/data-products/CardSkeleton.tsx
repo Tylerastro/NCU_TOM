@@ -1,15 +1,23 @@
-export default function CardSkeleton() {
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const CardSkeleton = () => {
   return (
-    <div className="border rounded-lg p-6 bg-background/50 flex flex-col gap-4">
-      <div className="w-1/2 h-4 bg-muted rounded animate-pulse" />
-      <div className="space-y-2">
-        <div className="w-3/4 h-3 bg-muted rounded animate-pulse" />
-        <div className="w-1/2 h-3 bg-muted rounded animate-pulse" />
-      </div>
-      <div className="mt-auto flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-        <div className="w-24 h-3 bg-muted rounded animate-pulse" />
-      </div>
-    </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-1/2 mt-1" />
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+        <div className="flex items-center justify-between pt-2">
+          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+      </CardContent>
+    </Card>
   );
-}
+};
+
+export default CardSkeleton;

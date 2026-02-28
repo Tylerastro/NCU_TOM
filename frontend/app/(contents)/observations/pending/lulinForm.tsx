@@ -1,5 +1,5 @@
 "use client";
-import { putLulinRun } from "@/apis/observations/putLulin";
+import { putLulinRun } from "@/apis/observations";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -278,7 +278,7 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     onSelect={field.onChange}
@@ -316,7 +316,7 @@ export function TargetLulinForm({ observation }: { observation: LulinRuns }) {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     onSelect={field.onChange}

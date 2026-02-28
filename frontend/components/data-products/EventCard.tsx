@@ -1,76 +1,77 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Observatory } from "@/models/enums";
-import { ETLLogs } from "@/models/helpers";
+import { ETLLogs } from "@/types/models";
 
-const TimeAgo = ({ date }: { date: Date }) => {
-  const calculateTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffInMilliseconds = now.getTime() - date.getTime();
-    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-    const diffInMonths = Math.floor(diffInDays / 30);
+interface EventCardProps {
+  event?: ETLLogs;
+}
 
-    if (diffInHours < 1) {
-      return "Less than an hour ago";
-    } else if (diffInHours < 24) {
-      return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
-    } else if (diffInDays < 30) {
-      return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
-    } else {
-      return `${diffInMonths} ${diffInMonths === 1 ? "month" : "months"} ago`;
-    }
-  };
-
-  return (
-    <span className="text-sm text-muted-foreground">
-      {calculateTimeAgo(date)}
-    </span>
-  );
-};
-
-export default function EventCard({ event }: { event?: ETLLogs }) {
+const EventCard = ({ event }: EventCardProps) => {
   if (!event) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle></CardTitle>
-          <CardDescription>No event</CardDescription>
+      <Card className="overflow-hidden opacity-50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base text-muted-foreground">
+            No Event
+          </CardTitle>
+          <CardDescription>No recent activity</CardDescription>
         </CardHeader>
-        <CardContent></CardContent>
-        <CardFooter>
-          <div className="flex items-center justify-between w-full"></div>
-        </CardFooter>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Waiting for new events...
+          </p>
+        </CardContent>
       </Card>
     );
   }
+
+  const formattedDate = new Date(event.created_at).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Event {event.name}</CardTitle>
-        <CardDescription>
-          Regularly data extraction from {Observatory[event.observatory]}
-        </CardDescription>
+    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base truncate" title={event.name}>
+            {event.name}
+          </CardTitle>
+          <Badge
+            variant={event.success ? "default" : "destructive"}
+            className="ml-2 shrink-0"
+          >
+            {event.success ? "Success" : "Failed"}
+          </Badge>
+        </div>
+        <CardDescription>Observatory {event.observatory}</CardDescription>
       </CardHeader>
       <CardContent>
-        Processed files: {event.file_processed} <br />
-        Processed rows: {event.row_processed} <br />
-        Status: {event.success ? "Success" : "Failed"}
-      </CardContent>
-      <CardFooter>
-        <div className="flex items-center justify-between w-full">
-          <TimeAgo date={new Date(event.created_at)} />
-          {/* <Link href="#" className="text-primary" prefetch={false}>
-            View Dataset
-          </Link> */}
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Files Processed</span>
+            <span className="font-medium">{event.file_processed}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Rows Processed</span>
+            <span className="font-medium">{event.row_processed}</span>
+          </div>
+          <div className="pt-2 text-xs text-muted-foreground">
+            {formattedDate}
+          </div>
         </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
-}
+};
+
+export default EventCard;

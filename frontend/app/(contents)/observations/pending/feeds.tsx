@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import React from "react";
 import { TextareaForm } from "./comments";
-import { getObservation } from "@/apis/observations/getObservation";
+import { getObservation } from "@/apis/observations";
 export default function Feeds(props: { observation_id: number }) {
   const { data: observation } = useQuery({
     queryKey: ["observations", props.observation_id],

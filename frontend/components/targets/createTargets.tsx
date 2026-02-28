@@ -1,5 +1,6 @@
 "use client";
-import { createTarget } from "@/apis/targets/createTarget";
+import { createTarget } from "@/apis/targets";
+import { useResolveTargetUrl } from "@/features/targets/hooks";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/tooltip";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -39,6 +41,8 @@ import FileUpload from "./fileUpload";
 
 export function NewTargetFrom({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
+  const [lookupUrl, setLookupUrl] = useState("");
+  const resolveMutation = useResolveTargetUrl();
 
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof formSchema>) => {
@@ -81,6 +85,8 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      ra: "" as unknown as number,
+      dec: "" as unknown as number,
     },
   });
 
@@ -99,6 +105,35 @@ export function NewTargetFrom({ refetch }: { refetch: () => void }) {
             csv file for bulk upload.
           </DialogDescription>
         </DialogHeader>
+        <div className="flex gap-2">
+          <Input
+            className="text-primary-foreground"
+            placeholder="Paste a SIMBAD URL to auto-fill..."
+            value={lookupUrl}
+            onChange={(e) => setLookupUrl(e.target.value)}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!lookupUrl || resolveMutation.isPending}
+            onClick={() => {
+              resolveMutation.mutate(lookupUrl, {
+                onSuccess: (data) => {
+                  form.setValue("name", data.name);
+                  form.setValue("ra", data.ra);
+                  form.setValue("dec", data.dec);
+                  toast.success(`Resolved "${data.name}" from ${data.source}`);
+                },
+              });
+            }}
+          >
+            {resolveMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((values) => {

@@ -1,4 +1,4 @@
-import { getLulinTargetData } from "@/apis/dataProducts/getLulinTargetData";
+import { getLulinTargetData } from "@/apis/dataProducts";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { TabsContent } from "@/components/ui/tabs";
 import { LulinFilter } from "@/models/enums";
 import { formatMJD, formatUTC } from "@/utils/timeFormatter";
 import { CalendarIcon } from "@radix-ui/react-icons";
@@ -123,11 +122,9 @@ export default function Analytics({ targetId }: { targetId: number }) {
 
   if (rawData === undefined || rawData.length === 0) {
     return (
-      <TabsContent value="analytics">
-        <div className="text-center">
-          <p className="text-3xl font-bold">No data</p>
-        </div>
-      </TabsContent>
+      <div className="text-center py-8">
+        <p className="text-3xl font-bold">No data</p>
+      </div>
     );
   }
 
@@ -163,17 +160,14 @@ export default function Analytics({ targetId }: { targetId: number }) {
   // Add loading state check
   if (isFetching || !dateExtent || Object.keys(visibleFilters).length === 0) {
     return (
-      <TabsContent value="analytics">
-        <div className="flex justify-center items-center h-64">
-          <p>Loading analytics data...</p> {/* Or a spinner component */}
-        </div>
-      </TabsContent>
+      <div className="flex justify-center items-center h-64">
+        <p>Loading analytics data...</p>
+      </div>
     );
   }
 
   return (
-    <TabsContent value="analytics">
-      <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 lg:col-span-3">
           <Card className="p-4">
             <h3 className="text-lg font-medium mb-4">Filter Options</h3>
@@ -384,6 +378,5 @@ export default function Analytics({ targetId }: { targetId: number }) {
           </ChartContainer>
         </div>
       </div>
-    </TabsContent>
   );
 }

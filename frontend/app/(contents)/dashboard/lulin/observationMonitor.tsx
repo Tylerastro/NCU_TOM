@@ -1,5 +1,5 @@
 "use client";
-import { getObservations } from "@/apis/observations/getObservations";
+import { getObservations } from "@/apis/observations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Status } from "@/models/enums";

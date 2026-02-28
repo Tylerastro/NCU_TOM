@@ -1,8 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { createNewTag } from "@/apis/tags/createTag";
-import { getTags } from "@/apis/tags/getTags";
+import { createNewTag, getTags } from "@/apis/tags";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {

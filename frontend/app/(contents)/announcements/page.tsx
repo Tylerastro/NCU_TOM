@@ -1,8 +1,14 @@
-"use server";
 import { AccordionAnnoucemnets } from "./accor";
 import { UserRole } from "@/models/enums";
-import { NewAnnouncementForm } from "./createAnnouncement";
+import dynamic from "next/dynamic";
 import { auth } from "@/auth";
+
+// Dynamic import with ssr: false to prevent hydration mismatch
+// caused by Radix UI generating different IDs on server vs client
+const NewAnnouncementForm = dynamic(
+  () => import("./createAnnouncement").then((mod) => mod.NewAnnouncementForm),
+  { ssr: false }
+);
 
 export default async function Announcements() {
   const session = await auth();
@@ -10,9 +16,7 @@ export default async function Announcements() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Announcements
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Announcements</h1>
           <p className="text-muted-foreground">
             Stay updated with the latest news and information
           </p>

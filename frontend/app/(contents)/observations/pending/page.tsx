@@ -1,5 +1,5 @@
 "use client";
-import { putObservation } from "@/apis/observations/putObservation";
+import { putObservation } from "@/apis/observations";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserRole } from "@/models/enums";

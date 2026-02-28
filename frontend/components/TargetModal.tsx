@@ -1,8 +1,8 @@
 import React, { forwardRef, useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { SimpleTarget } from "@/models/targets";
-import { getTargets } from "@/apis/targets/getTargets";
+import type { Target } from "@/types";
+import { getTargets } from "@/apis/targets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,7 +34,7 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
     const { data: allTargets, isLoading } = useQuery({
       queryKey: ["all-targets"],
       queryFn: async () => {
-        let allResults: SimpleTarget[] = [];
+        let allResults: Target[] = [];
         let currentPage = 1;
         let hasMore = true;
 
@@ -134,7 +134,7 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
                 <p className="text-center text-sm text-gray-500">Loading...</p>
               ) : filteredTargets.length > 0 ? (
                 filteredTargets
-                  .filter((target) => target.id !== undefined)
+                  .filter((target): target is Target & { id: number } => target.id !== undefined)
                   .map((target, index) => (
                     <div
                       key={target.id}
@@ -142,7 +142,7 @@ const TargetModal = forwardRef<HTMLDivElement, TargetOptionsProps>(
                         (targetRefs.current[index] = el);
                       }}
                       className="flex items-center justify-between py-2 px-2 hover:bg-gray-700 rounded cursor-pointer opacity-0"
-                      onClick={() => handleTargetToggle(target?.id)}
+                      onClick={() => handleTargetToggle(target.id)}
                     >
                       <span>{target.name}</span>
                       {selectedTargets.includes(target.id) && (

@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/Accordion";
 
-import { getAnnouncements } from "@/apis/announcements/getAnnouncements";
+import { getAnnouncements } from "@/apis/announcements";
 import { Announcements } from "@/models/helpers";
 import { useQuery } from "@tanstack/react-query";
 

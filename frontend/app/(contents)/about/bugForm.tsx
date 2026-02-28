@@ -1,5 +1,5 @@
 "use client";
-import { createIssue } from "@/apis/github/createIssue";
+import { createIssue } from "@/apis/github";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

@@ -23,16 +23,27 @@ function formatCoordinate(
   return `${parts[0]}:${parts[1]}:${formattedLastPart}`;
 }
 
-function CoordCard(
-  isEditing: boolean,
-  handleSaveClick: () => void,
-  handleEditClick: () => void,
-  editedRA: string | undefined,
-  setEditedRA: React.Dispatch<React.SetStateAction<string | undefined>>,
-  target: Target | undefined,
-  editedDec: string | undefined,
-  setEditedDec: React.Dispatch<React.SetStateAction<string | undefined>>
-) {
+interface CoordCardProps {
+  isEditing: boolean;
+  handleSaveClick: () => void;
+  handleEditClick: () => void;
+  editedRA: string | undefined;
+  setEditedRA: React.Dispatch<React.SetStateAction<string | undefined>>;
+  target: Target | undefined;
+  editedDec: string | undefined;
+  setEditedDec: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+function CoordCard({
+  isEditing,
+  handleSaveClick,
+  handleEditClick,
+  editedRA,
+  setEditedRA,
+  target,
+  editedDec,
+  setEditedDec,
+}: CoordCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -91,7 +102,7 @@ function CoordCard(
 
 import { ExternalLink } from "lucide-react";
 
-export default function ExternalLinksCard({
+function ExternalLinksCard({
   targetName,
 }: {
   targetName: string;
@@ -99,7 +110,7 @@ export default function ExternalLinksCard({
   const simbad_url = `https://simbad.u-strasbg.fr/simbad/sim-basic?Ident=${targetName}&submit=SIMBAD+search`;
   const ned_url = `https://ned.ipac.caltech.edu/byname?objname=${targetName}&hconst=67.8&omegam=0.308&omegav=0.692&wmap=4&corr_z=1`;
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">External Links</CardTitle>
       </CardHeader>

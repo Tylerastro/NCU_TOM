@@ -1,5 +1,5 @@
 "use client";
-import { getLulin } from "@/apis/observations/getLulin";
+import { getLulin, getObservation } from "@/apis/observations";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,11 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-import { getObservation } from "@/apis/observations/getObservation";
 import VisibilityChart from "@/components/observations/VisibilityPlot";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LulinRuns, Observation } from "@/models/observations";
 import { Comments } from "@/models/helpers";
@@ -245,25 +243,25 @@ export default function LulinPage(props: { observation_id: number }) {
           </div>
         </div>
 
+        {/* Visibility Chart Section - Full width */}
+        <div className="bg-card/50 rounded-lg border border-border/50 p-4 sm:p-6 mt-6">
+          <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
+            Visibility Chart
+          </h2>
+          {isFetching ? (
+            <LoadingSkeleton />
+          ) : (
+            <VisibilityChart
+              observation_id={props.observation_id}
+              airmass={true}
+            />
+          )}
+        </div>
+
         {/* Main Content Grid Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 py-6">
           {/* Left Column - Primary content */}
           <div className="xl:col-span-2 space-y-6">
-            {/* Visibility Chart Section */}
-            <div className="bg-card/50 rounded-lg border border-border/50 p-6">
-              <h2 className="text-xl font-semibold mb-4 text-primary-foreground">
-                Visibility Chart
-              </h2>
-              {isFetching ? (
-                <LoadingSkeleton />
-              ) : (
-                <VisibilityChart
-                  observation_id={props.observation_id}
-                  airmass={true}
-                />
-              )}
-            </div>
-
             {/* Observation Runs Section */}
             <div className="bg-card/50 rounded-lg border border-border/50 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -277,6 +275,7 @@ export default function LulinPage(props: { observation_id: number }) {
                     </Button>
                   </SheetTrigger>
                   <SheetContent>
+                    <SheetTitle className="sr-only">Add Run</SheetTitle>
                     <NewLulinRun observation={observation} refetch={refetch} />
                   </SheetContent>
                 </Sheet>

@@ -1,6 +1,6 @@
 "use client";
 
-import { getCodePreview } from "@/apis/observations/getCodePreview";
+import { getCodePreview } from "@/apis/observations";
 import {
   Dialog,
   DialogContent,

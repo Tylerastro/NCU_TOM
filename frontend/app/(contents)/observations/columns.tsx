@@ -1,6 +1,6 @@
 "use client";
 
-import { duplicateObservation } from "@/apis/observations/duplitcateObservation";
+import { duplicateObservation } from "@/apis/observations";
 import LocalTimeTooltip from "@/components/LocalTimeTooltip";
 import StatusBadge from "@/components/Status";
 import { badgeVariants } from "@/components/ui/badge";

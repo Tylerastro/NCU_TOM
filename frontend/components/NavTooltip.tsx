@@ -1,13 +1,8 @@
-import { auth, signOut } from "@/auth";
+"use client";
+
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-const settings = [
-  { name: "Dashboard", url: "/dashboard/", disabled: false },
-  { name: "Settings", url: "/auth/settings", disabled: true },
-];
-
-import { Button as ButtonUI } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,30 +13,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default async function NavTooltip() {
-  const session = await auth();
-  return session ? AuthTooltip(session) : UnAuthTooltip();
-}
+const settings = [
+  { name: "Dashboard", url: "/dashboard/", disabled: false },
+  { name: "Settings", url: "/auth/settings", disabled: true },
+];
 
-function UnAuthTooltip() {
-  return (
-    <>
+export default function NavTooltip() {
+  const { data: session } = useSession();
+
+  if (!session) {
+    return (
       <Button asChild variant="ghost">
         <Link href="/auth/signin">Login</Link>
       </Button>
-    </>
-  );
-}
+    );
+  }
 
-function AuthTooltip(session: any) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ButtonUI className="text-lg" variant="ghost">
-          {session?.user.username && session?.user.is_active
-            ? `Hi, ${session?.user.username}`
+        <Button className="text-lg" variant="ghost">
+          {session?.user?.username && session?.user?.is_active
+            ? `Hi, ${session?.user?.username}`
             : "GUEST"}
-        </ButtonUI>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -49,23 +44,16 @@ function AuthTooltip(session: any) {
         <DropdownMenuGroup>
           {settings.map((setting) => (
             <Link key={setting.name} href={setting.url} passHref>
-              <DropdownMenuItem key={setting.name} disabled={setting.disabled}>
+              <DropdownMenuItem disabled={setting.disabled}>
                 {setting.name}
               </DropdownMenuItem>
             </Link>
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <form
-          action={async (formData) => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        >
-          <button className="w-full" type="submit">
-            <DropdownMenuItem>logout</DropdownMenuItem>
-          </button>
-        </form>
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+          logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

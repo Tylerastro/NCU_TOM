@@ -1,5 +1,4 @@
-import { getLulin } from "@/apis/observations/getLulin";
-import { getObservation } from "@/apis/observations/getObservation";
+import { getLulin, getObservation } from "@/apis/observations";
 import VisibilityChart from "@/components/observations/VisibilityPlot";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -160,7 +159,7 @@ export default function Lulin(props: { observation_id: number }) {
       </div>
 
       {dataReady ? (
-        <div className="flex justify-center w-full h-svh py-5">
+        <div className="w-full py-5">
           <VisibilityChart
             observation_id={props.observation_id}
             airmass={true}

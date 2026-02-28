@@ -1,4 +1,4 @@
-import { createLulin } from "@/apis/observations/createLulin";
+import { createLulin, deleteLulin, putLulinRun } from "@/apis/observations";
 import {
   Table,
   TableBody,
@@ -12,9 +12,6 @@ import gsap from "gsap";
 import { CircleX, Files } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
-
-import { deleteLulin } from "@/apis/observations/deleteLulinRun";
-import { putLulinRun } from "@/apis/observations/putLulin";
 import { LulinFilter, LulinInstrument } from "@/models/enums";
 import { useEffect, useMemo, useRef } from "react";
 import InputCell from "./InputTableCell";

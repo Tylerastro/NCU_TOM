@@ -1,6 +1,6 @@
 "use client";
 
-import { postObservationMessages } from "@/apis/observations/putObservationMessage";
+import { postObservationMessages } from "@/apis/observations";
 import { Button } from "@/components/ui/button";
 import {
   Form,

@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteComment } from "@/apis/observations/deleteComment";
+import { deleteComment } from "@/apis/observations";
 import {
   AlertDialog,
   AlertDialogAction,

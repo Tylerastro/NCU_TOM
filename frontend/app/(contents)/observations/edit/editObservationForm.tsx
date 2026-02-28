@@ -1,4 +1,4 @@
-import { putObservation } from "@/apis/observations/putObservation";
+import { putObservation } from "@/apis/observations";
 import TargetModal from "@/components/TargetModal";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -206,7 +206,7 @@ export function EditObservationFrom({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent align="start">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -245,7 +245,7 @@ export function EditObservationFrom({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent align="start">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
